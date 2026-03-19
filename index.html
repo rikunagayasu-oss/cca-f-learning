@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA-F 学習サイト — Claude Certified Architect Foundations</title>
+<style>
+  :root {
+    --primary: #D97706;
+    --primary-light: #FEF3C7;
+    --primary-dark: #92400E;
+    --accent: #7C3AED;
+    --accent-light: #EDE9FE;
+    --bg: #F9FAFB;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --success: #059669;
+    --success-light: #D1FAE5;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --info: #2563EB;
+    --info-light: #DBEAFE;
+    --sidebar-w: 280px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  /* Layout */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: var(--sidebar-w); background: #1F2937; color: #F9FAFB; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100; transition: transform .3s; }
+  .sidebar.closed { transform: translateX(-100%); }
+  .main { margin-left: var(--sidebar-w); flex: 1; padding: 2rem 3rem; max-width: 900px; transition: margin-left .3s; }
+  .main.full { margin-left: 0; }
+
+  /* Sidebar */
+  .sidebar-header { padding: 1.5rem; border-bottom: 1px solid #374151; }
+  .sidebar-header h1 { font-size: 1.1rem; font-weight: 700; color: #F59E0B; }
+  .sidebar-header p { font-size: .75rem; color: #9CA3AF; margin-top: .25rem; }
+  .nav-section { padding: .75rem 0; }
+  .nav-section-title { padding: .5rem 1.5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: #6B7280; font-weight: 600; }
+  .nav-item { display: flex; align-items: center; padding: .6rem 1.5rem; cursor: pointer; transition: background .15s; font-size: .9rem; gap: .6rem; }
+  .nav-item:hover { background: #374151; }
+  .nav-item.active { background: #374151; border-left: 3px solid #F59E0B; }
+  .nav-item .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .nav-item .status-dot.completed { background: #10B981; }
+  .nav-item .status-dot.in-progress { background: #F59E0B; }
+  .nav-item .status-dot.locked { background: #4B5563; }
+  .nav-item .module-label { flex: 1; }
+  .nav-item .module-pct { font-size: .75rem; color: #6B7280; }
+
+  /* Progress bar in sidebar */
+  .sidebar-progress { padding: 1rem 1.5rem; border-top: 1px solid #374151; }
+  .sidebar-progress-label { font-size: .75rem; color: #9CA3AF; margin-bottom: .4rem; }
+  .progress-bar { background: #374151; border-radius: 4px; height: 6px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #F59E0B, #10B981); border-radius: 4px; transition: width .5s ease; }
+
+  /* Toggle button */
+  .sidebar-toggle { display: none; position: fixed; top: 1rem; left: 1rem; z-index: 200; background: #1F2937; color: white; border: none; border-radius: 8px; padding: .5rem .75rem; cursor: pointer; font-size: 1.2rem; }
+
+  /* Cards & Content */
+  .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  .card h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); }
+  .card h3 { font-size: 1.1rem; margin: 1.5rem 0 .75rem; color: var(--primary-dark); }
+  .card p { margin-bottom: .75rem; }
+
+  /* Module header */
+  .module-header { margin-bottom: 2rem; }
+  .module-header .week-badge { display: inline-block; background: var(--primary-light); color: var(--primary-dark); font-size: .8rem; font-weight: 600; padding: .25rem .75rem; border-radius: 999px; margin-bottom: .5rem; }
+  .module-header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: .25rem; }
+  .module-header .subtitle { color: var(--text-light); font-size: 1rem; }
+  .module-header .domain-tag { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: .75rem; font-weight: 600; padding: .2rem .6rem; border-radius: 999px; margin-top: .5rem; }
+
+  /* Learning Objectives */
+  .objectives { background: var(--info-light); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .objectives h3 { color: var(--info); font-size: .95rem; margin-bottom: .5rem; }
+  .objectives ul { padding-left: 1.25rem; }
+  .objectives li { margin-bottom: .3rem; font-size: .9rem; }
+
+  /* Key concept box */
+  .concept-box { border-left: 4px solid var(--primary); background: var(--primary-light); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .concept-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+
+  /* Comparison table */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9rem; }
+  .compare-table th { background: #F3F4F6; text-align: left; padding: .6rem .8rem; border-bottom: 2px solid var(--border); font-weight: 600; }
+  .compare-table td { padding: .6rem .8rem; border-bottom: 1px solid var(--border); }
+  .compare-table tr:hover td { background: #F9FAFB; }
+
+  /* Quiz */
+  .quiz-section { border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; background: #FAFAFF; }
+  .quiz-section h3 { color: var(--accent); margin-bottom: 1rem; font-size: 1.1rem; }
+  .quiz-question { margin-bottom: 1.5rem; }
+  .quiz-question .q-text { font-weight: 600; margin-bottom: .75rem; font-size: .95rem; }
+  .quiz-option { display: block; padding: .6rem 1rem; margin: .3rem 0; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .9rem; background: white; }
+  .quiz-option:hover { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.correct { border-color: var(--success); background: var(--success-light); }
+  .quiz-option.incorrect { border-color: var(--danger); background: var(--danger-light); }
+  .quiz-option.disabled { pointer-events: none; opacity: .8; }
+  .quiz-explanation { margin-top: .5rem; padding: .75rem 1rem; border-radius: 8px; font-size: .85rem; display: none; }
+  .quiz-explanation.show { display: block; }
+  .quiz-explanation.correct { background: var(--success-light); color: #065F46; }
+  .quiz-explanation.incorrect { background: var(--danger-light); color: #991B1B; }
+
+  .quiz-result { margin-top: 1rem; padding: 1rem; border-radius: 8px; text-align: center; font-weight: 600; }
+  .quiz-result.good { background: var(--success-light); color: #065F46; }
+  .quiz-result.needs-work { background: var(--primary-light); color: var(--primary-dark); }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: .9rem; cursor: pointer; border: none; transition: all .15s; }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-accent { background: var(--accent); color: white; }
+  .btn-accent:hover { background: #6D28D9; }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-group { display: flex; gap: .75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+  /* Dashboard */
+  .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--card); border-radius: 10px; padding: 1.25rem; border: 1px solid var(--border); text-align: center; }
+  .stat-card .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
+  .stat-card .stat-label { font-size: .8rem; color: var(--text-light); margin-top: .25rem; }
+
+  .domain-chart { display: flex; flex-direction: column; gap: .6rem; }
+  .domain-row { display: flex; align-items: center; gap: .75rem; font-size: .85rem; }
+  .domain-row .domain-name { width: 180px; flex-shrink: 0; }
+  .domain-row .domain-bar { flex: 1; height: 24px; background: #E5E7EB; border-radius: 4px; overflow: hidden; position: relative; }
+  .domain-row .domain-bar-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+  .domain-row .domain-bar-label { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: .75rem; font-weight: 600; }
+
+  /* Section navigation */
+  .section-nav { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .section-tab { padding: .4rem 1rem; border-radius: 999px; border: 2px solid var(--border); background: white; cursor: pointer; font-size: .85rem; font-weight: 500; transition: all .15s; }
+  .section-tab:hover { border-color: var(--primary); }
+  .section-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* Tip box */
+  .tip-box { background: #ECFDF5; border-left: 4px solid var(--success); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .tip-box .label { font-size: .75rem; font-weight: 700; color: var(--success); text-transform: uppercase; }
+
+  /* Warning box */
+  .warn-box { background: #FEF3C7; border-left: 4px solid var(--primary); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .warn-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; }
+
+  /* Scenario cards */
+  .scenario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .scenario-card { border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+  .scenario-card .scenario-num { font-size: .75rem; font-weight: 700; color: var(--accent); }
+  .scenario-card h4 { font-size: .95rem; margin: .25rem 0 .5rem; }
+  .scenario-card p { font-size: .85rem; color: var(--text-light); }
+
+  /* Glossary */
+  .glossary-item { margin-bottom: 1rem; }
+  .glossary-term { font-weight: 700; color: var(--accent); font-size: .95rem; }
+  .glossary-def { font-size: .9rem; margin-top: .15rem; }
+  .glossary-en { font-size: .8rem; color: var(--text-light); font-style: italic; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; padding: 1rem 1.25rem; padding-top: 4rem; }
+    .sidebar-toggle { display: block; }
+    .scenario-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Print */
+  @media print { .sidebar, .sidebar-toggle { display: none; } .main { margin-left: 0; } }
+</style>
+</head>
+<body>
+
+<button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+<div class="app">
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>CCA-F 学習サイト</h1>
+    <p>Claude Certified Architect — Foundations</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">ダッシュボード</div>
+    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <span>&#128200;</span>
+      <span class="module-label">学習ダッシュボード</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Week 1-2：基礎</div>
+    <div class="nav-item" onclick="showPage('m0')" id="nav-m0">
+      <span class="status-dot" id="dot-m0"></span>
+      <span class="module-label">M0: 導入 — 全体像と資格</span>
+      <span class="module-pct" id="pct-m0"></span>
+    </div>
+    <div class="nav-item" onclick="showPage('m1')" id="nav-m1">
+      <span class="status-dot" id="dot-m1"></span>
+      <span class="module-label">M1: Claude製品群を理解する</span>
+      <span class="module-pct" id="pct-m1"></span>
+    </div>
+    <div class="nav-item" onclick="showPage('m2')" id="nav-m2">
+      <span class="status-dot" id="dot-m2"></span>
+      <span class="module-label">M2: プロンプトの基本</span>
+      <span class="module-pct" id="pct-m2"></span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Week 3-4：プロンプト工学</div>
+    <div class="nav-item" onclick="showPage('m3')" id="nav-m3">
+      <span class="status-dot" id="dot-m3"></span>
+      <span class="module-label">M3: システムプロンプト設計</span>
+      <span class="module-pct" id="pct-m3"></span>
+    </div>
+    <div class="nav-item" onclick="showPage('m4')" id="nav-m4">
+      <span class="status-dot" id="dot-m4"></span>
+      <span class="module-label">M4: 構造化出力とJSON</span>
+      <span class="module-pct" id="pct-m4"></span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Week 5：ツールとMCP</div>
+    <div class="nav-item" onclick="showPage('m5')" id="nav-m5">
+      <span class="status-dot" id="dot-m5"></span>
+      <span class="module-label">M5: ツール設計の基礎</span>
+      <span class="module-pct" id="pct-m5"></span>
+    </div>
+    <div class="nav-item" onclick="showPage('m6')" id="nav-m6">
+      <span class="status-dot" id="dot-m6"></span>
+      <span class="module-label">M6: MCP統合</span>
+      <span class="module-pct" id="pct-m6"></span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Week 6：Claude Code</div>
+    <div class="nav-item" onclick="showPage('m7')" id="nav-m7">
+      <span class="status-dot" id="dot-m7"></span>
+      <span class="module-label">M7: Claude Code入門</span>
+      <span class="module-pct" id="pct-m7"></span>
+    </div>
+    <div class="nav-item" onclick="showPage('m8')" id="nav-m8">
+      <span class="status-dot" id="dot-m8"></span>
+      <span class="module-label">M8: CLAUDE.mdとワークフロー</span>
+      <span class="module-pct" id="pct-m8"></span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Week 7：エージェント設計</div>
+    <div class="nav-item" onclick="showPage('m9')" id="nav-m9">
+      <span class="status-dot" id="dot-m9"></span>
+      <span class="module-label">M9: エージェントアーキテクチャ</span>
+      <span class="module-pct" id="pct-m9"></span>
+    </div>
+    <div class="nav-item" onclick="showPage('m10')" id="nav-m10">
+      <span class="status-dot" id="dot-m10"></span>
+      <span class="module-label">M10: マルチエージェント</span>
+      <span class="module-pct" id="pct-m10"></span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Week 8：総仕上げ</div>
+    <div class="nav-item" onclick="showPage('m11')" id="nav-m11">
+      <span class="status-dot" id="dot-m11"></span>
+      <span class="module-label">M11: コンテキスト管理</span>
+      <span class="module-pct" id="pct-m11"></span>
+    </div>
+    <div class="nav-item" onclick="showPage('m12')" id="nav-m12">
+      <span class="status-dot" id="dot-m12"></span>
+      <span class="module-label">M12: 総復習と模擬試験</span>
+      <span class="module-pct" id="pct-m12"></span>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">全体の学習進捗 <span id="total-pct">0%</span></div>
+    <div class="progress-bar"><div class="progress-bar-fill" id="total-bar" style="width:0%"></div></div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main" id="main-content">
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="page-dashboard">
+  <div class="module-header">
+    <h1>学習ダッシュボード</h1>
+    <p class="subtitle">CCA-F (Claude Certified Architect – Foundations) 合格を目指して</p>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-modules">0/13</div>
+      <div class="stat-label">完了モジュール</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-quizzes">0%</div>
+      <div class="stat-label">クイズ正答率</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-streak">0</div>
+      <div class="stat-label">連続学習日数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-total">0%</div>
+      <div class="stat-label">総合進捗</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>ドメイン別 習熟度</h2>
+    <p style="font-size:.85rem; color:var(--text-light); margin-bottom:1rem;">各ドメインのクイズ正答率と配点ウェイトを表示しています</p>
+    <div class="domain-chart">
+      <div class="domain-row">
+        <span class="domain-name">エージェント設計 (27%)</span>
+        <div class="domain-bar"><div class="domain-bar-fill" id="bar-d1" style="width:0%;background:#7C3AED;"></div><span class="domain-bar-label" id="lbl-d1">—</span></div>
+      </div>
+      <div class="domain-row">
+        <span class="domain-name">Claude Code (20%)</span>
+        <div class="domain-bar"><div class="domain-bar-fill" id="bar-d2" style="width:0%;background:#2563EB;"></div><span class="domain-bar-label" id="lbl-d2">—</span></div>
+      </div>
+      <div class="domain-row">
+        <span class="domain-name">プロンプト工学 (20%)</span>
+        <div class="domain-bar"><div class="domain-bar-fill" id="bar-d3" style="width:0%;background:#D97706;"></div><span class="domain-bar-label" id="lbl-d3">—</span></div>
+      </div>
+      <div class="domain-row">
+        <span class="domain-name">ツール & MCP (18%)</span>
+        <div class="domain-bar"><div class="domain-bar-fill" id="bar-d4" style="width:0%;background:#059669;"></div><span class="domain-bar-label" id="lbl-d4">—</span></div>
+      </div>
+      <div class="domain-row">
+        <span class="domain-name">コンテキスト管理 (15%)</span>
+        <div class="domain-bar"><div class="domain-bar-fill" id="bar-d5" style="width:0%;background:#DC2626;"></div><span class="domain-bar-label" id="lbl-d5">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>試験概要</h2>
+    <table class="compare-table">
+      <tr><th>項目</th><th>内容</th></tr>
+      <tr><td>正式名称</td><td>Claude Certified Architect – Foundations (CCA-F)</td></tr>
+      <tr><td>出題数</td><td>60問（多肢選択式・シナリオベース）</td></tr>
+      <tr><td>試験時間</td><td>120分</td></tr>
+      <tr><td>合格ライン</td><td>720 / 1000 点</td></tr>
+      <tr><td>受験料</td><td>$99（約15,000円）</td></tr>
+      <tr><td>受験方法</td><td>オンライン（プロクター監視、外部ツール不可）</td></tr>
+      <tr><td>前提条件</td><td>Claude Partner Network メンバー（無料登録可）</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>学習の始め方</h2>
+    <p>左メニューの <strong>M0: 導入</strong> から順番に進めてください。各モジュールには解説とクイズが含まれています。クイズに回答すると進捗が自動的に記録されます。</p>
+    <div class="tip-box">
+      <div class="label">学習のコツ</div>
+      <p style="margin-top:.25rem;">試験は「コードが書けるか」ではなく「本番環境でClaudeをどう設計・運用するか」を問います。非エンジニアでも、概念とアーキテクチャの考え方を理解すれば十分合格可能です。</p>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="showPage('m0')">Module 0 から始める &#8594;</button>
+      <button class="btn btn-outline" onclick="resetProgress()">進捗をリセット</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODULE 0 ==================== -->
+<div id="page-m0" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 1</span>
+    <h1>Module 0: 導入 — Claudeの全体像と資格概要</h1>
+    <p class="subtitle">CCA-F試験の全体像を把握し、学習のロードマップを理解する</p>
+    <span class="domain-tag">全ドメイン共通</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>Claudeとは何か — AIアシスタントの位置づけ</li>
+      <li>Anthropicが提供する製品群の全体像</li>
+      <li>CCA-F試験の構成と5つのドメイン</li>
+      <li>6つの試験シナリオの概要</li>
+      <li>非エンジニアとしての学習戦略</li>
+    </ul>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m0','s1',this)">Claudeとは</button>
+    <button class="section-tab" onclick="showSection('m0','s2',this)">製品群</button>
+    <button class="section-tab" onclick="showSection('m0','s3',this)">試験の構成</button>
+    <button class="section-tab" onclick="showSection('m0','s4',this)">シナリオ</button>
+    <button class="section-tab" onclick="showSection('m0','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m0','s6',this)">クイズ</button>
+  </div>
+
+  <!-- Section 1: Claudeとは -->
+  <div id="m0-s1" class="card">
+    <h2>Claudeとは何か</h2>
+    <p>Claude（クロード）は、Anthropic社が開発したAIアシスタントです。人間が書いた大量のテキストを学習し、質問への回答、文章の作成、分析、コード生成など、幅広いタスクをこなすことができます。</p>
+
+    <h3>なぜ「Claude」が注目されるのか</h3>
+    <p>AIアシスタントは複数の会社から提供されていますが、Claudeには以下のような特徴があります。</p>
+    <p><strong>安全性への注力：</strong>Anthropicは「AIの安全性」を企業理念の中心に据えています。Claudeは、有害な出力を避け、正確で信頼できる応答を提供することを重視して設計されています。</p>
+    <p><strong>長文の処理能力：</strong>Claudeは非常に長い文章（数百ページ相当）を一度に読んで理解できます。これを「コンテキストウィンドウ」と呼びます。</p>
+    <p><strong>ツール連携：</strong>Claudeは、外部のツールやデータベースと連携して、検索・計算・ファイル操作などを行うことができます。これが試験で重要なテーマとなります。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念 &#x1F4A1;</div>
+      <p><strong>LLM (Large Language Model / 大規模言語モデル)：</strong>膨大な量のテキストデータを学習して、人間のような文章を生成・理解できるAIモデルのこと。Claude、GPT、Geminiなどがこれにあたります。</p>
+    </div>
+
+    <h3>Claudeのモデル一覧</h3>
+    <p>Claudeには用途に応じた複数のモデルがあります。試験では各モデルの位置づけを理解しておくことが求められます。</p>
+    <table class="compare-table">
+      <tr><th>モデル名</th><th>特徴</th><th>用途</th></tr>
+      <tr><td>Claude Opus</td><td>最も高性能。複雑な推論が得意</td><td>高度な分析、研究、複雑なタスク</td></tr>
+      <tr><td>Claude Sonnet</td><td>性能とスピードのバランス型</td><td>日常業務、コード生成、一般的なタスク</td></tr>
+      <tr><td>Claude Haiku</td><td>最も高速・低コスト</td><td>大量処理、簡単な質問応答、チャットボット</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">試験では「どのモデルを使うべきか」を問われることがあります。コスト・速度・性能のトレードオフを理解しておきましょう。例えば、大量のメール分類にはHaiku（低コスト・高速）が適しています。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: 製品群 -->
+  <div id="m0-s2" class="card" style="display:none">
+    <h2>Anthropicの製品群</h2>
+    <p>Anthropicは、Claudeを様々な方法で利用できるようにしています。それぞれのインターフェースは異なりますが、裏側では同じClaudeモデルが動いています。</p>
+
+    <table class="compare-table">
+      <tr><th>製品</th><th>説明</th><th>対象ユーザー</th></tr>
+      <tr><td><strong>claude.ai</strong></td><td>Webブラウザからチャット形式で使う</td><td>すべてのユーザー</td></tr>
+      <tr><td><strong>Claude Desktop</strong></td><td>Mac/Windows用デスクトップアプリ</td><td>すべてのユーザー</td></tr>
+      <tr><td><strong>Claude API</strong></td><td>プログラムからClaudeを呼び出す仕組み</td><td>開発者・エンジニア</td></tr>
+      <tr><td><strong>Claude Code</strong></td><td>コマンドラインからClaudeを使う開発ツール</td><td>開発者</td></tr>
+      <tr><td><strong>Cowork</strong></td><td>デスクトップ上でファイル操作やタスク管理を自動化</td><td>非エンジニアも対象</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">重要概念 &#x1F4A1;</div>
+      <p><strong>API (Application Programming Interface)：</strong>プログラム同士が会話するための「窓口」のこと。Claude APIを使えば、自社のアプリやWebサイトにClaudeの機能を組み込めます。レストランに例えると、claude.aiはお店の窓口、APIは出前の注文窓口のようなものです。</p>
+    </div>
+
+    <h3>CCA-F試験との関係</h3>
+    <p>試験では特に<strong>Claude API</strong>と<strong>Claude Code</strong>の理解が重要です。ユーザーとして使うだけでなく、「Claudeを使ったシステムをどう設計するか」というアーキテクト視点が求められます。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">試験は英語で実施され、外部ツール（Claude本体も含む）の使用は禁止されています。用語は英語で覚えておく必要がありますが、概念の理解はこの日本語教材で固めましょう。</p>
+    </div>
+  </div>
+
+  <!-- Section 3: 試験の構成 -->
+  <div id="m0-s3" class="card" style="display:none">
+    <h2>CCA-F 試験の構成</h2>
+    <p>CCA-F試験は5つの「ドメイン（出題領域）」から構成されています。各ドメインには配点のウェイトがあり、重みづけを意識した学習が効率的です。</p>
+
+    <h3>5つのドメインと配点</h3>
+    <table class="compare-table">
+      <tr><th>ドメイン</th><th>配点</th><th>概要</th><th>対応週</th></tr>
+      <tr><td><strong>1. エージェント型アーキテクチャとオーケストレーション</strong></td><td>27%</td><td>AIエージェントの設計パターン、複数エージェントの連携</td><td>Week 7</td></tr>
+      <tr><td><strong>2. Claude Codeの設定とワークフロー</strong></td><td>20%</td><td>Claude Codeの設定ファイル、コマンド、CI/CD連携</td><td>Week 6</td></tr>
+      <tr><td><strong>3. プロンプトエンジニアリングと構造化出力</strong></td><td>20%</td><td>効果的なプロンプト設計、JSON出力の制御</td><td>Week 3-4</td></tr>
+      <tr><td><strong>4. ツール設計とMCP統合</strong></td><td>18%</td><td>ツールの設計方法、MCPサーバーの構築</td><td>Week 5</td></tr>
+      <tr><td><strong>5. コンテキスト管理と信頼性</strong></td><td>15%</td><td>長文処理の戦略、エラー処理、人間によるレビュー</td><td>Week 8</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">学習戦略 &#x1F3AF;</div>
+      <p>ドメイン1（エージェント設計）が27%と最大の配点です。Week 7でじっくり取り組みますが、それまでの基礎知識（プロンプト、ツール、Claude Code）が土台になります。カリキュラムの順番には意味がありますので、飛ばさず順に進めましょう。</p>
+    </div>
+
+    <h3>合格に必要なスコア</h3>
+    <p>合格ラインは720/1000点です。つまり、すべてのドメインで完璧を目指す必要はなく、得意分野を確実に取り、苦手分野も基本を押さえるという戦略が有効です。</p>
+    <p>60問を120分で解くため、1問あたり約2分が目安です。わからない問題に時間をかけすぎず、マークして先に進む判断も重要です。</p>
+  </div>
+
+  <!-- Section 4: シナリオ -->
+  <div id="m0-s4" class="card" style="display:none">
+    <h2>6つの試験シナリオ</h2>
+    <p>CCA-F試験の大きな特徴は、<strong>シナリオベース</strong>であることです。60問すべてが、実際のビジネスユースケースを想定した「シナリオ」に基づいて出題されます。</p>
+
+    <div class="warn-box">
+      <div class="label">重要</div>
+      <p style="margin-top:.25rem;">全6シナリオのうち、試験ではランダムに4つが選ばれます。どの4つが出るかは受験ごとに変わるため、<strong>6つすべてを学習しておく必要があります。</strong></p>
+    </div>
+
+    <div class="scenario-grid">
+      <div class="scenario-card">
+        <div class="scenario-num">シナリオ 1</div>
+        <h4>カスタマーサポート解決エージェント</h4>
+        <p>顧客からの問い合わせを自動で分類し、適切な回答を生成するシステムの設計</p>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-num">シナリオ 2</div>
+        <h4>Claude Code によるコード生成</h4>
+        <p>Claude Codeを使った開発ワークフローの設計と最適化</p>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-num">シナリオ 3</div>
+        <h4>マルチエージェント・リサーチシステム</h4>
+        <p>複数のAIエージェントが協調して調査・分析を行うシステムの構築</p>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-num">シナリオ 4</div>
+        <h4>開発者の生産性向上</h4>
+        <p>Claudeを使って開発チームの生産性を高めるための設計・運用</p>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-num">シナリオ 5</div>
+        <h4>CI/CD のための Claude Code</h4>
+        <p>自動テスト・デプロイのパイプラインにClaude Codeを統合する設計</p>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-num">シナリオ 6</div>
+        <h4>構造化データ抽出</h4>
+        <p>非構造化テキストから必要な情報を正確に抽出するシステムの設計</p>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">非エンジニアへのアドバイス</div>
+      <p style="margin-top:.25rem;">シナリオ1「カスタマーサポート」とシナリオ6「データ抽出」は、ビジネス寄りの内容で比較的イメージしやすいです。まずはこの2つから理解を深め、技術的なシナリオに広げていきましょう。</p>
+    </div>
+  </div>
+
+  <!-- Section 5: 用語集 -->
+  <div id="m0-s5" class="card" style="display:none">
+    <h2>基本用語集</h2>
+    <p>この学習を進める上で頻出する用語をまとめました。試験は英語のため、英語表記も併記しています。</p>
+
+    <div class="glossary-item">
+      <div class="glossary-term">プロンプト</div>
+      <div class="glossary-en">Prompt</div>
+      <div class="glossary-def">AIに対する指示や質問のこと。「何をしてほしいか」を伝える文章です。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">コンテキストウィンドウ</div>
+      <div class="glossary-en">Context Window</div>
+      <div class="glossary-def">AIが一度に「見る」ことができるテキストの量。Claudeは非常に長いコンテキストウィンドウを持つのが特徴です。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">トークン</div>
+      <div class="glossary-en">Token</div>
+      <div class="glossary-def">AIがテキストを処理する最小単位。おおよそ英語の1単語＝1トークン、日本語の1文字＝1-2トークン程度です。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">エージェント</div>
+      <div class="glossary-en">Agent</div>
+      <div class="glossary-def">ツールを使いながら自律的にタスクを遂行するAIシステムのこと。単なるチャットではなく、計画→実行→確認のループを回します。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">MCP (Model Context Protocol)</div>
+      <div class="glossary-en">Model Context Protocol</div>
+      <div class="glossary-def">AIモデルと外部ツール・データソースを接続するための標準的なプロトコル（通信規約）。USBのような「共通の差し込み口」をイメージしてください。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">オーケストレーション</div>
+      <div class="glossary-en">Orchestration</div>
+      <div class="glossary-def">複数のAIエージェントやツールを協調させて動かすこと。指揮者（オーケストラ）のように全体を制御します。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ハルシネーション</div>
+      <div class="glossary-en">Hallucination</div>
+      <div class="glossary-def">AIが事実ではない情報をもっともらしく生成してしまうこと。これを防ぐ設計が試験で問われます。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">構造化出力</div>
+      <div class="glossary-en">Structured Output</div>
+      <div class="glossary-def">AIの出力をJSON等の決まった形式で返すこと。プログラムが結果を正確に処理するために重要です。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">CLAUDE.md</div>
+      <div class="glossary-en">CLAUDE.md</div>
+      <div class="glossary-def">Claude Codeの設定ファイル。プロジェクトのルールや規約を記述し、Claudeの振る舞いをカスタマイズします。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">CI/CD</div>
+      <div class="glossary-en">Continuous Integration / Continuous Deployment</div>
+      <div class="glossary-def">コードの変更を自動的にテスト・配信する仕組み。ソフトウェア開発の効率化手法です。</div>
+    </div>
+  </div>
+
+  <!-- Section 6: Quiz -->
+  <div id="m0-s6" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 0 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
+
+      <div class="quiz-question" id="m0-q1">
+        <div class="q-text">Q1. CCA-F試験で最も配点が高いドメインはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',0,0)">プロンプトエンジニアリングと構造化出力（20%）</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',0,1)">エージェント型アーキテクチャとオーケストレーション（27%）</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',0,2)">ツール設計とMCP統合（18%）</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',0,3)">Claude Codeの設定とワークフロー（20%）</div>
+        <div class="quiz-explanation" id="m0-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m0-q2">
+        <div class="q-text">Q2. CCA-F試験の合格ラインは何点ですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',1,0)">600 / 1000点</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',1,1)">700 / 1000点</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',1,2)">720 / 1000点</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',1,3)">800 / 1000点</div>
+        <div class="quiz-explanation" id="m0-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m0-q3">
+        <div class="q-text">Q3. CCA-F試験では全6シナリオのうち、何シナリオが出題されますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',2,0)">全6シナリオすべて</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',2,1)">ランダムに4シナリオ</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',2,2)">受験者が3シナリオを選択</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',2,3)">ランダムに5シナリオ</div>
+        <div class="quiz-explanation" id="m0-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m0-q4">
+        <div class="q-text">Q4. MCPとは何の略称ですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',3,0)">Model Communication Platform</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',3,1)">Model Context Protocol</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',3,2)">Machine Control Protocol</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',3,3)">Multi-Cloud Processing</div>
+        <div class="quiz-explanation" id="m0-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m0-q5">
+        <div class="q-text">Q5. 大量のメール分類タスクに最適なClaudeモデルはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',4,0)">Claude Opus（最高性能）</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',4,1)">Claude Sonnet（バランス型）</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',4,2)">Claude Haiku（高速・低コスト）</div>
+        <div class="quiz-option" onclick="selectAnswer('m0',4,3)">どれでも同じ結果になる</div>
+        <div class="quiz-explanation" id="m0-q5-exp"></div>
+      </div>
+
+      <div id="m0-quiz-result" class="quiz-result" style="display:none"></div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="submitQuiz('m0')" id="m0-submit-btn">回答を確定する</button>
+        <button class="btn btn-outline" onclick="retryQuiz('m0')" id="m0-retry-btn" style="display:none">もう一度挑戦</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="btn-group" style="margin-top:2rem; justify-content: space-between;">
+    <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; ダッシュボード</button>
+    <button class="btn btn-primary" onclick="showPage('m1')">次のモジュールへ &#8594;</button>
+  </div>
+</div>
+
+<!-- ==================== PLACEHOLDER MODULES ==================== -->
+<div id="page-m1" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 1</span>
+    <h1>Module 1: Claude製品群を理解する</h1>
+    <p class="subtitle">API、Claude Code、Coworkなどの関係性を整理する</p>
+    <span class="domain-tag">全ドメイン共通</span>
+  </div>
+  <div class="card">
+    <h2>コンテンツ準備中</h2>
+    <p>このモジュールのコンテンツは次回のセッションで作成します。Module 0の学習を完了してからお進みください。</p>
+    <div class="tip-box">
+      <div class="label">予習のヒント</div>
+      <p style="margin-top:.25rem;">公式サイト <a href="https://docs.anthropic.com" target="_blank">docs.anthropic.com</a> でClaudeの製品一覧を眺めておくと理解が深まります。</p>
+    </div>
+  </div>
+  <div class="btn-group"><button class="btn btn-outline" onclick="showPage('m0')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m2')">次へ &#8594;</button></div>
+</div>
+
+<div id="page-m2" style="display:none"><div class="module-header"><span class="week-badge">Week 2</span><h1>Module 2: プロンプトの基本</h1><p class="subtitle">Claudeへの効果的な指示の出し方を学ぶ</p><span class="domain-tag">ドメイン3: プロンプト工学</span></div><div class="card"><h2>コンテンツ準備中</h2><p>Module 0 → M1 の順に学習を進めてください。</p></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m1')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m3')">次へ &#8594;</button></div></div>
+
+<div id="page-m3" style="display:none"><div class="module-header"><span class="week-badge">Week 3</span><h1>Module 3: システムプロンプト設計</h1><p class="subtitle">本番環境のためのプロンプト設計パターン</p><span class="domain-tag">ドメイン3: プロンプト工学 (20%)</span></div><div class="card"><h2>コンテンツ準備中</h2><p>Week 1-2の基礎モジュールを先に完了してください。</p></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m2')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m4')">次へ &#8594;</button></div></div>
+
+<div id="page-m4" style="display:none"><div class="module-header"><span class="week-badge">Week 4</span><h1>Module 4: 構造化出力とJSON</h1><p class="subtitle">AIの出力を制御し、プログラムで処理可能にする</p><span class="domain-tag">ドメイン3: プロンプト工学 (20%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m3')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m5')">次へ &#8594;</button></div></div>
+
+<div id="page-m5" style="display:none"><div class="module-header"><span class="week-badge">Week 5</span><h1>Module 5: ツール設計の基礎</h1><p class="subtitle">Claudeに外部機能を与える仕組みを理解する</p><span class="domain-tag">ドメイン4: ツール & MCP (18%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m4')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m6')">次へ &#8594;</button></div></div>
+
+<div id="page-m6" style="display:none"><div class="module-header"><span class="week-badge">Week 5</span><h1>Module 6: MCP統合</h1><p class="subtitle">Model Context Protocolでツールを標準化する</p><span class="domain-tag">ドメイン4: ツール & MCP (18%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m5')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m7')">次へ &#8594;</button></div></div>
+
+<div id="page-m7" style="display:none"><div class="module-header"><span class="week-badge">Week 6</span><h1>Module 7: Claude Code入門</h1><p class="subtitle">開発者向けCLIツールの基本を理解する</p><span class="domain-tag">ドメイン2: Claude Code (20%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m6')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m8')">次へ &#8594;</button></div></div>
+
+<div id="page-m8" style="display:none"><div class="module-header"><span class="week-badge">Week 6</span><h1>Module 8: CLAUDE.mdとワークフロー</h1><p class="subtitle">設定ファイル階層とCI/CD統合</p><span class="domain-tag">ドメイン2: Claude Code (20%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m7')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m9')">次へ &#8594;</button></div></div>
+
+<div id="page-m9" style="display:none"><div class="module-header"><span class="week-badge">Week 7</span><h1>Module 9: エージェントアーキテクチャ</h1><p class="subtitle">自律的に動くAIシステムの設計パターン</p><span class="domain-tag">ドメイン1: エージェント設計 (27%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m8')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m10')">次へ &#8594;</button></div></div>
+
+<div id="page-m10" style="display:none"><div class="module-header"><span class="week-badge">Week 7</span><h1>Module 10: マルチエージェント</h1><p class="subtitle">複数エージェントの協調設計</p><span class="domain-tag">ドメイン1: エージェント設計 (27%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m9')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m11')">次へ &#8594;</button></div></div>
+
+<div id="page-m11" style="display:none"><div class="module-header"><span class="week-badge">Week 8</span><h1>Module 11: コンテキスト管理</h1><p class="subtitle">長文処理とエラー対策の設計</p><span class="domain-tag">ドメイン5: コンテキスト管理 (15%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m10')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m12')">次へ &#8594;</button></div></div>
+
+<div id="page-m12" style="display:none"><div class="module-header"><span class="week-badge">Week 8</span><h1>Module 12: 総復習と模擬試験</h1><p class="subtitle">全ドメインの最終確認</p><span class="domain-tag">全ドメイン</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m11')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('dashboard')">ダッシュボードへ</button></div></div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ===================== DATA =====================
+const MODULES = ['m0','m1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11','m12'];
+const DOMAIN_MAP = {
+  m0: null, m1: null, m2: 'd3',
+  m3: 'd3', m4: 'd3',
+  m5: 'd4', m6: 'd4',
+  m7: 'd2', m8: 'd2',
+  m9: 'd1', m10: 'd1',
+  m11: 'd5', m12: null
+};
+
+// Quiz data: { answers: [correctIndex,...], explanations: [...] }
+const QUIZ_DATA = {
+  m0: {
+    answers: [1, 2, 1, 1, 2],
+    explanations: [
+      'エージェント型アーキテクチャとオーケストレーションが27%で最も高い配点です。この領域ではマルチエージェントシステムの設計やタスク分解のパターンが問われます。',
+      'CCA-F試験の合格ラインは720/1000点です。100〜1000のスケールで採点されます。',
+      '全6シナリオのうち、試験ではランダムに4シナリオが選ばれます。そのため、6つすべてを学習しておく必要があります。',
+      'MCPは「Model Context Protocol」の略です。AIモデルと外部ツール・データソースを接続するための標準プロトコルです。',
+      '大量の分類タスクにはClaude Haiku（高速・低コスト）が最適です。1件あたりのコストが低く、処理速度も速いため、大量処理に向いています。'
+    ]
+  }
+};
+
+// ===================== STATE =====================
+let state = loadState();
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('ccaf-state');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return {
+    currentPage: 'dashboard',
+    quizResults: {},   // { m0: { answers: [1,2,1,1,2], score: 5, total: 5 }, ... }
+    completedModules: [],
+    lastStudyDate: null,
+    streak: 0
+  };
+}
+
+function saveState() {
+  try { localStorage.setItem('ccaf-state', JSON.stringify(state)); } catch(e) {}
+}
+
+// ===================== NAVIGATION =====================
+function showPage(pageId) {
+  // Hide all pages
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
+  document.getElementById('page-' + pageId).style.display = 'block';
+
+  // Update nav active
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navId = pageId === 'dashboard' ? 'nav-dashboard' : 'nav-' + pageId;
+  const navEl = document.getElementById(navId);
+  if (navEl) navEl.classList.add('active');
+
+  state.currentPage = pageId;
+  saveState();
+  window.scrollTo(0,0);
+
+  // Update streak
+  updateStreak();
+
+  // Close sidebar on mobile
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function showSection(module, section, tabEl) {
+  // Hide all sections for this module
+  let i = 1;
+  while(true) {
+    const el = document.getElementById(module + '-s' + i);
+    if (!el) break;
+    el.style.display = 'none';
+    i++;
+  }
+  document.getElementById(module + '-' + section).style.display = 'block';
+
+  // Update tabs
+  tabEl.parentElement.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+}
+
+// ===================== QUIZ =====================
+let quizSelections = {}; // { m0: [null, null, ...] }
+
+function selectAnswer(module, qIdx, optIdx) {
+  if (!quizSelections[module]) {
+    const qData = QUIZ_DATA[module];
+    quizSelections[module] = new Array(qData.answers.length).fill(null);
+  }
+
+  // Check if already submitted
+  if (state.quizResults[module]) return;
+
+  quizSelections[module][qIdx] = optIdx;
+
+  // Highlight selected option
+  const qEl = document.getElementById(module + '-q' + (qIdx+1));
+  qEl.querySelectorAll('.quiz-option').forEach((opt, i) => {
+    opt.classList.remove('selected');
+    if (i === optIdx) opt.classList.add('selected');
+  });
+}
+
+function submitQuiz(module) {
+  const qData = QUIZ_DATA[module];
+  if (!qData) return;
+  if (!quizSelections[module]) return;
+
+  // Check all answered
+  const sel = quizSelections[module];
+  if (sel.some(s => s === null)) {
+    alert('すべての問題に回答してください。');
+    return;
+  }
+
+  let correct = 0;
+  qData.answers.forEach((ans, i) => {
+    const qEl = document.getElementById(module + '-q' + (i+1));
+    const options = qEl.querySelectorAll('.quiz-option');
+    const expEl = document.getElementById(module + '-q' + (i+1) + '-exp');
+
+    options.forEach((opt, j) => {
+      opt.classList.add('disabled');
+      opt.classList.remove('selected');
+      if (j === ans) opt.classList.add('correct');
+      if (j === sel[i] && j !== ans) opt.classList.add('incorrect');
+    });
+
+    if (sel[i] === ans) {
+      correct++;
+      expEl.className = 'quiz-explanation show correct';
+      expEl.innerHTML = '<strong>&#10004; 正解！</strong> ' + qData.explanations[i];
+    } else {
+      expEl.className = 'quiz-explanation show incorrect';
+      expEl.innerHTML = '<strong>&#10008; 不正解</strong> ' + qData.explanations[i];
+    }
+  });
+
+  // Save result
+  state.quizResults[module] = { answers: [...sel], score: correct, total: qData.answers.length };
+
+  // Mark module completed if >0 (attempted)
+  if (!state.completedModules.includes(module)) {
+    state.completedModules.push(module);
+  }
+  saveState();
+
+  // Show result
+  const pct = Math.round(correct / qData.answers.length * 100);
+  const resultEl = document.getElementById(module + '-quiz-result');
+  resultEl.style.display = 'block';
+  resultEl.className = 'quiz-result ' + (pct >= 80 ? 'good' : 'needs-work');
+  resultEl.innerHTML = correct + ' / ' + qData.answers.length + ' 正解 (' + pct + '%)' +
+    (pct >= 80 ? '<br>&#127881; 素晴らしい！次のモジュールに進みましょう。' : '<br>復習してからもう一度挑戦してみましょう。');
+
+  document.getElementById(module + '-submit-btn').style.display = 'none';
+  document.getElementById(module + '-retry-btn').style.display = 'inline-flex';
+
+  updateUI();
+}
+
+function retryQuiz(module) {
+  const qData = QUIZ_DATA[module];
+  quizSelections[module] = new Array(qData.answers.length).fill(null);
+  delete state.quizResults[module];
+  state.completedModules = state.completedModules.filter(m => m !== module);
+  saveState();
+
+  qData.answers.forEach((_, i) => {
+    const qEl = document.getElementById(module + '-q' + (i+1));
+    qEl.querySelectorAll('.quiz-option').forEach(opt => {
+      opt.className = 'quiz-option';
+    });
+    const expEl = document.getElementById(module + '-q' + (i+1) + '-exp');
+    expEl.className = 'quiz-explanation';
+    expEl.innerHTML = '';
+  });
+
+  document.getElementById(module + '-quiz-result').style.display = 'none';
+  document.getElementById(module + '-submit-btn').style.display = 'inline-flex';
+  document.getElementById(module + '-retry-btn').style.display = 'none';
+
+  updateUI();
+}
+
+// ===================== PROGRESS =====================
+function updateStreak() {
+  const today = new Date().toISOString().split('T')[0];
+  if (state.lastStudyDate !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    if (state.lastStudyDate === yesterday) {
+      state.streak++;
+    } else if (state.lastStudyDate !== today) {
+      state.streak = 1;
+    }
+    state.lastStudyDate = today;
+    saveState();
+  }
+}
+
+function updateUI() {
+  // Sidebar dots and percentages
+  MODULES.forEach(m => {
+    const dot = document.getElementById('dot-' + m);
+    const pct = document.getElementById('pct-' + m);
+    if (!dot) return;
+
+    if (state.quizResults[m]) {
+      const r = state.quizResults[m];
+      const p = Math.round(r.score / r.total * 100);
+      dot.className = 'status-dot completed';
+      if (pct) pct.textContent = p + '%';
+    } else if (state.completedModules.includes(m)) {
+      dot.className = 'status-dot completed';
+      if (pct) pct.textContent = '&#10003;';
+    } else {
+      dot.className = 'status-dot locked';
+      if (pct) pct.textContent = '';
+    }
+  });
+
+  // Total progress
+  const totalPct = Math.round(state.completedModules.length / MODULES.length * 100);
+  document.getElementById('total-pct').textContent = totalPct + '%';
+  document.getElementById('total-bar').style.width = totalPct + '%';
+
+  // Dashboard stats
+  document.getElementById('stat-modules').textContent = state.completedModules.length + '/' + MODULES.length;
+  document.getElementById('stat-total').textContent = totalPct + '%';
+  document.getElementById('stat-streak').textContent = state.streak;
+
+  // Quiz average
+  let totalScore = 0, totalQ = 0;
+  Object.values(state.quizResults).forEach(r => { totalScore += r.score; totalQ += r.total; });
+  document.getElementById('stat-quizzes').textContent = totalQ > 0 ? Math.round(totalScore/totalQ*100) + '%' : '—';
+
+  // Domain bars
+  const domainScores = { d1: {s:0,t:0}, d2: {s:0,t:0}, d3: {s:0,t:0}, d4: {s:0,t:0}, d5: {s:0,t:0} };
+  MODULES.forEach(m => {
+    const d = DOMAIN_MAP[m];
+    if (d && state.quizResults[m]) {
+      domainScores[d].s += state.quizResults[m].score;
+      domainScores[d].t += state.quizResults[m].total;
+    }
+  });
+  ['d1','d2','d3','d4','d5'].forEach(d => {
+    const bar = document.getElementById('bar-' + d);
+    const lbl = document.getElementById('lbl-' + d);
+    if (domainScores[d].t > 0) {
+      const p = Math.round(domainScores[d].s / domainScores[d].t * 100);
+      bar.style.width = p + '%';
+      lbl.textContent = p + '%';
+    } else {
+      bar.style.width = '0%';
+      lbl.textContent = '—';
+    }
+  });
+}
+
+function resetProgress() {
+  if (confirm('学習の進捗をすべてリセットしますか？この操作は取り消せません。')) {
+    state = { currentPage: 'dashboard', quizResults: {}, completedModules: [], lastStudyDate: null, streak: 0 };
+    saveState();
+    location.reload();
+  }
+}
+
+// ===================== INIT =====================
+updateUI();
+if (state.currentPage && state.currentPage !== 'dashboard') {
+  showPage(state.currentPage);
+}
+</script>
+
+</body>
+</html>
