@@ -664,15 +664,310 @@
     <p class="subtitle">API、Claude Code、Coworkなどの関係性を整理する</p>
     <span class="domain-tag">全ドメイン共通</span>
   </div>
-  <div class="card">
-    <h2>コンテンツ準備中</h2>
-    <p>このモジュールのコンテンツは次回のセッションで作成します。Module 0の学習を完了してからお進みください。</p>
-    <div class="tip-box">
-      <div class="label">予習のヒント</div>
-      <p style="margin-top:.25rem;">公式サイト <a href="https://docs.anthropic.com" target="_blank">docs.anthropic.com</a> でClaudeの製品一覧を眺めておくと理解が深まります。</p>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>Claudeの製品ラインナップと各製品の対象ユーザーを理解する</li>
+      <li>API（Application Programming Interface）の仕組みとSDKの役割を知る</li>
+      <li>Claude Codeの基本概念と開発ワークフローへの活用を理解する</li>
+      <li>ユースケースに応じた製品の使い分けを判断できるようになる</li>
+    </ul>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m1','s1',this)">製品ラインナップ</button>
+    <button class="section-tab" onclick="showSection('m1','s2',this)">APIとSDK</button>
+    <button class="section-tab" onclick="showSection('m1','s3',this)">Claude Code</button>
+    <button class="section-tab" onclick="showSection('m1','s4',this)">使い分けガイド</button>
+    <button class="section-tab" onclick="showSection('m1','s5',this)">クイズ</button>
+  </div>
+
+  <!-- Section 1: 製品ラインナップ -->
+  <div id="m1-s1" class="card">
+    <h2>Claudeの製品ラインナップ</h2>
+    <p>Module 0では「Claudeは様々な方法で使える」と学びました。ここでは、各製品の特徴と対象ユーザーを詳しく見ていきます。</p>
+    <p>イメージとしては、Claudeは「優秀なスタッフ」で、製品群は「そのスタッフに仕事を頼む窓口」です。窓口の種類によって、頼み方や頼める範囲が変わります。</p>
+
+    <h3>誰でも使える製品</h3>
+    <table class="compare-table">
+      <tr><th>製品</th><th>特徴</th><th>イメージ</th></tr>
+      <tr><td><strong>claude.ai</strong></td><td>Webブラウザから使えるチャット画面。無料プランあり。ファイルのアップロードや画像の読み取りにも対応</td><td>オフィスの受付窓口</td></tr>
+      <tr><td><strong>Claude Desktop</strong></td><td>Mac/Windows用のデスクトップアプリ。ローカルファイルとの連携やCowork機能が使える</td><td>自分の席に来てくれるスタッフ</td></tr>
+      <tr><td><strong>Claude モバイルアプリ</strong></td><td>iOS/Androidアプリ。外出先でもclaude.aiと同等の機能が使える</td><td>持ち歩ける相談相手</td></tr>
+    </table>
+
+    <h3>開発者向け製品</h3>
+    <table class="compare-table">
+      <tr><th>製品</th><th>特徴</th><th>イメージ</th></tr>
+      <tr><td><strong>Claude API</strong></td><td>プログラムからClaudeを呼び出す仕組み。自社のアプリやWebサイトにClaudeの機能を組み込める</td><td>出前注文の電話回線</td></tr>
+      <tr><td><strong>Claude Code</strong></td><td>ターミナル（コマンドライン）から使うAIコーディングエージェント。ファイル編集やコマンド実行を自律的に行う</td><td>隣で一緒にコードを書くパートナー</td></tr>
+      <tr><td><strong>Claude Agent SDK</strong></td><td>Claude Codeと同じ能力をライブラリとして提供。CI/CDやプロダクション環境での自動化に使う</td><td>自動化ラインに組み込む部品</td></tr>
+    </table>
+
+    <h3>チーム・企業向け製品</h3>
+    <table class="compare-table">
+      <tr><th>製品</th><th>特徴</th><th>イメージ</th></tr>
+      <tr><td><strong>Team プラン</strong></td><td>最大150席。SSO/SAMLによるシングルサインオン、支出管理、組織レベルの権限管理に対応</td><td>部門契約の業務委託</td></tr>
+      <tr><td><strong>Enterprise プラン</strong></td><td>席数無制限。Compliance API、高度な管理機能、Google Drive・Slack等のコネクタ連携</td><td>全社契約の専属チーム</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">重要概念 &#x1F4A1;</div>
+      <p><strong>Cowork（コワーク）：</strong>Claude Desktopに統合されたエージェント機能です。単に質問に答えるだけでなく、リサーチ・ドキュメント作成・データ抽出などの複雑なタスクを自律的に実行できます。「会話型AI」から「自律型タスク実行AI」への進化を象徴する機能で、Max プランまたはEnterprise プランで利用できます。</p>
+    </div>
+
+    <h3>料金プラン一覧</h3>
+    <table class="compare-table">
+      <tr><th>プラン</th><th>月額</th><th>主な特徴</th></tr>
+      <tr><td>Free</td><td>無料</td><td>基本機能、使用量制限あり</td></tr>
+      <tr><td>Pro</td><td>$20/月</td><td>拡張された使用量</td></tr>
+      <tr><td>Max 5x</td><td>$100/月</td><td>Proの5倍。Claude Code・Cowork利用可</td></tr>
+      <tr><td>Max 20x</td><td>$200/月</td><td>Proの20倍。Claude Code・Cowork利用可</td></tr>
+      <tr><td>Team</td><td>$25/席/月</td><td>組織管理・SSO対応</td></tr>
+      <tr><td>Enterprise</td><td>$125/席/月</td><td>席数無制限・Compliance API</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">サブスクリプション（Pro/Max等）とAPI従量課金は<strong>別の料金体系</strong>です。Proプランに加入していても、API経由でClaudeを呼び出す場合は別途API料金が発生します。試験ではこの区別を理解しているか問われることがあります。</p>
     </div>
   </div>
-  <div class="btn-group"><button class="btn btn-outline" onclick="showPage('m0')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m2')">次へ &#8594;</button></div>
+
+  <!-- Section 2: APIとSDK -->
+  <div id="m1-s2" class="card" style="display:none">
+    <h2>APIとSDK — プログラムからClaudeを使う</h2>
+    <p>Module 0で「APIはレストランの出前注文窓口のようなもの」と紹介しました。ここでは、その注文の仕組みをもう少し詳しく見ていきましょう。</p>
+
+    <h3>Messages API（メッセージAPI）</h3>
+    <p>Claude APIの中核となるのが<strong>Messages API</strong>です。プログラムからClaudeに「メッセージ」を送り、回答を受け取る仕組みです。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念 &#x1F4A1;</div>
+      <p><strong>Messages API（メッセージAPI）：</strong>Claudeとプログラムが会話するための窓口です。レストランに例えると、注文書（リクエスト）に「どのモデルを使うか」「何を聞きたいか」を書いて送ると、回答（レスポンス）が返ってくる仕組みです。エンドポイントは <code>POST https://api.anthropic.com/v1/messages</code> です。</p>
+    </div>
+
+    <p>APIを利用するには、3つの必須ヘッダー（送り状）が必要です。</p>
+    <table class="compare-table">
+      <tr><th>ヘッダー名</th><th>役割</th><th>例</th></tr>
+      <tr><td><code>x-api-key</code></td><td>本人確認のためのAPIキー</td><td><code>sk-ant-api03-...</code></td></tr>
+      <tr><td><code>anthropic-version</code></td><td>使用するAPIのバージョン</td><td><code>2023-06-01</code></td></tr>
+      <tr><td><code>content-type</code></td><td>データの形式指定</td><td><code>application/json</code></td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Messages APIの3つの必須ヘッダーは頻出です。特に <code>x-api-key</code>（APIキー）と <code>anthropic-version</code>（バージョン指定）がClaude API固有の認証方法であることを覚えておきましょう。</p>
+    </div>
+
+    <h3>その他の主要API</h3>
+    <table class="compare-table">
+      <tr><th>API名</th><th>用途</th><th>ポイント</th></tr>
+      <tr><td><strong>Message Batches API</strong></td><td>大量のリクエストを一括で非同期処理</td><td>通常の<strong>50%割引</strong>で利用可能</td></tr>
+      <tr><td><strong>Token Counting API</strong></td><td>送信前にトークン数を計測</td><td>コスト見積もりに便利</td></tr>
+      <tr><td><strong>Models API</strong></td><td>利用可能なモデル一覧を取得</td><td>プログラムからモデル情報を確認</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><strong>Batches API の50%割引</strong>は重要です。大量のデータを処理するシナリオ（例：数千件のメール分類）では、コスト最適化の手段としてBatches APIが正解になることがあります。</p>
+    </div>
+
+    <h3>SDK（Software Development Kit）とは</h3>
+    <p>SDKは「開発キット」のこと。APIを直接呼び出すのは少し手間がかかるため、SDKがその手間を代行してくれます。料理に例えると、APIが「食材と調理器具」なら、SDKは「食材セット＋レシピ付き」のようなものです。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念 &#x1F4A1;</div>
+      <p><strong>SDK (Software Development Kit / ソフトウェア開発キット)：</strong>APIを簡単に使えるようにまとめたツールセット。認証処理・エラー処理・再試行を自動で行ってくれるため、開発者はビジネスロジックに集中できます。Anthropicは Python と TypeScript を含む7言語の公式SDKを提供しています。</p>
+    </div>
+
+    <table class="compare-table">
+      <tr><th>SDK（言語）</th><th>インストール方法</th><th>備考</th></tr>
+      <tr><td><strong>Python</strong></td><td><code>pip install anthropic</code></td><td>最も広く使われる</td></tr>
+      <tr><td><strong>TypeScript</strong></td><td><code>npm install @anthropic-ai/sdk</code></td><td>Web開発向け</td></tr>
+      <tr><td>Java / Go / Ruby / C# / PHP</td><td>各言語のパッケージマネージャー</td><td>公式サポート</td></tr>
+    </table>
+
+    <h3>サードパーティプラットフォーム</h3>
+    <p>Claude APIはAnthropicに直接アクセスするだけでなく、大手クラウドプラットフォーム経由でも利用できます。</p>
+    <table class="compare-table">
+      <tr><th>プラットフォーム</th><th>プロバイダー</th><th>メリット</th></tr>
+      <tr><td><strong>Amazon Bedrock</strong></td><td>AWS</td><td>既存のAWSインフラと統合しやすい</td></tr>
+      <tr><td><strong>Vertex AI</strong></td><td>Google Cloud</td><td>Google Cloudユーザーに便利</td></tr>
+      <tr><td><strong>Azure AI Foundry</strong></td><td>Microsoft Azure</td><td>Azureインフラと連携</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">直接API vs サードパーティの選択基準が試験で問われます。<strong>最新機能をすぐに使いたい場合は直接API</strong>、<strong>既存のクラウド基盤と統合したい場合はサードパーティ</strong>が適しています。</p>
+    </div>
+  </div>
+
+  <!-- Section 3: Claude Code -->
+  <div id="m1-s3" class="card" style="display:none">
+    <h2>Claude Code — AIコーディングエージェント</h2>
+    <p>Claude Codeは、CCA-F試験の<strong>ドメイン2（配点20%）</strong>に直結する重要な製品です。Module 7-8で詳しく学びますが、ここでは全体像を把握しましょう。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念 &#x1F4A1;</div>
+      <p><strong>Claude Code（クロードコード）：</strong>ターミナル（コマンドライン）で動作するAIコーディングエージェントです。単にコードを提案するだけでなく、ファイルの読み書き・コマンド実行・Web検索などを<strong>自律的に</strong>行います。「AIが隣の席でペアプログラミングしてくれる」イメージです。VS CodeやJetBrainsなどのエディタにも統合できます。</p>
+    </div>
+
+    <h3>Claude Codeの主要機能</h3>
+    <table class="compare-table">
+      <tr><th>機能</th><th>説明</th><th>例</th></tr>
+      <tr><td><strong>ファイル操作</strong></td><td>コードの読み取り・編集・新規作成</td><td>バグ修正、リファクタリング</td></tr>
+      <tr><td><strong>コマンド実行</strong></td><td>ターミナルコマンドの実行</td><td>テスト実行、ビルド、Git操作</td></tr>
+      <tr><td><strong>コード検索</strong></td><td>プロジェクト全体のコード検索</td><td>関数の定義箇所を特定</td></tr>
+      <tr><td><strong>Web検索</strong></td><td>ドキュメントやエラー解決策の検索</td><td>最新APIの使い方を調査</td></tr>
+      <tr><td><strong>サブエージェント</strong></td><td>複雑なタスクを分割して並列処理</td><td>調査と実装を同時に実行</td></tr>
+    </table>
+
+    <h3>CLAUDE.md — 設定ファイル</h3>
+    <p>Claude Codeの振る舞いをカスタマイズするためのMarkdownファイルです。プロジェクトのルートに置くと、セッション開始時に自動で読み込まれます。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念 &#x1F4A1;</div>
+      <p><strong>CLAUDE.md：</strong>Claude Codeの「業務マニュアル」のようなファイルです。「このプロジェクトではTypeScriptを使う」「テストは必ずJestで書く」といったルールを記述しておくと、Claude Codeがそれに従って作業します。ドメイン2で詳しく学びます。</p>
+    </div>
+
+    <h3>フック（Hooks）とMCP</h3>
+    <p>Claude Codeの拡張機能として、<strong>フック</strong>と<strong>MCP統合</strong>があります。</p>
+    <table class="compare-table">
+      <tr><th>機能</th><th>説明</th><th>イメージ</th></tr>
+      <tr><td><strong>フック（Hooks）</strong></td><td>Claude Codeのアクション前後にシェルコマンドを自動実行する仕組み</td><td>「ファイルを保存したら自動でフォーマットする」というルール</td></tr>
+      <tr><td><strong>MCP統合</strong></td><td>外部データソース（Google Drive、Jira、Slack等）とClaudeを接続する標準プロトコル</td><td>USBのような「共通の差し込み口」</td></tr>
+    </table>
+
+    <h3>Claude Agent SDK</h3>
+    <p>Claude Codeの能力を「ライブラリ」として提供するものです。開発者が自分のプログラムの中にClaude Codeと同等の機能を組み込めます。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><strong>Claude Code CLI vs Agent SDK の違い</strong>を理解しましょう。CLI（コマンドラインインターフェース）は開発者が対話的に使うもの、Agent SDKはCI/CD（自動テスト・自動デプロイ）やプロダクション環境での自動化に使うものです。「人間が使う」か「プログラムが使う」かの違いです。</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><strong>Client SDK vs Agent SDK の違い</strong>も重要です。Client SDK（Python/TypeScript SDK）はAPI呼び出しを簡単にするもので、ツール実行のループは開発者自身が実装します。Agent SDKはClaude自身がツールを自律的に使って作業を進めます。</p>
+    </div>
+  </div>
+
+  <!-- Section 4: 使い分けガイド -->
+  <div id="m1-s4" class="card" style="display:none">
+    <h2>製品の使い分けガイド</h2>
+    <p>「どの製品をいつ使うべきか」は、CCA-F試験で繰り返し問われるテーマです。ユースケースに応じた最適な選択ができるようになりましょう。</p>
+
+    <h3>ユーザータイプ別の推奨製品</h3>
+    <table class="compare-table">
+      <tr><th>ユーザータイプ</th><th>推奨製品</th><th>典型的な用途</th></tr>
+      <tr><td>非エンジニア（個人）</td><td>claude.ai / Desktop / モバイル</td><td>文章作成、調査、分析、質問応答</td></tr>
+      <tr><td>非エンジニア（自動化）</td><td>Cowork（Max/Enterprise）</td><td>複雑なリサーチ、レポート作成の自動化</td></tr>
+      <tr><td>開発者（個人開発）</td><td>Claude Code CLI</td><td>コーディング支援、バグ修正、リファクタリング</td></tr>
+      <tr><td>開発者（アプリ統合）</td><td>Messages API + SDK</td><td>自社サービスにClaude機能を組み込み</td></tr>
+      <tr><td>開発者（自動化）</td><td>Agent SDK / Batches API</td><td>CI/CDパイプライン、大量データ処理</td></tr>
+      <tr><td>チーム管理者</td><td>Team / Enterprise プラン</td><td>組織での一括管理、セキュリティ管理</td></tr>
+    </table>
+
+    <h3>モデル選択の指針</h3>
+    <p>Module 0で学んだモデル一覧を、より実践的な視点で整理します。</p>
+    <table class="compare-table">
+      <tr><th>シナリオ</th><th>推奨モデル</th><th>理由</th></tr>
+      <tr><td>複雑な分析・高度な推論</td><td>Claude Opus</td><td>最高の知性、長い出力</td></tr>
+      <tr><td>日常的な開発・一般業務</td><td>Claude Sonnet</td><td>速度と性能のバランス</td></tr>
+      <tr><td>大量の分類・簡単なQ&A</td><td>Claude Haiku</td><td>最速・最低コスト</td></tr>
+      <tr><td>段階的な思考が必要なタスク</td><td>拡張思考（Extended Thinking）機能を有効化</td><td>回答前にステップバイステップで「思考」</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">重要概念 &#x1F4A1;</div>
+      <p><strong>拡張思考（Extended Thinking）：</strong>Claudeが回答を出す前に、ステップバイステップで「考える」プロセスです。数学の問題を「途中式を書いてから答えを出す」のに似ています。<code>budget_tokens</code> パラメータで思考に使うトークン量を制御します。思考トークンも出力トークンとして課金される点に注意してください。</p>
+    </div>
+
+    <h3>コスト最適化の考え方</h3>
+    <table class="compare-table">
+      <tr><th>手法</th><th>効果</th><th>適用場面</th></tr>
+      <tr><td><strong>Batches API</strong></td><td>50%割引</td><td>即時応答が不要な大量処理</td></tr>
+      <tr><td><strong>プロンプトキャッシュ（Prompt Caching）</strong></td><td>キャッシュヒット時90%割引</td><td>同じプロンプトの繰り返し利用</td></tr>
+      <tr><td><strong>モデルの使い分け</strong></td><td>最大5倍のコスト差</td><td>タスク難度に応じてモデルを選択</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">試験のシナリオ問題では「コスト効率の良い設計」がよく問われます。<strong>全てにOpusを使うのはアンチパターン</strong>です。簡単なタスクにはHaiku、複雑なタスクにはOpusというように、タスクの性質に応じてモデルを使い分ける設計が正解になります。</p>
+    </div>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">CCA-F試験では、モデルの具体的なバージョン番号よりも、<strong>Opus / Sonnet / Haiku の位置づけと使い分けの原則</strong>を理解しているかが重要です。バージョンは更新されますが、「高性能 / バランス / 高速低コスト」という3段階の構造は変わりません。</p>
+    </div>
+  </div>
+
+  <!-- Section 5: Quiz -->
+  <div id="m1-s5" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 1 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
+
+      <div class="quiz-question" id="m1-q1">
+        <div class="q-text">Q1. 自社のWebアプリにClaudeの機能を組み込みたい場合、最も適切な製品はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',0,0)">claude.ai（Webチャット）</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',0,1)">Claude Code（CLI）</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',0,2)">Claude API（Messages API）+ SDK</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',0,3)">Claude Desktop</div>
+        <div class="quiz-explanation" id="m1-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m1-q2">
+        <div class="q-text">Q2. Message Batches APIの最大のメリットは何ですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',1,0)">リアルタイムでの応答速度が向上する</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',1,1)">通常のAPIと比べて50%のコスト削減になる</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',1,2)">より高性能なモデルが使用できる</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',1,3)">APIキーが不要になる</div>
+        <div class="quiz-explanation" id="m1-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m1-q3">
+        <div class="q-text">Q3. Claude Code CLIとClaude Agent SDKの主な違いは何ですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',2,0)">Claude Codeは無料だがAgent SDKは有料である</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',2,1)">Claude Codeは対話的な開発向け、Agent SDKはCI/CDや自動化向けである</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',2,2)">Claude Codeはファイル編集ができるがAgent SDKはできない</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',2,3)">Agent SDKはPythonでのみ利用可能である</div>
+        <div class="quiz-explanation" id="m1-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m1-q4">
+        <div class="q-text">Q4. 数千件の顧客フィードバックを分類するタスクにおいて、最もコスト効率の良い構成はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',3,0)">Claude Opus + Messages API</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',3,1)">Claude Sonnet + Messages API</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',3,2)">Claude Opus + Batches API</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',3,3)">Claude Haiku + Batches API</div>
+        <div class="quiz-explanation" id="m1-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m1-q5">
+        <div class="q-text">Q5. CLAUDE.mdファイルの役割として最も適切な説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',4,0)">Claude APIの認証情報を保存するファイル</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',4,1)">Claudeの応答ログを記録するファイル</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',4,2)">プロジェクト固有のルールや規約をClaude Codeに伝える設定ファイル</div>
+        <div class="quiz-option" onclick="selectAnswer('m1',4,3)">Claudeのモデルバージョンを指定するファイル</div>
+        <div class="quiz-explanation" id="m1-q5-exp"></div>
+      </div>
+
+      <div id="m1-quiz-result" class="quiz-result" style="display:none"></div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="submitQuiz('m1')" id="m1-submit-btn">回答を確定する</button>
+        <button class="btn btn-outline" onclick="retryQuiz('m1')" id="m1-retry-btn" style="display:none">もう一度挑戦</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="btn-group" style="margin-top:2rem; justify-content: space-between;">
+    <button class="btn btn-outline" onclick="showPage('m0')">&#8592; Module 0へ</button>
+    <button class="btn btn-primary" onclick="showPage('m2')">次のモジュールへ &#8594;</button>
+  </div>
 </div>
 
 <div id="page-m2" style="display:none"><div class="module-header"><span class="week-badge">Week 2</span><h1>Module 2: プロンプトの基本</h1><p class="subtitle">Claudeへの効果的な指示の出し方を学ぶ</p><span class="domain-tag">ドメイン3: プロンプト工学</span></div><div class="card"><h2>コンテンツ準備中</h2><p>Module 0 → M1 の順に学習を進めてください。</p></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m1')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m3')">次へ &#8594;</button></div></div>
@@ -722,6 +1017,16 @@ const QUIZ_DATA = {
       '全6シナリオのうち、試験ではランダムに4シナリオが選ばれます。そのため、6つすべてを学習しておく必要があります。',
       'MCPは「Model Context Protocol」の略です。AIモデルと外部ツール・データソースを接続するための標準プロトコルです。',
       '大量の分類タスクにはClaude Haiku（高速・低コスト）が最適です。1件あたりのコストが低く、処理速度も速いため、大量処理に向いています。'
+    ]
+  },
+  m1: {
+    answers: [2, 1, 1, 3, 2],
+    explanations: [
+      '自社のWebアプリにClaudeを組み込むには、Claude API（Messages API）とSDKを使います。claude.aiやDesktopはエンドユーザー向けの対話ツール、Claude CodeはCLIベースの開発支援ツールです。',
+      'Message Batches APIは大量のリクエストを非同期で一括処理し、通常の50%のコストで利用できます。リアルタイム応答ではなく、バッチ（一括）処理による時間と引き換えのコスト削減がメリットです。',
+      'Claude Code CLIは開発者が対話的に使う開発支援ツール、Agent SDKはCI/CDパイプラインやプロダクション環境での自動化に組み込むためのライブラリです。「人間が使う」か「プログラムが使う」かの違いがポイントです。',
+      '数千件の分類という大量処理には、最もコストが低いClaude Haikuと、50%割引のBatches APIの組み合わせが最適です。Opusは高性能ですが単純な分類タスクにはオーバースペックで、コスト効率が悪くなります。',
+      'CLAUDE.mdはプロジェクト固有のルール・規約・コーディング方針をClaude Codeに伝えるための設定ファイルです。APIキーの保存やログ記録には使いません。'
     ]
   }
 };

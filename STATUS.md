@@ -20,10 +20,17 @@
   - 確認クイズ（5問）
 - [x] PROJECT.md（方針書）作成
 - [x] STATUS.md（このファイル）作成
+- [x] GitHub Pages セットアップ（rikunagayasu-oss/cca-f-learning）
+- [x] Module 1「Claude製品群を理解する」のコンテンツ作成
+  - 製品ラインナップ（一般向け・開発者向け・企業向け）
+  - APIとSDK（Messages API、Batches API、公式SDK 7言語）
+  - Claude Code（CLI・CLAUDE.md・フック・MCP・Agent SDK）
+  - 製品の使い分けガイド（ユーザー別推奨・モデル選択・コスト最適化）
+  - 確認クイズ（5問）
 
 ## 次にやること
 
-- [ ] Module 1「Claude製品群を理解する」のコンテンツ作成
+- [ ] Module 1の内容レビュー・フィードバック反映
 - [ ] Module 2「プロンプトの基本」のコンテンツ作成
 - [ ] 以降、M3〜M12を順次作成
 
