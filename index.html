@@ -3051,13 +3051,1443 @@
   </div>
 </div>
 
-<div id="page-m9" style="display:none"><div class="module-header"><span class="week-badge">Week 7</span><h1>Module 9: エージェントアーキテクチャ</h1><p class="subtitle">自律的に動くAIシステムの設計パターン</p><span class="domain-tag">ドメイン1: エージェント設計 (27%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m8')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m10')">次へ &#8594;</button></div></div>
+<div id="page-m9" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 7</span>
+    <h1>Module 9: エージェントアーキテクチャ</h1>
+    <p class="subtitle">自律的に動くAIシステムの設計パターンを理解する</p>
+    <span class="domain-tag">ドメイン1: エージェント設計 (27%)</span>
+  </div>
 
-<div id="page-m10" style="display:none"><div class="module-header"><span class="week-badge">Week 7</span><h1>Module 10: マルチエージェント</h1><p class="subtitle">複数エージェントの協調設計</p><span class="domain-tag">ドメイン1: エージェント設計 (27%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m9')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m11')">次へ &#8594;</button></div></div>
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>拡張LLM（Augmented LLM）の概念と、ワークフロー・自律エージェントの違いを理解する</li>
+      <li>Anthropicが提唱する5つのワークフローパターンを理解し、使い分けを判断できる</li>
+      <li>エージェントループの仕組みと、stop_reasonによるループ制御を理解する</li>
+      <li>ガードレールとプログラム的エンフォースメントの重要性を理解する</li>
+      <li>エージェント設計のベストプラクティスとアンチパターンを知る</li>
+    </ul>
+  </div>
 
-<div id="page-m11" style="display:none"><div class="module-header"><span class="week-badge">Week 8</span><h1>Module 11: コンテキスト管理</h1><p class="subtitle">長文処理とエラー対策の設計</p><span class="domain-tag">ドメイン5: コンテキスト管理 (15%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m10')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m12')">次へ &#8594;</button></div></div>
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m9','s1',this)">エージェントとは</button>
+    <button class="section-tab" onclick="showSection('m9','s2',this)">5つのワークフロー</button>
+    <button class="section-tab" onclick="showSection('m9','s3',this)">自律エージェント</button>
+    <button class="section-tab" onclick="showSection('m9','s4',this)">設計の原則</button>
+    <button class="section-tab" onclick="showSection('m9','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m9','s6',this)">クイズ</button>
+  </div>
 
-<div id="page-m12" style="display:none"><div class="module-header"><span class="week-badge">Week 8</span><h1>Module 12: 総復習と模擬試験</h1><p class="subtitle">全ドメインの最終確認</p><span class="domain-tag">全ドメイン</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m11')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('dashboard')">ダッシュボードへ</button></div></div>
+  <!-- Section 1: エージェントとは -->
+  <div id="m9-s1" class="card">
+    <h2>エージェントとは何か</h2>
+    <p>これまでのモジュールで、Claudeにプロンプトを送り、ツールを使わせる方法を学びました。しかし、現実の仕事は「1回のやり取り」では終わりません。調べ物をして、判断して、実行して、結果を確認して、必要なら修正する ── この<strong>ループ（繰り返し）</strong>を自律的に回せるAIシステムが「エージェント」です。</p>
+
+    <p>身近な例えで言うと、チャットAIは「質問したら答えてくれる辞書」、エージェントは「指示を出したら自分で段取りを考え、必要な道具を使いこなして仕事を片付けてくれる優秀な部下」のようなものです。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>エージェント（Agent）：</strong>LLMがツールを使いながら、環境からのフィードバック（実行結果やエラー）に基づいてタスクを自律的に遂行するシステムのこと。計画 → 実行 → 確認 → 修正のループを繰り返します。</p>
+    </div>
+
+    <h3>拡張LLM（Augmented LLM）— エージェントの基本部品</h3>
+    <p>Anthropicは、エージェントの基本構成要素を<strong>「拡張LLM（Augmented LLM）」</strong>と呼んでいます。素のLLM（脳だけの状態）に3つの能力を付与したものです。</p>
+
+    <table class="compare-table">
+      <tr><th>能力</th><th>英語名</th><th>比喩</th><th>説明</th></tr>
+      <tr><td><strong>検索</strong></td><td>Retrieval</td><td>目</td><td>外部の情報源（データベース、ドキュメント等）から必要な情報を取得する</td></tr>
+      <tr><td><strong>ツール統合</strong></td><td>Tool Integration</td><td>手</td><td>外部のAPI・サービスを呼び出して操作を実行する（Module 5で学習済み）</td></tr>
+      <tr><td><strong>メモリ</strong></td><td>Memory</td><td>メモ帳</td><td>過去のやり取りや重要な情報を保持・参照する</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Augmented LLMは「脳（LLM）に手（ツール）・目（検索）・メモ帳（メモリ）を与えた作業者」と覚えましょう。この3つの能力がエージェントの土台です。ツール統合の標準規格がMCP（Model Context Protocol）であることも試験で問われます。</p>
+    </div>
+
+    <h3>ワークフロー vs 自律エージェント — 2つのアプローチ</h3>
+    <p>Anthropicは、エージェント的なシステム（Agentic Systems）を大きく2種類に分けています。</p>
+
+    <div class="concept-box">
+      <div class="label">重要な区別</div>
+      <p><strong>ワークフロー（Workflows）：</strong>事前に定義されたコードパス（Predefined Code Paths）でLLMとツールを制御する方式。料理のレシピのように、手順が決まっている。</p>
+      <p><strong>自律エージェント（Agents）：</strong>LLM自身がプロセスやツール使用を動的に決定する方式。熟練シェフのように、状況を見て自分で判断する。</p>
+    </div>
+
+    <table class="compare-table">
+      <tr><th>観点</th><th>ワークフロー</th><th>自律エージェント</th></tr>
+      <tr><td>制御方式</td><td>開発者が手順をコードで定義</td><td>LLMが自ら判断して実行</td></tr>
+      <tr><td>柔軟性</td><td>低い（決まった手順に沿う）</td><td>高い（状況に応じて変化）</td></tr>
+      <tr><td>予測可能性</td><td>高い（結果が安定）</td><td>低い（結果が変わりうる）</td></tr>
+      <tr><td>適した場面</td><td>サブタスクが予測可能な場合</td><td>手順が事前に決められない場合</td></tr>
+      <tr><td>コスト</td><td>比較的低い</td><td>ループが増えると高くなる</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">Anthropicは「最も洗練されたシステムを作ることが成功ではなく、ニーズに合った正しいシステムを作ることが成功」と強調しています。多くのアプリケーションは、単一LLM呼び出し+検索+in-context examplesの最適化で十分です。不必要にエージェント化しないことが重要です。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: 5つのワークフローパターン -->
+  <div id="m9-s2" class="card" style="display:none">
+    <h2>5つのワークフローパターン</h2>
+    <p>Anthropicは公式ブログ「Building effective agents」で、5つの基本ワークフローパターンを提唱しています。これらはCCA-F試験で最も頻出するテーマの一つです。</p>
+
+    <h3>1. プロンプト連鎖（Prompt Chaining）</h3>
+    <div class="concept-box">
+      <div class="label">Prompt Chaining</div>
+      <p>LLM呼び出しを<strong>順番に実行</strong>し、前段の出力が次段の入力になるパターン。各ステップの間に検証ゲート（Validation Gate）を挟むことで品質を確保します。</p>
+      <p><strong>たとえ：</strong>工場の組み立てライン。部品を作る → 検品する → 次の工程に渡す → 検品する → 完成品にする。</p>
+      <p><strong>使いどころ：</strong>タスクが「固定されたサブタスク」に分解でき、レイテンシ（応答時間）より精度を優先する場合。</p>
+      <p><strong>例：</strong>マーケティングコピー生成 → 翻訳 → 品質チェック。</p>
+    </div>
+
+    <h3>2. ルーティング（Routing）</h3>
+    <div class="concept-box">
+      <div class="label">Routing</div>
+      <p>入力を<strong>分類</strong>し、適切な専門処理パスに<strong>振り分ける</strong>パターン。交通整理の信号機のようなものです。</p>
+      <p><strong>使いどころ：</strong>明確なカテゴリが存在し、カテゴリごとに異なる処理が必要な場合。</p>
+      <p><strong>例：</strong>カスタマーサービスで問い合わせ内容を「返金」「技術サポート」「一般質問」に振り分け、それぞれの専門処理へ。簡単な質問をHaikuで、複雑な質問をSonnetで処理するモデル振り分けにも使えます。</p>
+    </div>
+
+    <h3>3. 並列化（Parallelization）</h3>
+    <div class="concept-box">
+      <div class="label">Parallelization</div>
+      <p>複数の処理パスを<strong>同時実行</strong>し、結果を集約するパターン。2つの変形があります。</p>
+      <p><strong>セクション分け（Sectioning）：</strong>独立したサブタスクを並行実行。たとえば、ガードレール検査とメイン応答生成を同時に行う。</p>
+      <p><strong>投票（Voting）：</strong>同じタスクを複数回実行し、多数決やスコアリングで結果を決定。たとえば、セキュリティコードレビューを3つの独立分析で実行し、閾値投票で判定する。</p>
+    </div>
+
+    <h3>4. オーケストレータ-ワーカー（Orchestrator-Workers）</h3>
+    <div class="concept-box">
+      <div class="label">Orchestrator-Workers</div>
+      <p>中央のLLM（オーケストレータ）が<strong>動的にタスクを分解</strong>し、専門ワーカーに委任し、結果を統合するパターン。オーケストラの指揮者のように全体を調整します。</p>
+      <p><strong>Parallelizationとの違い：</strong>サブタスクが事前に決まっているのではなく、<strong>入力に応じて動的に決まる</strong>点が異なります。</p>
+      <p><strong>例：</strong>複数ファイルにまたがるコード修正（対象ファイル数がタスクにより変動）。</p>
+    </div>
+
+    <h3>5. 評価者-最適化者（Evaluator-Optimizer）</h3>
+    <div class="concept-box">
+      <div class="label">Evaluator-Optimizer</div>
+      <p>一方のLLMが応答を生成し、もう一方のLLMが構造化フィードバックを提供する<strong>反復改善ループ</strong>。「書く人」と「校正する人」の分業です。</p>
+      <p><strong>使いどころ：</strong>明確な評価基準があり、反復的な改善が測定可能な価値を持つ場合。</p>
+      <p><strong>例：</strong>文学翻訳の品質向上（翻訳 → レビュー → 修正 → 再レビュー）。</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">5つのパターンの使い分けは頻出です。特に「サブタスクが予測可能か」が判断基準になります。予測可能ならPrompt ChainingやParallelization、予測不可能ならOrchestrator-Workersや自律エージェントを選択します。Evaluator-Optimizerでは、同一セッション内でのセルフレビューはアンチパターン ── 必ず独立したレビューインスタンスを使用する点も重要です。</p>
+    </div>
+
+    <h3>パターン選択の早見表</h3>
+    <table class="compare-table">
+      <tr><th>状況</th><th>推奨パターン</th></tr>
+      <tr><td>手順が決まっている順次処理</td><td>Prompt Chaining</td></tr>
+      <tr><td>入力に応じて処理先を分ける</td><td>Routing</td></tr>
+      <tr><td>独立した複数タスクを同時実行</td><td>Parallelization（Sectioning）</td></tr>
+      <tr><td>同じ処理を複数視点で検証</td><td>Parallelization（Voting）</td></tr>
+      <tr><td>サブタスクが動的に変わる複雑な作業</td><td>Orchestrator-Workers</td></tr>
+      <tr><td>明確な基準で反復的に品質向上</td><td>Evaluator-Optimizer</td></tr>
+      <tr><td>手順が予測できないオープンなタスク</td><td>自律エージェント</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 3: 自律エージェント -->
+  <div id="m9-s3" class="card" style="display:none">
+    <h2>自律エージェントとエージェントループ</h2>
+    <p>5つのワークフローパターンでは対応できない、手順が事前に予測できないタスクには<strong>自律エージェント</strong>を使います。</p>
+
+    <h3>エージェントループ（Agentic Loop）の仕組み</h3>
+    <p>自律エージェントの核心は、<strong>ループ（繰り返し）</strong>です。Anthropicは「エージェントとは、ループ内で環境フィードバックに基づきツールを使うLLMに過ぎない」と述べています。実装は意外とシンプルです。</p>
+
+    <div class="concept-box">
+      <div class="label">エージェントループの4段階</div>
+      <p><strong>1. 情報収集（Gather Context）：</strong>タスクに必要な情報を検索・取得する。</p>
+      <p><strong>2. 行動実行（Take Action）：</strong>ツールを使ってタスクを実行する。</p>
+      <p><strong>3. 作業検証（Verify Work）：</strong>実行結果を評価・確認する。</p>
+      <p><strong>4. 反復改善（Iterate）：</strong>検証結果に基づき、必要なら修正して繰り返す。</p>
+    </div>
+
+    <h3>stop_reasonによるループ制御</h3>
+    <p>エージェントループの制御で最も重要なのが、APIレスポンスの<code>stop_reason</code>フィールドです。</p>
+
+    <table class="compare-table">
+      <tr><th>stop_reason</th><th>意味</th><th>エージェントの動作</th></tr>
+      <tr><td><code>"tool_use"</code></td><td>ツール呼び出しを要求</td><td>ツールを実行し、結果を返して<strong>ループ継続</strong></td></tr>
+      <tr><td><code>"end_turn"</code></td><td>最終回答を返した</td><td>タスク完了、<strong>ループ終了</strong></td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">ループの終了判定は必ず<code>stop_reason</code>フィールドの検査で行います。「テキスト内容に"完了"と書いてあるか」「特定のキーワードが含まれるか」などの自然言語パースによるループ終了判定はアンチパターンです。これは非常に頻出する試験ポイントです。</p>
+    </div>
+
+    <h3>Coordinator-Subagentパターン</h3>
+    <p>複数のエージェントが協力するマルチエージェントシステムでは、<strong>Hub-and-spoke（車輪のハブとスポーク）</strong>型のアーキテクチャが推奨されます。</p>
+
+    <div class="concept-box">
+      <div class="label">Coordinator-Subagent</div>
+      <p><strong>コーディネーター（Coordinator）：</strong>中心に位置し、タスクの分解・委任・結果の統合を担当。全サブエージェント間の通信とエラー処理を管理する「司令塔」。</p>
+      <p><strong>サブエージェント（Subagent）：</strong>個別のタスクを実行する「実行部隊」。それぞれが独立したコンテキストウィンドウで動作し、コーディネーターの会話履歴を自動的には継承しない。</p>
+    </div>
+
+    <p>Agent SDKでは、サブエージェントの生成には<code>Task</code>ツールを使います。並列実行するサブエージェントは、<strong>1回のコーディネーターレスポンスで複数の<code>Task</code>ツール呼び出しをまとめて発行</strong>します（別々のターンに分けない）。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">サブエージェントは独立したコンテキストで動作するため、必要な情報はプロンプトで<strong>明示的に提供</strong>する必要があります。「親エージェントの情報が自動で共有される」という前提は誤りです。コーディネーターのプロンプトは「手順的な指示」ではなく「研究目標と品質基準」を指定し、サブエージェントの適応性を確保しましょう。</p>
+    </div>
+
+    <h3>セッション管理</h3>
+    <p>長時間にわたるエージェント作業では、セッションの管理も重要です。</p>
+    <ul>
+      <li><strong>セッション再開（Resume）：</strong>名前付きセッションを途中から再開できる。ただし、コード変更後は変更内容をエージェントに明示的に通知する必要がある</li>
+      <li><strong>セッション分岐（Fork）：</strong>共有の分析ベースラインから独立した探索ブランチを作成。異なるアプローチを並列で試す場合に有効</li>
+      <li><strong>コンテキスト圧縮（Context Compaction）：</strong>コンテキスト限界に近づくと、前のメッセージを自動要約してウィンドウを確保</li>
+    </ul>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">古いツール結果を持つセッションを単純に再開するより、構造化サマリー（Structured Summary）を注入した新規セッションを開始するほうが信頼性が高い、というのも出題されやすいポイントです。</p>
+    </div>
+  </div>
+
+  <!-- Section 4: 設計の原則 -->
+  <div id="m9-s4" class="card" style="display:none">
+    <h2>エージェント設計の原則とベストプラクティス</h2>
+    <p>27%という最大配点を持つこのドメインでは、「どうやってエージェントを作るか」だけでなく、「どう設計すべきか」「何を避けるべきか」の判断力が問われます。</p>
+
+    <h3>Anthropicの3原則</h3>
+    <div class="concept-box">
+      <div class="label">エージェント設計の3原則</div>
+      <p><strong>1. シンプルさ（Simplicity）：</strong>不要な複雑さを避ける。多くのアプリケーションは単一LLM呼び出し+検索で十分。エージェント化は本当に必要な場合のみ。</p>
+      <p><strong>2. 透明性（Transparency）：</strong>エージェントの計画ステップと判断過程を明示する。ブラックボックスにしない。</p>
+      <p><strong>3. ACI設計（Agent-Computer Interface）：</strong>ツールのインターフェース設計にHCI（人間向けUI設計）並みの労力を投入する。</p>
+    </div>
+
+    <h3>プログラム的エンフォースメント vs プロンプトベースのガイダンス</h3>
+    <p>エージェント設計で最も重要な判断の一つが「ルールをどう強制するか」です。</p>
+
+    <table class="compare-table">
+      <tr><th>手法</th><th>英語名</th><th>特徴</th><th>適用場面</th></tr>
+      <tr><td><strong>プログラム的強制</strong></td><td>Programmatic Enforcement</td><td>hooks・前提条件ゲートなどコードで100%遵守を保証</td><td>ID検証後にのみ操作を許可、$500超の返金をブロック等</td></tr>
+      <tr><td><strong>プロンプト指示</strong></td><td>Prompt-based Guidance</td><td>自然言語の指示。遵守率は高いが100%ではない</td><td>応答のトーン調整、一般的なガイドライン等</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">ビジネスルールの遵守が決定論的に必要な場面（金融操作、個人情報アクセス等）では、プロンプト指示だけでは不十分です。Agent SDKの<code>PostToolUse</code>フックなどプログラム的な手段で強制する必要があります。「プロンプトで指示すればよい」という選択肢はアンチパターンです。</p>
+    </div>
+
+    <h3>検証の3手法</h3>
+    <p>エージェントの出力を検証する方法は3つあります。</p>
+
+    <table class="compare-table">
+      <tr><th>手法</th><th>英語名</th><th>説明</th><th>例</th></tr>
+      <tr><td>ルールベース検証</td><td>Rules-Based Feedback</td><td>コードのlintなど自動ルールで検査</td><td>構文エラーチェック、フォーマット検証</td></tr>
+      <tr><td>視覚的検証</td><td>Visual Feedback</td><td>スクリーンショットによるUI確認</td><td>画面レイアウトの崩れがないか確認</td></tr>
+      <tr><td>LLM判定</td><td>LLM-as-Judge</td><td>別のLLMが曖昧な基準で評価</td><td>「回答は丁寧な口調か」「要約は正確か」</td></tr>
+    </table>
+
+    <h3>ツール設計のベストプラクティス（ACI設計）</h3>
+    <p>エージェントが使うツールの設計も、エージェントの品質を大きく左右します。</p>
+    <ul>
+      <li><strong>ポカヨケ設計（Poka-yoke）：</strong>ミスが起きにくいインターフェースにする。たとえば、相対パスではなく絶対パスを要求する</li>
+      <li><strong>description の充実：</strong>エッジケース・使用例・境界条件を含める。「ジュニア開発者が理解できるドキュメント」レベルの記述を目指す</li>
+      <li><strong>ツール数の制限：</strong>多すぎるとLLMの選択精度が下がる。1リクエストあたり4〜5個に絞ることを推奨</li>
+      <li><strong>結果の整形：</strong>ツール戻り値が巨大すぎるとコンテキストウィンドウを圧迫する。必要な情報だけに絞る</li>
+    </ul>
+
+    <h3>よくあるアンチパターン</h3>
+    <table class="compare-table">
+      <tr><th>アンチパターン</th><th>正しいアプローチ</th></tr>
+      <tr><td>プロンプト指示だけでビジネスルールを強制</td><td>プログラム的フック（hooks）で強制</td></tr>
+      <tr><td>同一セッション内でセルフレビュー</td><td>独立したレビューインスタンスを使用</td></tr>
+      <tr><td>18個のツールを全て提供</td><td>4〜5個に絞ってツール選択の信頼性を確保</td></tr>
+      <tr><td>自然言語パースでループ終了判定</td><td><code>stop_reason</code>フィールドの検査</td></tr>
+      <tr><td>過度に狭いタスク分解</td><td>適切な粒度で分割（広い視点の欠落を防止）</td></tr>
+      <tr><td>古いセッションを無条件に再開</td><td>構造化サマリーを注入した新規セッション開始</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">Anthropicは「フレームワーク（LangChainなど）は抽象レイヤーを追加しデバッグを困難にする。まずLLM APIを直接使用することを推奨」と公式に述べています。試験でフレームワーク利用を推奨する選択肢が出たら注意しましょう。</p>
+    </div>
+  </div>
+
+  <!-- Section 5: 用語集 -->
+  <div id="m9-s5" class="card" style="display:none">
+    <h2>エージェントアーキテクチャ 用語集</h2>
+    <p>このモジュールで登場した重要な用語をまとめています。試験は英語のため、英語表記も併記しています。</p>
+
+    <div class="glossary-item">
+      <div class="glossary-term">拡張LLM</div>
+      <div class="glossary-en">Augmented LLM</div>
+      <div class="glossary-def">素のLLMに検索・ツール統合・メモリの3つの能力を付与したもの。エージェントの基本構成要素。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">エージェント的システム</div>
+      <div class="glossary-en">Agentic System</div>
+      <div class="glossary-def">ワークフローと自律エージェントの両方を包含する広義の用語。LLMを核としてタスクを遂行するシステム全般を指す。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">プロンプト連鎖</div>
+      <div class="glossary-en">Prompt Chaining</div>
+      <div class="glossary-def">LLM呼び出しを順次実行し、前段の出力を次段の入力にするパターン。各段の間に検証ゲートを挟む。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ルーティング</div>
+      <div class="glossary-en">Routing</div>
+      <div class="glossary-def">入力を分類し、適切な専門処理パスに振り分けるパターン。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">並列化</div>
+      <div class="glossary-en">Parallelization</div>
+      <div class="glossary-def">複数の処理パスを同時実行し、結果を集約するパターン。Sectioning（分割実行）とVoting（投票）の2変形がある。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">オーケストレータ-ワーカー</div>
+      <div class="glossary-en">Orchestrator-Workers</div>
+      <div class="glossary-def">中央のLLMが動的にタスクを分解し、専門ワーカーに委任・統合するパターン。サブタスクが入力に応じて変わる点がParallelizationと異なる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">評価者-最適化者</div>
+      <div class="glossary-en">Evaluator-Optimizer</div>
+      <div class="glossary-def">生成と評価を別のLLMが分担し、反復改善ループで品質を向上させるパターン。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">エージェントループ</div>
+      <div class="glossary-en">Agentic Loop</div>
+      <div class="glossary-def">情報収集→行動実行→作業検証→反復改善の4段階を繰り返すエージェントの核心メカニズム。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">コーディネーター</div>
+      <div class="glossary-en">Coordinator</div>
+      <div class="glossary-def">マルチエージェントシステムの司令塔。タスク分解・サブエージェント委任・結果統合を担当。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">プログラム的エンフォースメント</div>
+      <div class="glossary-en">Programmatic Enforcement</div>
+      <div class="glossary-def">フック（hooks）やゲートなどのコードで、ビジネスルールの100%遵守を保証する手法。プロンプト指示だけでは不十分な場面で使う。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ポカヨケ設計</div>
+      <div class="glossary-en">Poka-yoke Design</div>
+      <div class="glossary-def">ミスが起きにくいツールインターフェース設計。相対パスでなく絶対パスを要求する等。</div>
+    </div>
+  </div>
+
+  <!-- Section 6: クイズ -->
+  <div id="m9-s6" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 9 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
+
+      <div class="quiz-question" id="m9-q1">
+        <div class="q-text">Q1. Anthropicが提唱する「Augmented LLM」の3つの構成要素として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',0,0)">計画（Planning）、実行（Execution）、報告（Reporting）</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',0,1)">検索（Retrieval）、ツール統合（Tool Integration）、メモリ（Memory）</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',0,2)">入力（Input）、処理（Processing）、出力（Output）</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',0,3)">学習（Learning）、推論（Reasoning）、生成（Generation）</div>
+        <div class="quiz-explanation" id="m9-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q2">
+        <div class="q-text">Q2. エージェントループの終了判定として、Anthropicが推奨する方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',1,0)">応答テキストに「完了」というキーワードが含まれるかチェック</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',1,1)">一定回数のループ後に強制終了する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',1,2)">APIレスポンスのstop_reasonフィールドが"end_turn"かどうかを検査</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',1,3)">ユーザーが手動で停止指示を送る</div>
+        <div class="quiz-explanation" id="m9-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q3">
+        <div class="q-text">Q3. カスタマーサポートで、問い合わせを「返金」「技術サポート」「一般質問」に振り分けるシステムに最適なワークフローパターンはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',2,0)">Prompt Chaining（プロンプト連鎖）</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',2,1)">Evaluator-Optimizer（評価者-最適化者）</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',2,2)">Routing（ルーティング）</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',2,3)">Orchestrator-Workers（オーケストレータ-ワーカー）</div>
+        <div class="quiz-explanation" id="m9-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q4">
+        <div class="q-text">Q4. 金融アプリケーションで「$500を超える返金操作をブロックする」ルールを確実に適用するベストプラクティスはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',3,0)">システムプロンプトに「$500以上の返金は行わないこと」と記載する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',3,1)">エージェントに判断を任せ、結果を後からレビューする</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',3,2)">PostToolUseフックやプログラム的ゲートで返金額を検査しブロックする</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',3,3)">ユーザーに毎回確認メッセージを表示する</div>
+        <div class="quiz-explanation" id="m9-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q5">
+        <div class="q-text">Q5. Orchestrator-WorkersパターンとParallelizationパターンの最も重要な違いはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',4,0)">Orchestrator-Workersのほうが処理速度が速い</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',4,1)">Parallelizationはワーカーを1つしか使えない</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',4,2)">Orchestrator-Workersではサブタスクが入力に応じて動的に決まる</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',4,3)">Parallelizationは自律エージェントの一種である</div>
+        <div class="quiz-explanation" id="m9-q5-exp"></div>
+      </div>
+
+      <div id="m9-quiz-result" class="quiz-result" style="display:none"></div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="submitQuiz('m9')" id="m9-submit-btn">回答を確定する</button>
+        <button class="btn btn-outline" onclick="retryQuiz('m9')" id="m9-retry-btn" style="display:none">もう一度挑戦</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="btn-group" style="margin-top:2rem; justify-content: space-between;">
+    <button class="btn btn-outline" onclick="showPage('m8')">&#8592; 前のモジュールへ</button>
+    <button class="btn btn-primary" onclick="showPage('m10')">次のモジュールへ &#8594;</button>
+  </div>
+</div>
+
+<div id="page-m10" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 7</span>
+    <h1>Module 10: マルチエージェント</h1>
+    <p class="subtitle">複数のAIエージェントを協調させるシステム設計を学ぶ</p>
+    <span class="domain-tag">ドメイン1: エージェント型アーキテクチャとオーケストレーション (27%)</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>マルチエージェントシステムの設計パターンと使い分け</li>
+      <li>エージェント間通信の3方式（メッセージパッシング、共有メモリ、ハンドオフ）</li>
+      <li>Agent-as-Tool と Handoff の違いと適用場面</li>
+      <li>タスク分解の手法（機能分割 vs データ分割）</li>
+      <li>安全性設計（Guardrails、Human-in-the-loop、エスカレーション）</li>
+    </ul>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m10','s1',this)">マルチエージェントとは</button>
+    <button class="section-tab" onclick="showSection('m10','s2',this)">設計パターン</button>
+    <button class="section-tab" onclick="showSection('m10','s3',this)">通信と連携</button>
+    <button class="section-tab" onclick="showSection('m10','s4',this)">安全性と信頼性</button>
+    <button class="section-tab" onclick="showSection('m10','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m10','s6',this)">クイズ</button>
+  </div>
+
+  <!-- Section 1: マルチエージェントとは -->
+  <div id="m10-s1" class="card">
+    <h2>マルチエージェントシステムとは</h2>
+    <p>Module 9で学んだエージェント（自律的にタスクを遂行するAI）を<strong>複数協調させる</strong>のがマルチエージェントシステムです。1人で全部やるのではなく、<strong>チームで分業して仕事を進める</strong>アプローチです。</p>
+    <p>会社に例えると、Module 9は「1人の優秀な社員」の働き方でした。Module 10は「チーム全体」の編成方法 — 誰にどの仕事を任せるか、どう連携するか、問題が起きたらどうエスカレーションするかを学びます。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>マルチエージェントシステム（Multi-Agent System）：</strong>複数のAIエージェントが協調してタスクを遂行するシステム。各エージェントが専門の役割を持ち、通信しながら全体の目標を達成する。</p>
+    </div>
+
+    <h3>いつマルチエージェントにすべきか？</h3>
+    <p>Anthropicは<strong>「シンプルさを優先せよ（Start with the simplest solution）」</strong>と明確に推奨しています。いきなり複雑なマルチエージェントを組むのではなく、段階的に複雑さを増やすのが正しいアプローチです。</p>
+
+    <div class="concept-box">
+      <div class="label">Anthropic推奨の判断フロー</div>
+      <p><strong>Step 1：</strong>まず単一のLLM呼び出し（プロンプトエンジニアリング）で試す</p>
+      <p><strong>Step 2：</strong>不十分なら → プロンプトチェーン（最もシンプルなワークフロー）</p>
+      <p><strong>Step 3：</strong>それでも不十分なら → 複雑なワークフローパターンを検討</p>
+      <p><strong>Step 4：</strong>動的な判断が必要な場合のみ → 自律エージェント / マルチエージェント</p>
+    </div>
+
+    <p>料理に例えると：まず一人で作れるか試す → 助手に下ごしらえを頼む → 複数人で分担する → フルキッチンチームを組む。いきなりチームを組むのは非効率です。</p>
+
+    <h3>マルチエージェントが適するケース</h3>
+    <table class="compare-table">
+      <tr><th>判断基準</th><th>シングルエージェント</th><th>マルチエージェント</th></tr>
+      <tr><td><strong>専門性</strong></td><td>単一領域で完結</td><td>異なるスキルが必要（コード + テスト + 文書）</td></tr>
+      <tr><td><strong>並列処理</strong></td><td>順次処理で十分</td><td>独立サブタスクを同時実行して速度向上</td></tr>
+      <tr><td><strong>コンテキスト</strong></td><td>ウィンドウ内で完結</td><td>情報量が多く分離が必要</td></tr>
+      <tr><td><strong>信頼性</strong></td><td>単一の回答で十分</td><td>複数の視点で照合（投票方式）</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「このシナリオに最適なアプローチはどれか」という問題が頻出します。<strong>過度に複雑なアーキテクチャを選ぶ選択肢はほぼ不正解</strong>です。Anthropicの「シンプルさ優先」の哲学を常に意識しましょう。英語では "Start with the simplest solution that could work" と表現されます。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: 設計パターン -->
+  <div id="m10-s2" class="card" style="display:none">
+    <h2>マルチエージェントの設計パターン</h2>
+    <p>Anthropicの公式ドキュメント（"Building effective agents"）では、エージェントシステムを<strong>ワークフロー（Workflows）</strong>と<strong>エージェント（Agents）</strong>に大別しています。ワークフローはオーケストレーション側がフローを制御し、エージェントはLLM自身が判断する方式です。</p>
+
+    <h3>ワークフローパターン</h3>
+
+    <div class="concept-box">
+      <div class="label">1. Prompt Chaining（プロンプトチェーン）</div>
+      <p>タスクを順番に処理する方式。前のステップの出力が次の入力になります。途中にゲート（品質チェック）を挟むことで、問題を早期発見できます。</p>
+      <p><strong>比喩：</strong>工場の組立ライン。部品を順に組み立て、各工程で品質検査する。</p>
+      <p><strong>適するケース：</strong>タスクを明確な順次ステップに分解できる場合。</p>
+    </div>
+
+    <div class="concept-box">
+      <div class="label">2. Routing（ルーティング）</div>
+      <p>入力を分類し、適切な専門処理に振り分ける方式。</p>
+      <p><strong>比喩：</strong>病院の受付トリアージ。症状を聞いて「内科」「外科」「眼科」に振り分ける。</p>
+      <p><strong>適するケース：</strong>入力の種類によって最適な処理が異なる場合（カスタマーサポートの部門振り分けなど）。</p>
+    </div>
+
+    <div class="concept-box">
+      <div class="label">3. Parallelization（並列化）</div>
+      <p>複数のエージェントが同時に処理する方式。<strong>Sectioning（機能分割）</strong>と<strong>Voting（投票 / 多数決）</strong>の2種があります。</p>
+      <p><strong>Sectioning：</strong>異なるサブタスクを同時実行（例：コードレビュー + セキュリティチェック + パフォーマンス分析を並行）。</p>
+      <p><strong>Voting：</strong>同じタスクを複数エージェントが実行し、結果を照合（例：3つのエージェントが独立して分類し、多数決で最終判断）。</p>
+      <p><strong>比喩：</strong>Sectioningは「複数の専門家が同時に異なる検査をする」、Votingは「複数の審査員が同時に採点する」。</p>
+    </div>
+
+    <div class="concept-box">
+      <div class="label">4. Orchestrator-Workers（オーケストレーター・ワーカー）</div>
+      <p>中央のオーケストレーターがタスクを動的に分解し、ワーカーに割り振り、結果を統合する方式。</p>
+      <p><strong>比喩：</strong>現場監督と作業員。監督が全体を見て指示を出し、作業員が実行する。</p>
+      <p><strong>適するケース：</strong>タスクの分解方法が事前に決められず、入力に応じて動的に判断する必要がある場合。</p>
+    </div>
+
+    <div class="concept-box">
+      <div class="label">5. Evaluator-Optimizer（評価者・最適化者）</div>
+      <p>一方が生成し、もう一方が評価・フィードバック。基準を満たすまでループする方式。</p>
+      <p><strong>比喩：</strong>作家と編集者。作家が原稿を書き、編集者が赤入れし、作家が修正する。</p>
+      <p><strong>適するケース：</strong>品質基準が明確で、反復的な改善が有効な場合。</p>
+    </div>
+
+    <h3>パターン選択のまとめ</h3>
+    <table class="compare-table">
+      <tr><th>パターン</th><th>制御方式</th><th>比喩</th><th>キーワード</th></tr>
+      <tr><td><strong>Prompt Chaining</strong></td><td>順次</td><td>組立ライン</td><td>ステップ分解、ゲート</td></tr>
+      <tr><td><strong>Routing</strong></td><td>振り分け</td><td>病院のトリアージ</td><td>分類、専門化</td></tr>
+      <tr><td><strong>Parallelization</strong></td><td>並列</td><td>複数審査員</td><td>Sectioning / Voting</td></tr>
+      <tr><td><strong>Orchestrator-Workers</strong></td><td>動的分配</td><td>現場監督</td><td>動的分解、統合</td></tr>
+      <tr><td><strong>Evaluator-Optimizer</strong></td><td>反復</td><td>作家と編集者</td><td>生成→評価→改善ループ</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Anthropicは<strong>「予測可能なフローにはワークフロー、動的な判断にはエージェント」</strong>（"Workflows for predictable, agents for dynamic"）と推奨しています。パターンの特徴と比喩を覚え、シナリオに応じた選択ができるようにしましょう。Parallelizationの<strong>SectioningとVotingの違い</strong>も頻出が予想されます。</p>
+    </div>
+  </div>
+
+  <!-- Section 3: 通信と連携 -->
+  <div id="m10-s3" class="card" style="display:none">
+    <h2>エージェント間の通信と連携</h2>
+    <p>複数のエージェントが協調するには、<strong>情報をやり取りする仕組み</strong>が必要です。主に3つの方式があります。</p>
+
+    <h3>1. メッセージパッシング（Message Passing）</h3>
+    <p>エージェント間で明示的にメッセージを送受信する方式です。</p>
+    <p><strong>比喩：</strong>手紙のやり取り。送信者と受信者が明確で、記録が残る。</p>
+    <p><strong>利点：</strong>追跡可能性（トレーサビリティ）が高く、責任範囲が明確。</p>
+
+    <h3>2. 共有メモリ / 共有ファイル（Shared State）</h3>
+    <p>共有のファイルシステムやデータベースを介して情報を共有する方式です。</p>
+    <p><strong>比喩：</strong>チームの共有ホワイトボード。誰でも書き込み・読み取りできる。</p>
+    <p><strong>利点：</strong>非同期処理に向き、エージェントの独立性が高い。</p>
+    <p><strong>注意：</strong>競合制御（同時書き込み）の考慮が必要。</p>
+
+    <h3>3. ハンドオフ（Handoff）</h3>
+    <p>あるエージェントが別のエージェントに<strong>会話の制御権を譲渡</strong>する方式です。</p>
+    <p><strong>比喩：</strong>電話の転送。カスタマーサポートで「専門部署におつなぎします」。</p>
+    <p><strong>利点：</strong>ユーザー体験がシームレスで、専門性による分業が自然。</p>
+
+    <h3>Agent SDK の2つの連携方式</h3>
+    <p>Claude Agent SDKでは、マルチエージェント連携に<strong>2つの主要な方式</strong>が用意されています。</p>
+
+    <table class="compare-table">
+      <tr><th>観点</th><th>Agent-as-Tool</th><th>Handoff</th></tr>
+      <tr><td><strong>制御権</strong></td><td>呼び出し元が保持し続ける</td><td>移譲先に完全に移る</td></tr>
+      <tr><td><strong>比喩</strong></td><td>専門家に電話で相談する</td><td>電話を専門部署に転送する</td></tr>
+      <tr><td><strong>会話の流れ</strong></td><td>呼び出し元が結果を統合して回答</td><td>移譲先が直接ユーザーと対話</td></tr>
+      <tr><td><strong>適するケース</strong></td><td>部分的な専門処理を委任したい</td><td>完全な担当交代が必要</td></tr>
+      <tr><td><strong>例</strong></td><td>メインエージェントが法務チェックだけ専門家に依頼</td><td>一般窓口から技術サポートに完全移管</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">Agent-as-Tool（エージェント・アズ・ツール）</div>
+      <p>あるエージェントを別のエージェントの<strong>「ツール」として登録</strong>する方式。呼び出し元エージェントが制御権を保持し続けます。Module 5で学んだTool Useの仕組みを使い、ツールの代わりにエージェントを呼び出します。</p>
+    </div>
+
+    <div class="concept-box">
+      <div class="label">Handoff（ハンドオフ）</div>
+      <p>あるエージェントから別のエージェントに<strong>会話の制御権を完全に移譲</strong>する方式。バトンリレーのように走者が変わり、前の走者は退場します。明示的に「戻す」ハンドオフを定義しない限り、元のエージェントには戻りません。</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><strong>Agent-as-ToolとHandoffの違い</strong>はCCA-F試験で確実に問われるテーマです。「制御権が誰にあるか」が最大の判断基準です。制御権を保持したまま専門処理を委任するならAgent-as-Tool、完全に担当を交代するならHandoff。英語では "agent-as-tool retains control, handoff transfers control" と覚えましょう。</p>
+    </div>
+
+    <h3>タスク分解の2つのアプローチ</h3>
+    <table class="compare-table">
+      <tr><th>方式</th><th>英語名</th><th>分け方</th><th>比喩</th><th>例</th></tr>
+      <tr><td><strong>機能分割</strong></td><td>Functional Decomposition</td><td>「何をするか」で分ける</td><td>会社の部署分け（営業/開発/経理）</td><td>レビュー担当、テスト担当、ドキュメント担当</td></tr>
+      <tr><td><strong>データ分割</strong></td><td>Data Decomposition</td><td>「何に対してするか」で分ける</td><td>選挙の開票作業（地域ごとに分担）</td><td>100ファイルを10エージェントで分担レビュー</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 4: 安全性と信頼性 -->
+  <div id="m10-s4" class="card" style="display:none">
+    <h2>安全性と信頼性の設計</h2>
+    <p>マルチエージェントシステムでは、複数のエージェントが自律的に行動するため、<strong>安全性の確保がさらに重要</strong>になります。Anthropicが推奨する主な安全性メカニズムを学びましょう。</p>
+
+    <h3>1. Guardrails（ガードレール）</h3>
+    <p>エージェントの入出力を監視・制限する仕組みです。</p>
+    <p><strong>比喩：</strong>高速道路のガードレール。道を外れそうになったら物理的に防ぐ。</p>
+    <table class="compare-table">
+      <tr><th>種類</th><th>英語名</th><th>タイミング</th><th>目的</th></tr>
+      <tr><td><strong>入力ガードレール</strong></td><td>Input Guardrail</td><td>ユーザー入力の受信時</td><td>プロンプトインジェクション検出、不正入力の排除</td></tr>
+      <tr><td><strong>出力ガードレール</strong></td><td>Output Guardrail</td><td>エージェント出力の送信前</td><td>個人情報（PII）漏洩チェック、不適切コンテンツの検出</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">ガードレールの実装</div>
+      <p>Agent SDKでは <code>InputGuardrail</code> と <code>OutputGuardrail</code> として実装されます。ガードレールはエージェントの通常処理と<strong>並行して実行</strong>され、問題を検出した場合は処理を中断します。これにより、エージェントの応答速度を大きく低下させずに安全性を確保できます。</p>
+    </div>
+
+    <h3>2. Human-in-the-Loop（HITL）</h3>
+    <p>重要な判断の前に<strong>人間の確認を挟む</strong>設計パターンです。</p>
+    <p><strong>比喩：</strong>承認フロー付きの稟議書。重要な決裁は必ず上長が確認する。</p>
+    <p>実装パターン:</p>
+    <ul>
+      <li><strong>破壊的操作の承認</strong> — データ削除、メール送信、決済処理の前に人間が確認</li>
+      <li><strong>信頼度ベースのエスカレーション</strong> — エージェントの確信度が低い場合に人間に判断を委ねる</li>
+      <li><strong>定期的なスポットチェック</strong> — ランダムにエージェントの出力を人間が監査</li>
+    </ul>
+
+    <h3>3. エスカレーション（Escalation）</h3>
+    <p>エージェントが自分の能力範囲外と判断した場合、<strong>上位（人間またはより高権限のエージェント）に報告</strong>する仕組みです。</p>
+    <p><strong>比喩：</strong>店員が判断できない問題を店長に報告する。</p>
+    <p><strong>設計原則：</strong>エスカレーション条件を明確に定義し、エージェントが「分からない」と正直に言えるように設計する。無理に回答させるより、エスカレーションさせた方が安全です。</p>
+
+    <h3>信頼性のための4つの設計原則</h3>
+    <table class="compare-table">
+      <tr><th>原則</th><th>英語名</th><th>内容</th></tr>
+      <tr><td><strong>最小権限</strong></td><td>Principle of Least Privilege</td><td>各エージェントに必要最小限のツール・権限のみ付与</td></tr>
+      <tr><td><strong>フェイルセーフ</strong></td><td>Fail-Safe Design</td><td>エラー時は安全側に倒す（実行しない方向）</td></tr>
+      <tr><td><strong>監査可能性</strong></td><td>Auditability</td><td>全エージェントの行動をログに記録し、後から追跡可能に</td></tr>
+      <tr><td><strong>段階的自律性</strong></td><td>Graduated Autonomy</td><td>最初は人間の承認を多くし、信頼が蓄積されたら徐々に自律範囲を広げる</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">マルチエージェントでは各エージェントが個別にツールにアクセスできるため、<strong>権限の設計がシングルエージェント以上に重要</strong>です。全エージェントに全権限を与えるのではなく、担当タスクに必要な権限だけを付与しましょう。</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">安全性はドメイン1の中核テーマです。「このシナリオでどのガードレールが必要か」「HITLをどこに配置すべきか」は頻出が予想されます。Anthropicの5つのキーフレーズを押さえましょう：(1) Start with the simplest solution (2) Agents are not always the answer (3) Workflows for predictable, agents for dynamic (4) Tools extend capabilities, guardrails constrain behavior (5) Human-in-the-loop for high-stakes decisions</p>
+    </div>
+  </div>
+
+  <!-- Section 5: 用語集 -->
+  <div id="m10-s5" class="card" style="display:none">
+    <h2>Module 10 用語集</h2>
+    <p>マルチエージェントシステムに関する重要用語をまとめました。</p>
+
+    <div class="glossary-item">
+      <div class="glossary-term">マルチエージェントシステム</div>
+      <div class="glossary-en">Multi-Agent System</div>
+      <div class="glossary-def">複数のAIエージェントが協調してタスクを遂行するシステム。各エージェントが専門の役割を持ち、通信しながら全体の目標を達成する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">オーケストレーター・ワーカー</div>
+      <div class="glossary-en">Orchestrator-Workers</div>
+      <div class="glossary-def">中央のオーケストレーターがタスクを動的に分解・割り振り・統合するパターン。現場監督と作業員の関係。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">プロンプトチェーン</div>
+      <div class="glossary-en">Prompt Chaining</div>
+      <div class="glossary-def">タスクを順次ステップに分解し、前のステップの出力を次の入力にする方式。組立ラインのイメージ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ルーティング</div>
+      <div class="glossary-en">Routing</div>
+      <div class="glossary-def">入力を分類し、適切な専門処理に振り分ける方式。病院のトリアージのイメージ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">並列化</div>
+      <div class="glossary-en">Parallelization</div>
+      <div class="glossary-def">複数エージェントが同時に処理する方式。Sectioning（機能分割）とVoting（多数決）の2種がある。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Agent-as-Tool</div>
+      <div class="glossary-en">Agent-as-Tool</div>
+      <div class="glossary-def">あるエージェントを別のエージェントの「ツール」として登録する連携方式。呼び出し元が制御権を保持する。電話で専門家に相談するイメージ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ハンドオフ</div>
+      <div class="glossary-en">Handoff</div>
+      <div class="glossary-def">あるエージェントから別のエージェントに会話の制御権を完全に移譲する方式。電話の転送、バトンリレーのイメージ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ガードレール</div>
+      <div class="glossary-en">Guardrails</div>
+      <div class="glossary-def">エージェントの入出力を監視・制限する安全メカニズム。入力ガードレール（不正入力排除）と出力ガードレール（不適切出力防止）がある。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">エスカレーション</div>
+      <div class="glossary-en">Escalation</div>
+      <div class="glossary-def">エージェントが能力範囲外と判断した場合に上位（人間または上位エージェント）に報告する仕組み。店員が店長に判断を仰ぐイメージ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">機能分割</div>
+      <div class="glossary-en">Functional Decomposition / Sectioning</div>
+      <div class="glossary-def">「何をするか」でタスクを分ける方式。会社の部署分け（営業/開発/経理）のイメージ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">データ分割</div>
+      <div class="glossary-en">Data Decomposition</div>
+      <div class="glossary-def">「何に対してするか」でタスクを分ける方式。選挙の開票作業（地域ごとに分担）のイメージ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">段階的自律性</div>
+      <div class="glossary-en">Graduated Autonomy</div>
+      <div class="glossary-def">最初は人間の承認を多くし、信頼が蓄積されたら徐々にエージェントの自律範囲を広げる設計原則。</div>
+    </div>
+  </div>
+
+  <!-- Section 6: クイズ -->
+  <div id="m10-s6" class="card" style="display:none">
+    <h2>確認クイズ</h2>
+    <p>Module 10の内容を確認しましょう。全5問、すべて4択です。</p>
+
+    <div class="quiz-section" id="m10-quiz">
+      <div class="quiz-question" id="m10-q1">
+        <div class="q-text">Q1. カスタマーサポートで、問い合わせ内容に応じて「請求」「技術」「一般」の専門チームに振り分けたい場合、最も適切なワークフローパターンはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',0,0)">Prompt Chaining（順次処理）</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',0,1)">Routing（ルーティング）</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',0,2)">Evaluator-Optimizer（評価・最適化ループ）</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',0,3)">Parallelization - Voting（並列投票）</div>
+        <div class="quiz-explanation" id="m10-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q2">
+        <div class="q-text">Q2. Claude Agent SDKにおいて、Agent-as-ToolとHandoffの最大の違いはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',1,0)">Agent-as-Toolはツールを使えるがHandoffは使えない</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',1,1)">Agent-as-Toolは呼び出し元が制御権を保持し、Handoffは制御権が移譲先に移る</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',1,2)">Agent-as-Toolは高速だがHandoffは低速</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',1,3)">Agent-as-ToolはOpusモデル専用、HandoffはHaikuモデル専用</div>
+        <div class="quiz-explanation" id="m10-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q3">
+        <div class="q-text">Q3. Parallelization（並列化）パターンにおけるSectioningとVotingの違いとして正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',2,0)">Sectioningは順次処理、Votingは並列処理</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',2,1)">Sectioningは異なるサブタスクを並行実行、Votingは同じタスクを複数エージェントが実行して結果を照合</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',2,2)">Sectioningは1エージェント、Votingは複数エージェント</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',2,3)">Sectioningはデータ分割、Votingは機能分割の別名</div>
+        <div class="quiz-explanation" id="m10-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q4">
+        <div class="q-text">Q4. Anthropicが推奨するエージェントシステムの設計アプローチとして正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',3,0)">最初からマルチエージェントで設計し、後から簡略化する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',3,1)">まず単一のLLM呼び出しで試し、不十分なら段階的に複雑さを増やす</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',3,2)">常にOrchestrator-Workersパターンを使えば間違いない</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',3,3)">エージェントフレームワークを使えば自動的に最適なパターンが選ばれる</div>
+        <div class="quiz-explanation" id="m10-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q5">
+        <div class="q-text">Q5. マルチエージェントシステムの安全性設計において、Agent SDKのGuardrailsの動作として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',4,0)">エージェントの処理が完了した後にのみ実行される</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',4,1)">エージェントの通常処理と並行して実行され、問題検出時に処理を中断する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',4,2)">入力ガードレールのみが存在し、出力の検証機能はない</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',4,3)">ガードレールはCLAUDE.mdに記述する自然言語ルールである</div>
+        <div class="quiz-explanation" id="m10-q5-exp"></div>
+      </div>
+
+      <button class="btn btn-accent" onclick="submitQuiz('m10')" id="m10-submit-btn">回答を確定する</button>
+      <button class="btn btn-outline" onclick="retryQuiz('m10')" id="m10-retry-btn" style="display:none">もう一度挑戦</button>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="showPage('m9')">&#8592; 前へ</button>
+    <button class="btn btn-primary" onclick="showPage('m11')">次へ &#8594;</button>
+  </div>
+</div>
+
+<div id="page-m11" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 8</span>
+    <h1>Module 11: コンテキスト管理と信頼性</h1>
+    <p class="subtitle">長文処理の戦略とAI出力の信頼性を確保する設計パターン</p>
+    <span class="domain-tag">ドメイン5: コンテキスト管理 (15%)</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>コンテキストウィンドウ（Context Window）の概念とトークンの仕組み</li>
+      <li>RAG（検索拡張生成）のアーキテクチャと活用パターン</li>
+      <li>プロンプトキャッシングによるコスト・レイテンシ最適化</li>
+      <li>ハルシネーション対策と引用ベースの信頼性確保</li>
+      <li>エラー処理とグレースフルデグラデーションの設計</li>
+    </ul>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m11','s1',this)">コンテキストウィンドウ</button>
+    <button class="section-tab" onclick="showSection('m11','s2',this)">RAGと検索拡張</button>
+    <button class="section-tab" onclick="showSection('m11','s3',this)">信頼性の確保</button>
+    <button class="section-tab" onclick="showSection('m11','s4',this)">エラー処理と運用</button>
+    <button class="section-tab" onclick="showSection('m11','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m11','s6',this)">クイズ</button>
+  </div>
+
+  <!-- Section 1: コンテキストウィンドウ -->
+  <div id="m11-s1" class="card">
+    <h2>コンテキストウィンドウとトークン</h2>
+    <p>コンテキストウィンドウ（Context Window）とは、AIモデルが一度に「見える」テキストの量の上限です。たとえるなら、<strong>机の上の作業スペース</strong>のようなもの。机が広いほど多くの資料を同時に広げられますが、無限ではありません。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>コンテキストウィンドウ（Context Window）：</strong>モデルが1回のリクエストで処理できるトークンの合計上限。<strong>入力トークン（プロンプト・システムプロンプト・会話履歴・ツール定義）+ 出力トークン（AIの応答）</strong>の合計がこの上限に収まる必要がある。Claudeは200,000トークン（約15万語・500ページ相当）のウィンドウを持つ。</p>
+    </div>
+
+    <h3>トークンとは</h3>
+    <p>トークン（Token）は、AIがテキストを処理する<strong>最小単位</strong>です。おおよそ英語の1単語が1トークン、日本語の1文字が1〜2トークンに相当します。つまり、<strong>日本語は英語よりもトークンを多く消費します</strong>。</p>
+
+    <table class="compare-table">
+      <tr><th>種類</th><th>内容</th><th>コスト</th></tr>
+      <tr><td><strong>入力トークン（Input Tokens）</strong></td><td>ユーザーのプロンプト、システムプロンプト、会話履歴、ツール定義など</td><td>低い</td></tr>
+      <tr><td><strong>出力トークン（Output Tokens）</strong></td><td>AIが生成する応答テキスト</td><td>高い（入力の数倍）</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">コンテキストウィンドウは「入力+出力」の<strong>合計</strong>であることが重要です。入力が大きいほど、出力に使える余地が減ります。また、Anthropicは<code>/v1/messages/count_tokens</code>というトークンカウント用のAPIエンドポイントを提供しており、事前にトークン数を見積もることができます。</p>
+    </div>
+
+    <h3>コンテキストの効率的な使い方</h3>
+    <p>コンテキストウィンドウは大きいですが、無駄遣いすればすぐに埋まります。効率的に使うための戦略を知っておきましょう。</p>
+    <ul>
+      <li><strong>システムプロンプトの簡潔化：</strong>冗長な指示を避け、必要最小限に</li>
+      <li><strong>会話履歴の管理：</strong>不要な過去のやりとりを含めない（スライディングウィンドウ方式）</li>
+      <li><strong>関連情報のみ注入：</strong>全文ではなく、質問に関連する部分だけをコンテキストに含める</li>
+      <li><strong>構造化データの活用：</strong>JSON/XMLなどで情報密度を高める</li>
+    </ul>
+
+    <h3>チャンキング戦略</h3>
+    <p>長い文書を処理する場合、<strong>チャンキング（Chunking）</strong>という手法で適切なサイズに分割します。</p>
+    <table class="compare-table">
+      <tr><th>方式</th><th>説明</th><th>利点/欠点</th></tr>
+      <tr><td><strong>固定長チャンキング</strong></td><td>一定トークン数で機械的に分割</td><td>簡単だが文脈が切れるリスク</td></tr>
+      <tr><td><strong>セマンティックチャンキング</strong></td><td>段落・セクション単位で意味的に分割</td><td>文脈保持に優れるが実装が複雑</td></tr>
+      <tr><td><strong>オーバーラップチャンキング</strong></td><td>チャンク間に重複部分を設ける</td><td>文脈の断絶を防ぐがトークン消費増</td></tr>
+    </table>
+
+    <h3>コンテキストコンパクション</h3>
+    <p>会話が長くなると、コンテキストウィンドウが一杯になります。これを解決する<strong>コンパクション（圧縮）</strong>の手法があります。</p>
+    <ul>
+      <li><strong>スライディングウィンドウ：</strong>古い会話を削除し、最新のN件のみ保持。簡単だが重要な初期情報が失われるリスクあり</li>
+      <li><strong>要約ベース：</strong>古い会話を要約で置き換え。「ここまでの要約: ...」として先頭に配置</li>
+      <li><strong>重要情報の抽出：</strong>会話からファクトや決定事項のみを抽出して保持</li>
+    </ul>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">コンパクション時に、システムプロンプトやユーザーの重要な指示が消えないよう設計する必要があります。「何を残し、何を圧縮するか」の判断基準が設計の要です。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: RAGと検索拡張 -->
+  <div id="m11-s2" class="card" style="display:none">
+    <h2>RAG（検索拡張生成）</h2>
+    <p>RAG（Retrieval-Augmented Generation / 検索拡張生成）は、AIの「知識の限界」を克服するための手法です。たとえるなら、<strong>試験中にカンニングペーパーを見るのではなく、正式に参考書を持ち込める試験</strong>のようなものです。モデルの内部知識に頼るのではなく、外部のデータベースから関連情報を取得してコンテキストに注入します。</p>
+
+    <h3>RAGの3段階パイプライン</h3>
+    <div class="concept-box">
+      <div class="label">RAGの仕組み</div>
+      <p><strong>1. 検索（Retrieval）：</strong>ユーザーの質問をベクトル化（Embedding）し、ベクトルデータベースから類似度の高いドキュメントチャンクを検索する<br><br>
+      <strong>2. 拡張（Augmentation）：</strong>検索結果をプロンプトに組み込み、出典情報を付与してコンテキストとして整形する<br><br>
+      <strong>3. 生成（Generation）：</strong>注入されたコンテキストに基づいてモデルが応答を生成する。コンテキスト外の知識に頼らない回答が可能</p>
+    </div>
+
+    <h3>Contextual Retrieval（文脈的検索）</h3>
+    <p>Anthropicが提唱した独自の検索改善手法です。通常のチャンキングでは、チャンク単体では「このチャンクがドキュメント全体のどの文脈に属するか」が分からなくなることがあります。</p>
+    <p>Contextual Retrievalでは、<strong>各チャンクにドキュメント全体の文脈説明を付加</strong>してからEmbeddingすることで、検索精度を最大67%向上させたと報告されています。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Contextual RetrievalはAnthropicオリジナルの手法であり、CCA-F試験で出題される可能性が高いです。「チャンクに文脈を付加して検索精度を向上させる」という概念を理解しておきましょう。また、キーワード検索（BM25）とベクトル検索のハイブリッドが推奨されていることも重要です。</p>
+    </div>
+
+    <h3>RAGとコンテキストウィンドウの関係</h3>
+    <table class="compare-table">
+      <tr><th>観点</th><th>説明</th></tr>
+      <tr><td><strong>関係性</strong></td><td>RAGはコンテキストウィンドウの制約を「間接的に」克服する手法</td></tr>
+      <tr><td><strong>仕組み</strong></td><td>数百万件のドキュメントから関連部分だけを抽出し、200Kウィンドウ内に収める</td></tr>
+      <tr><td><strong>注意点</strong></td><td>「全部入れれば良い」わけではない。ノイズが多いと精度低下</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">"Lost in the Middle" 問題</div>
+      <p style="margin-top:.25rem;">コンテキストの<strong>中央部に配置された情報は見落とされやすい</strong>という現象が知られています。重要な情報はコンテキストの<strong>先頭</strong>または<strong>末尾</strong>に配置するのがベストプラクティスです。Anthropicは、長文データを先頭に、質問を末尾に配置することで品質が最大30%向上すると報告しています。</p>
+    </div>
+
+    <h3>プロンプトキャッシングとの組み合わせ</h3>
+    <p>RAGパイプラインでは、システムプロンプトやツール定義など<strong>毎回同じ内容</strong>をプロンプトキャッシュに保存し、検索結果（毎回変わる部分）だけを動的に注入する設計が効率的です。</p>
+    <table class="compare-table">
+      <tr><th>指標</th><th>キャッシュヒット時の効果</th></tr>
+      <tr><td><strong>コスト削減</strong></td><td>キャッシュ対象部分の入力コスト90%削減</td></tr>
+      <tr><td><strong>レイテンシ削減</strong></td><td>最大85%短縮</td></tr>
+      <tr><td><strong>キャッシュ有効期限</strong></td><td>5分間（最後のアクセスから。使い続ける限り延長）</td></tr>
+      <tr><td><strong>初回書き込みコスト</strong></td><td>通常の入力トークンコストの25%増</td></tr>
+      <tr><td><strong>最小トークン数</strong></td><td>1,024トークン以上（Sonnet/Opus）、2,048以上（Haiku）</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">プロンプト構造の設計原則</div>
+      <p>キャッシュ効率を最大化するため、プロンプトは以下の順序で構成します：<br><br>
+      <strong>[キャッシュ対象]</strong> システムプロンプト + ツール定義 + 静的コンテキスト<br>
+      &darr;<br>
+      <strong>[非キャッシュ]</strong> 検索結果（RAG） + ユーザーメッセージ</p>
+    </div>
+  </div>
+
+  <!-- Section 3: 信頼性の確保 -->
+  <div id="m11-s3" class="card" style="display:none">
+    <h2>信頼性の確保</h2>
+    <p>AIの出力は常に正しいとは限りません。本番環境では、出力の<strong>信頼性を設計で確保</strong>する必要があります。ここでは主要な信頼性パターンを学びます。</p>
+
+    <h3>ハルシネーション対策</h3>
+    <p>ハルシネーション（Hallucination / 幻覚）とは、AIが<strong>事実と異なる情報をもっともらしく生成してしまう現象</strong>です。たとえるなら、「知らないことを知ったかぶりで答えてしまう」ような状態です。</p>
+
+    <div class="concept-box">
+      <div class="label">主要な対策パターン</div>
+      <p><strong>1. 明示的な指示：</strong>「わからない場合は『わからない』と回答するように」と指示<br>
+      <strong>2. コンテキスト限定：</strong>RAGで提供した情報のみに基づいて回答させる<br>
+      <strong>3. 確信度の表明：</strong>回答の確信度（高/中/低）を併記させる<br>
+      <strong>4. Temperature制御：</strong>temperatureを下げて応答の決定論性を高める<br>
+      <strong>5. 複数回生成・比較：</strong>同じ質問に複数回答させ、一貫性を検証</p>
+    </div>
+
+    <h3>引用ベースの応答（Citations）</h3>
+    <p>Claudeは<strong>Citations（引用）機能</strong>をAPIレベルでサポートしています。ドキュメントを<code>source</code>として提供すると、応答内の各主張に対して原文の該当箇所を自動引用します。</p>
+    <p>引用を要求することでハルシネーションが大幅に減少します。「出典付きの回答」は「出典なしの回答」より検証が容易で、信頼性が高くなります。</p>
+
+    <h3>検証パターン（Validation Patterns）</h3>
+    <table class="compare-table">
+      <tr><th>パターン</th><th>説明</th><th>用途</th></tr>
+      <tr><td><strong>出力スキーマ検証</strong></td><td>JSON Schema等で出力形式を制約し、構造的正しさを保証</td><td>構造化データの生成</td></tr>
+      <tr><td><strong>自己検証（2段階生成）</strong></td><td>生成→検証の2ステップで品質チェック</td><td>重要な分析タスク</td></tr>
+      <tr><td><strong>クロスチェック</strong></td><td>異なるプロンプトや設定で複数回生成し、結果を比較</td><td>高精度が求められる場面</td></tr>
+      <tr><td><strong>ガードレール</strong></td><td>事前定義のルールで出力をフィルタリング</td><td>コンプライアンス要件</td></tr>
+    </table>
+
+    <h3>Human-in-the-loop（人間による確認）</h3>
+    <p>すべてをAIに任せるのではなく、<strong>操作の危険度に応じて人間の承認を求める設計</strong>です。</p>
+    <table class="compare-table">
+      <tr><th>操作の種類</th><th>推奨される制御</th><th>例</th></tr>
+      <tr><td><strong>読み取り専用</strong></td><td>自動実行可</td><td>ファイル読み取り、検索</td></tr>
+      <tr><td><strong>書き込み・変更</strong></td><td>人間の確認を挟む</td><td>ファイル編集、設定変更</td></tr>
+      <tr><td><strong>不可逆操作</strong></td><td>必ず人間が承認</td><td>削除、送信、本番デプロイ</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">信頼性は<strong>単一の手法ではなく、多層防御で確保</strong>します。「プロンプトだけで信頼性を保証できるか？」という問いには「No」と答えるのが正解です。プロンプト設計 + 出力検証 + プログラム側のガードレール + Human-in-the-loopの組み合わせが求められます。</p>
+    </div>
+  </div>
+
+  <!-- Section 4: エラー処理と運用 -->
+  <div id="m11-s4" class="card" style="display:none">
+    <h2>エラー処理と運用パターン</h2>
+    <p>本番環境でAIシステムを運用する際、エラーは避けられません。重要なのは「エラーが起きないようにする」ことではなく、<strong>「エラーが起きても適切に対処できる設計」</strong>にすることです。</p>
+
+    <h3>指数バックオフ（Exponential Backoff）</h3>
+    <p>API呼び出しが失敗した場合のリトライ戦略です。リトライ間隔を<strong>指数的に増加</strong>させることで、サーバーへの負荷集中を避けます。</p>
+    <div class="concept-box">
+      <div class="label">指数バックオフの例</div>
+      <p>1回目の失敗 → <strong>1秒</strong>待ってリトライ<br>
+      2回目の失敗 → <strong>2秒</strong>待ってリトライ<br>
+      3回目の失敗 → <strong>4秒</strong>待ってリトライ<br>
+      4回目の失敗 → <strong>8秒</strong>待ってリトライ<br>
+      最大リトライ回数（通常3〜5回）に達したらエラーとして処理</p>
+    </div>
+
+    <h3>エラーの種類による対応分岐</h3>
+    <table class="compare-table">
+      <tr><th>HTTPステータス</th><th>意味</th><th>対応</th></tr>
+      <tr><td><strong>429 Rate Limit</strong></td><td>リクエスト数上限到達</td><td><code>retry-after</code>ヘッダーに従って待機→リトライ</td></tr>
+      <tr><td><strong>529 Overloaded</strong></td><td>サーバー過負荷</td><td>指数バックオフでリトライ</td></tr>
+      <tr><td><strong>400 Bad Request</strong></td><td>リクエスト不正</td><td>リトライせず、リクエスト内容を修正</td></tr>
+      <tr><td><strong>401 Unauthorized</strong></td><td>認証エラー</td><td>リトライせず、APIキーを確認</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">一時的エラー（429, 529）はリトライで解決できますが、永続的エラー（400, 401）はリトライしても解決しません。エラーの種類を判別し、適切に対応を分岐させることが重要です。</p>
+    </div>
+
+    <h3>べき等性（Idempotency）</h3>
+    <p>べき等性（Idempotency）とは、<strong>同じ操作を何回実行しても結果が同じになる</strong>性質です。リトライを安全に行うために重要な概念です。</p>
+    <p>たとえば、「ファイルに内容を書き込む」操作はべき等ですが、「ファイルに内容を追加する」操作はべき等ではありません（追加するたびに内容が増える）。リトライで重複処理が発生しない設計が求められます。</p>
+
+    <h3>グレースフルデグラデーション</h3>
+    <p>グレースフルデグラデーション（Graceful Degradation / 優美な縮退）とは、完全な失敗ではなく、<strong>機能を段階的に縮退させて最低限のサービスを継続する設計</strong>です。</p>
+    <table class="compare-table">
+      <tr><th>障害シナリオ</th><th>デグラデーション対応</th></tr>
+      <tr><td>ツール呼び出し失敗</td><td>ツールなしで可能な範囲で回答</td></tr>
+      <tr><td>外部API障害</td><td>キャッシュデータで応答</td></tr>
+      <tr><td>コンテキストオーバーフロー</td><td>重要度の低い情報を削除して再試行</td></tr>
+      <tr><td>高性能モデル利用不可</td><td>フォールバックモデルに切り替え（Opus→Sonnet→Haiku）</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「429 Rate Limitが発生した場合の適切な対応は？」といった実践的なシナリオ問題が出題されます。「<code>retry-after</code>ヘッダーに従って待機後にリトライ」が正解です。また、グレースフルデグラデーションの考え方 — 「全部動かなくなるのではなく、機能を落としながらもサービスを継続する」 — は設計思想として重要です。</p>
+    </div>
+  </div>
+
+  <!-- Section 5: 用語集 -->
+  <div id="m11-s5" class="card" style="display:none">
+    <h2>Module 11 用語集</h2>
+    <p>このモジュールで登場した重要用語をまとめました。試験は英語のため、英語表記も確認しておきましょう。</p>
+
+    <div class="glossary-item">
+      <div class="glossary-term">コンテキストウィンドウ</div>
+      <div class="glossary-en">Context Window</div>
+      <div class="glossary-def">モデルが1回のリクエストで処理できるトークンの合計上限。Claudeは200,000トークン。入力+出力の合計がこの上限に収まる必要がある。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">検索拡張生成</div>
+      <div class="glossary-en">RAG (Retrieval-Augmented Generation)</div>
+      <div class="glossary-def">外部データベースから関連情報を検索し、プロンプトに注入してからAIに回答させる手法。検索→拡張→生成の3段階パイプライン。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">文脈的検索</div>
+      <div class="glossary-en">Contextual Retrieval</div>
+      <div class="glossary-def">Anthropicが提唱した手法。各チャンクにドキュメント全体の文脈説明を付加してからEmbeddingし、検索精度を最大67%向上させる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">チャンキング</div>
+      <div class="glossary-en">Chunking</div>
+      <div class="glossary-def">長い文書を適切なサイズに分割する処理。固定長・セマンティック・オーバーラップの3方式がある。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ハルシネーション</div>
+      <div class="glossary-en">Hallucination</div>
+      <div class="glossary-def">AIが事実と異なる情報をもっともらしく生成してしまう現象。コンテキスト限定・引用要求・Temperature制御などで対策する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">引用機能</div>
+      <div class="glossary-en">Citations</div>
+      <div class="glossary-def">AIの回答に原文の該当箇所を自動的に紐づける機能。信頼性の検証が容易になり、ハルシネーションを抑制する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">指数バックオフ</div>
+      <div class="glossary-en">Exponential Backoff</div>
+      <div class="glossary-def">リトライ間隔を指数的に増加させる戦略（1秒→2秒→4秒→...）。サーバー負荷集中を防ぐ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">優美な縮退</div>
+      <div class="glossary-en">Graceful Degradation</div>
+      <div class="glossary-def">障害時に完全停止ではなく、機能を段階的に縮退させてサービスを継続する設計。フォールバックモデルへの切り替えなど。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">べき等性</div>
+      <div class="glossary-en">Idempotency</div>
+      <div class="glossary-def">同じ操作を何回実行しても結果が同じになる性質。リトライ時の重複処理を防ぐために重要。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">"Lost in the Middle"</div>
+      <div class="glossary-en">Lost in the Middle</div>
+      <div class="glossary-def">コンテキストの中央部に配置された情報が見落とされやすい現象。重要情報は先頭または末尾に配置するのがベストプラクティス。</div>
+    </div>
+  </div>
+
+  <!-- Section 6: Quiz -->
+  <div id="m11-s6" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 11 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
+
+      <div class="quiz-question" id="m11-q1">
+        <div class="q-text">Q1. Claudeのコンテキストウィンドウについて正しい説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',0,0)">入力トークンのみの上限である</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',0,1)">入力トークンと出力トークンの合計の上限である</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',0,2)">出力トークンのみの上限である</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',0,3)">会話のターン数の上限である</div>
+        <div class="quiz-explanation" id="m11-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m11-q2">
+        <div class="q-text">Q2. Anthropicが提唱するContextual Retrievalの主な特徴はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',1,0)">チャンクサイズを固定長にすることで検索速度を向上させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',1,1)">各チャンクにドキュメント全体の文脈説明を付加して検索精度を向上させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',1,2)">ベクトル検索を使わずキーワード検索のみに限定する</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',1,3)">コンテキストウィンドウを自動的に拡張する</div>
+        <div class="quiz-explanation" id="m11-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m11-q3">
+        <div class="q-text">Q3. APIから429 Rate Limitエラーが返された場合の適切な対応はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',2,0)">即座に同じリクエストを再送信する</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',2,1)">APIキーを変更して再試行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',2,2)">retry-afterヘッダーに従って待機後にリトライする</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',2,3)">リクエスト内容を修正して再送信する</div>
+        <div class="quiz-explanation" id="m11-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m11-q4">
+        <div class="q-text">Q4. "Lost in the Middle"問題への対策として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',3,0)">コンテキストの中央部に重要情報を集約する</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',3,1)">重要情報をコンテキストの先頭または末尾に配置する</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',3,2)">コンテキストウィンドウを小さく設定する</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',3,3)">長文データの使用を完全に避ける</div>
+        <div class="quiz-explanation" id="m11-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m11-q5">
+        <div class="q-text">Q5. プロンプトキャッシングのデフォルトのキャッシュ有効期限はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',4,0)">1分間</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',4,1)">5分間</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',4,2)">30分間</div>
+        <div class="quiz-option" onclick="selectAnswer('m11',4,3)">24時間</div>
+        <div class="quiz-explanation" id="m11-q5-exp"></div>
+      </div>
+
+      <div id="m11-quiz-result" class="quiz-result" style="display:none"></div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="submitQuiz('m11')" id="m11-submit-btn">回答を確定する</button>
+        <button class="btn btn-outline" onclick="retryQuiz('m11')" id="m11-retry-btn" style="display:none">もう一度挑戦</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="showPage('m10')">&#8592; 前へ</button>
+    <button class="btn btn-primary" onclick="showPage('m12')">次へ &#8594;</button>
+  </div>
+</div>
+
+<div id="page-m12" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 8</span>
+    <h1>Module 12: 総復習と模擬試験</h1>
+    <p class="subtitle">全ドメインの知識を統合し、本番形式の模擬試験に挑戦する</p>
+    <span class="domain-tag">全ドメイン</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>5つのドメインの要点を横断的に復習する</li>
+      <li>ドメイン間のつながりを理解し、統合的な視点を身につける</li>
+      <li>試験本番の時間配分とシナリオ問題の読み方を習得する</li>
+      <li>模擬試験（15問）で実力を確認し、弱点を特定する</li>
+    </ul>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m12','s1',this)">ドメイン総復習</button>
+    <button class="section-tab" onclick="showSection('m12','s2',this)">試験対策</button>
+    <button class="section-tab" onclick="showSection('m12','s3',this)">模擬試験</button>
+  </div>
+
+  <!-- Section 1: ドメイン総復習 -->
+  <div id="m12-s1" class="card">
+    <h2>5ドメイン 要点総まとめ</h2>
+    <p>CCA-F試験は5つのドメインから構成されています。各ドメインの核心ポイントを振り返りましょう。</p>
+
+    <h3>ドメイン1: エージェント型アーキテクチャとオーケストレーション（27%）</h3>
+    <div class="concept-box">
+      <div class="label">最重要ドメイン &mdash; 配点最大</div>
+      <p><strong>核心：</strong>AIエージェントは「計画 &rarr; 実行 &rarr; 確認」のループを自律的に回すシステム。単なるチャットとは異なる。</p>
+      <p><strong>押さえるべきポイント：</strong></p>
+      <p>&bull; <strong>エージェントループ（Agentic Loop）</strong>：ツールを使いながらタスクを自律的に遂行する仕組み<br>
+      &bull; <strong>オーケストレーションパターン</strong>：シーケンシャル（順次実行）、パラレル（並列実行）、ルーティング（振り分け）<br>
+      &bull; <strong>マルチエージェント設計</strong>：オーケストレーター-ワーカー方式、フィードバックループ、エスカレーション<br>
+      &bull; <strong>タスク分解（Decomposition）</strong>：複雑なタスクを小さなサブタスクに分割する設計</p>
+    </div>
+
+    <h3>ドメイン2: Claude Codeの設定とワークフロー（20%）</h3>
+    <div class="concept-box">
+      <div class="label">実務直結 &mdash; 設定と自動化</div>
+      <p><strong>核心：</strong>CLAUDE.mdは「自然言語のルールブック」、settings.jsonは「機械的な権限設定」。両者の使い分けが鍵。</p>
+      <p><strong>押さえるべきポイント：</strong></p>
+      <p>&bull; <strong>CLAUDE.mdの3層階層</strong>：グローバル &rarr; リポジトリルート &rarr; ユーザーローカル（後勝ち）<br>
+      &bull; <strong>Hooks</strong>：PreToolUse/PostToolUseでツール実行の前後にスクリプト実行。stderrでClaudeにフィードバック<br>
+      &bull; <strong>permissions</strong>：deny が always より優先（ブラックリスト方式）<br>
+      &bull; <strong>CI/CDでの活用</strong>：<code>--print</code> モードで非対話実行、ANTHROPIC_API_KEY環境変数が必要</p>
+    </div>
+
+    <h3>ドメイン3: プロンプトエンジニアリングと構造化出力（20%）</h3>
+    <div class="concept-box">
+      <div class="label">基礎力 &mdash; AI活用の土台</div>
+      <p><strong>核心：</strong>効果的なプロンプト設計と、AIの出力をプログラムで処理可能な形式（JSON）で返させる技術。</p>
+      <p><strong>押さえるべきポイント：</strong></p>
+      <p>&bull; <strong>システムプロンプト</strong>：Claudeの振る舞いを定義する「役割設定」。ロール・ルール・制約を記述<br>
+      &bull; <strong>JSON Outputs vs Strict Tool Use</strong>：データ抽出にはJSON Outputs、ツール呼び出しにはStrict Tool Use<br>
+      &bull; <strong>制約付きデコーディング</strong>：スキーマ通りのJSON出力が100%保証される仕組み<br>
+      &bull; <strong>Prefill</strong>：最新モデルでは非推奨（deprecated）。Structured Outputsが正式な代替</p>
+    </div>
+
+    <h3>ドメイン4: ツール設計とMCP統合（18%）</h3>
+    <div class="concept-box">
+      <div class="label">連携力 &mdash; 外部世界とつなぐ</div>
+      <p><strong>核心：</strong>Claudeにツール（外部API・データベース等）を使わせる仕組み。MCPは「USBのような共通の差し込み口」。</p>
+      <p><strong>押さえるべきポイント：</strong></p>
+      <p>&bull; <strong>ツール定義</strong>：name、description、input_schemaの3要素。descriptionがツール選択の決め手<br>
+      &bull; <strong>MCP（Model Context Protocol）</strong>：AIとツールを接続する標準プロトコル。クライアント-サーバーモデル<br>
+      &bull; <strong>MCPの3つのプリミティブ</strong>：Tools（ツール）、Resources（リソース）、Prompts（プロンプト）<br>
+      &bull; <strong>CLI優先原則</strong>：git/gh/docker等はCLI推奨。MCPはCLI代替がないものにのみ使用</p>
+    </div>
+
+    <h3>ドメイン5: コンテキスト管理と信頼性（15%）</h3>
+    <div class="concept-box">
+      <div class="label">堅牢性 &mdash; 信頼できるシステム</div>
+      <p><strong>核心：</strong>コンテキストウィンドウ（作業机）の有限性を前提に、信頼性の高いAIシステムを設計する。</p>
+      <p><strong>押さえるべきポイント：</strong></p>
+      <p>&bull; <strong>コンテキストウィンドウ管理</strong>：長い入力は要約・チャンク分割で対処。不要な情報でコンテキストを浪費しない<br>
+      &bull; <strong>ハルシネーション対策</strong>：出典の明示、構造化出力による制約、検証-再試行ループ<br>
+      &bull; <strong>Human-in-the-Loop</strong>：重要な判断は人間が確認する設計。全自動にしない<br>
+      &bull; <strong>エラーハンドリング</strong>：stop_reasonの確認、max_tokens到達時の対処、リトライ戦略</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">ドメイン間のつながり</div>
+      <p style="margin-top:.25rem;">5つのドメインは独立ではなく、互いに密接に関連しています。例えば、エージェント（ドメイン1）はツール（ドメイン4）を使い、プロンプト（ドメイン3）で制御し、CLAUDE.md（ドメイン2）で設定し、コンテキスト管理（ドメイン5）で信頼性を担保します。試験ではこの<strong>統合的な視点</strong>が問われます。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: 試験対策 -->
+  <div id="m12-s2" class="card" style="display:none">
+    <h2>CCA-F試験 直前対策ガイド</h2>
+
+    <h3>試験の基本情報</h3>
+    <table class="compare-table">
+      <tr><th>項目</th><th>内容</th></tr>
+      <tr><td><strong>問題数</strong></td><td>60問（多肢選択式）</td></tr>
+      <tr><td><strong>制限時間</strong></td><td>120分（1問あたり約2分）</td></tr>
+      <tr><td><strong>合格ライン</strong></td><td>720 / 1000点</td></tr>
+      <tr><td><strong>出題形式</strong></td><td>シナリオベース（6シナリオ中ランダムに4つ）</td></tr>
+      <tr><td><strong>言語</strong></td><td>英語</td></tr>
+      <tr><td><strong>ツール使用</strong></td><td>禁止（Claude含む外部ツール不可）</td></tr>
+    </table>
+
+    <h3>時間配分の戦略</h3>
+    <div class="concept-box">
+      <div class="label">推奨タイムマネジメント</div>
+      <p><strong>Phase 1（最初の60分）</strong>：全60問を一通り解く。自信のない問題はマークして飛ばす<br>
+      <strong>Phase 2（次の40分）</strong>：マークした問題に戻って再挑戦<br>
+      <strong>Phase 3（最後の20分）</strong>：見直し。特に「2択まで絞った問題」を再検討</p>
+      <p>1問に3分以上かけない。「分からない問題を飛ばす勇気」が合格の鍵。</p>
+    </div>
+
+    <h3>シナリオ問題の読み方</h3>
+    <p>CCA-F試験の最大の特徴は<strong>シナリオベース</strong>であること。長い状況説明の後に問題が来るため、効率的な読み方が重要です。</p>
+
+    <div class="warn-box">
+      <div class="label">読解テクニック</div>
+      <p style="margin-top:.25rem;"><strong>1. 質問文を先に読む</strong> &mdash; 何が問われているかを先に把握してからシナリオを読む<br>
+      <strong>2. キーワードに注目</strong> &mdash; 「most appropriate（最も適切）」「first step（最初のステップ）」「best practice」など<br>
+      <strong>3. 消去法を活用</strong> &mdash; 明らかに間違いの選択肢を先に除外する<br>
+      <strong>4. 「なぜその選択肢か」を説明できるか確認</strong> &mdash; 直感ではなく根拠で選ぶ</p>
+    </div>
+
+    <h3>ドメイン別 配点と目標正答率</h3>
+    <table class="compare-table">
+      <tr><th>ドメイン</th><th>配点</th><th>推定問題数</th><th>目標正答率</th></tr>
+      <tr><td>1. エージェント設計</td><td>27%</td><td>約16問</td><td>75%以上</td></tr>
+      <tr><td>2. Claude Code</td><td>20%</td><td>約12問</td><td>80%以上</td></tr>
+      <tr><td>3. プロンプト&amp;構造化出力</td><td>20%</td><td>約12問</td><td>80%以上</td></tr>
+      <tr><td>4. ツール&amp;MCP</td><td>18%</td><td>約11問</td><td>70%以上</td></tr>
+      <tr><td>5. コンテキスト管理</td><td>15%</td><td>約9問</td><td>70%以上</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">合格戦略</div>
+      <p style="margin-top:.25rem;">全ドメインで完璧を目指す必要はありません。<strong>得意ドメイン（2・3）で確実に取り、苦手ドメイン（1・4）でも基本を押さえる</strong>のが現実的な戦略です。特にドメイン2（Claude Code）と3（プロンプト）は実務経験が活きやすく、高得点を狙いやすい領域です。</p>
+    </div>
+
+    <h3>よくある間違いパターン</h3>
+    <table class="compare-table">
+      <tr><th>間違いパターン</th><th>正しい考え方</th></tr>
+      <tr><td>「全部自動化する」を選ぶ</td><td>重要な判断にはHuman-in-the-Loopが必要</td></tr>
+      <tr><td>最も複雑な解決策を選ぶ</td><td>シンプルで十分な解決策が正解のことが多い</td></tr>
+      <tr><td>Prefillを正解として選ぶ</td><td>最新モデルではStructured Outputsが正式手段</td></tr>
+      <tr><td>MCPを何でも使う</td><td>CLI代替可能ならCLIを使うのがベスト</td></tr>
+      <tr><td>コンテキストを無限と想定</td><td>コンテキストウィンドウは有限。管理が必要</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 3: 模擬試験 -->
+  <div id="m12-s3" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>CCA-F 模擬試験（15問）</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">本番と同じシナリオベース形式の模擬試験です。全5ドメインから配点比率に応じて出題しています。目標：11問以上正解（73%以上）で合格圏内です。</p>
+
+      <!-- Q1: ドメイン1 - エージェント設計 -->
+      <div class="quiz-question" id="m12-q1">
+        <div class="q-text">Q1. 【シナリオ：カスタマーサポート】あなたはカスタマーサポートシステムを設計しています。顧客からの問い合わせを受け取り、内容に応じて「返品処理」「技術サポート」「請求問い合わせ」の専門チームに振り分けたいと考えています。最も適切なオーケストレーションパターンはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',0,0)">シーケンシャル（Sequential） &mdash; すべての専門チームに順番に処理させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',0,1)">ルーティング（Routing） &mdash; 問い合わせ内容を分析し、適切な専門チームに振り分ける</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',0,2)">パラレル（Parallel） &mdash; すべての専門チームに同時に処理させ、最適な回答を選ぶ</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',0,3)">単一エージェント &mdash; 1つのエージェントにすべてのケースを処理させる</div>
+        <div class="quiz-explanation" id="m12-q1-exp"></div>
+      </div>
+
+      <!-- Q2: ドメイン1 - エージェント設計 -->
+      <div class="quiz-question" id="m12-q2">
+        <div class="q-text">Q2. 【シナリオ：マルチエージェントリサーチ】複数のAIエージェントが協調して市場調査を行うシステムを設計しています。「データ収集エージェント」が情報を集め、「分析エージェント」がレポートを作成します。分析エージェントの結果が不十分な場合、データ収集エージェントに追加情報を依頼する仕組みが必要です。この設計パターンは何と呼ばれますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',1,0)">シーケンシャルパイプライン（Sequential Pipeline）</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',1,1)">フィードバックループ（Feedback Loop）</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',1,2)">ファンアウト-ファンイン（Fan-out/Fan-in）</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',1,3)">イベント駆動アーキテクチャ（Event-Driven Architecture）</div>
+        <div class="quiz-explanation" id="m12-q2-exp"></div>
+      </div>
+
+      <!-- Q3: ドメイン1 - エージェント設計 -->
+      <div class="quiz-question" id="m12-q3">
+        <div class="q-text">Q3. 【シナリオ：カスタマーサポート】AIエージェントが顧客対応中に、返金額が10万円を超えるケースに遭遇しました。このような高額な判断をエージェントに自動で行わせることに懸念があります。最も適切な設計アプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',2,0)">エージェントの判断閾値を上げて、10万円でも自動処理できるようにする</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',2,1)">Human-in-the-Loopを導入し、一定額以上の返金は人間の承認を必要とする</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',2,2)">すべての返金処理を手動に戻し、AIエージェントは情報収集のみ行う</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',2,3)">別のAIエージェントに二重チェックさせて自動承認する</div>
+        <div class="quiz-explanation" id="m12-q3-exp"></div>
+      </div>
+
+      <!-- Q4: ドメイン1 - エージェント設計 -->
+      <div class="quiz-question" id="m12-q4">
+        <div class="q-text">Q4. 【シナリオ：開発者の生産性向上】大規模なコードリファクタリングタスクをAIエージェントに任せたいと考えています。タスクは「依存関係の分析」「リファクタリング計画の作成」「コード変更の実行」「テストの実行と検証」の4ステップで構成されます。最も適切なタスク分解のアプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',3,0)">4ステップすべてを1つのプロンプトで一度に実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',3,1)">各ステップを独立したサブタスクとして定義し、順次実行する。各ステップの完了を検証してから次に進む</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',3,2)">4ステップを並列実行して処理速度を最大化する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',3,3)">最初と最後のステップだけ実行し、中間ステップは省略する</div>
+        <div class="quiz-explanation" id="m12-q4-exp"></div>
+      </div>
+
+      <!-- Q5: ドメイン2 - Claude Code -->
+      <div class="quiz-question" id="m12-q5">
+        <div class="q-text">Q5. 【シナリオ：Claude Codeによるコード生成】チームでClaude Codeを使用しています。新しいメンバーが参加した際、全員が同じコーディング規約に従うようClaude Codeを設定したいと考えています。規約を記述するファイルとその管理方法として最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',4,0)">各メンバーの ~/.claude/CLAUDE.md に規約を記述する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',4,1)">プロジェクトルートのCLAUDE.mdに規約を記述し、git管理する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',4,2)">.claude/settings.local.json に規約をJSON形式で記述する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',4,3)">毎回プロンプトで規約を指定する</div>
+        <div class="quiz-explanation" id="m12-q5-exp"></div>
+      </div>
+
+      <!-- Q6: ドメイン2 - Claude Code -->
+      <div class="quiz-question" id="m12-q6">
+        <div class="q-text">Q6. 【シナリオ：CI/CDのためのClaude Code】GitHub Actionsで、PRが作成されるたびにClaude Codeが自動コードレビューを行う仕組みを構築しています。Claude Codeの実行に必要な設定として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',5,0)">CLAUDE.mdにレビュー指示を書けば、PRイベント時に自動で起動する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',5,1)">GitHub ActionsのワークフローでANTHROPIC_API_KEYを環境変数に設定し、claude --print モードで実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',5,2)">MCPサーバー経由でGitHub APIに接続し、対話モードで実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',5,3)">settings.jsonのhooksにPR作成イベントを登録する</div>
+        <div class="quiz-explanation" id="m12-q6-exp"></div>
+      </div>
+
+      <!-- Q7: ドメイン2 - Claude Code -->
+      <div class="quiz-question" id="m12-q7">
+        <div class="q-text">Q7. 【シナリオ：Claude Codeによるコード生成】PreToolUseフックを使って、開発者が誤って本番データベースに接続するコマンドを実行するのを防ぎたいと考えています。フックスクリプトがコマンドをブロックし、開発者に理由を通知するために行うべきことはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',6,0)">stdoutにエラーメッセージを出力し、終了コード0で終了する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',6,1)">stderrにブロック理由を出力し、非ゼロの終了コードで終了する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',6,2)">CLAUDE.mdにブロック履歴を書き込み、終了コード1で終了する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',6,3)">settings.jsonのdenyリストにコマンドを動的に追加する</div>
+        <div class="quiz-explanation" id="m12-q7-exp"></div>
+      </div>
+
+      <!-- Q8: ドメイン3 - プロンプト&構造化出力 -->
+      <div class="quiz-question" id="m12-q8">
+        <div class="q-text">Q8. 【シナリオ：構造化データ抽出】法務部門から、契約書PDFを読み込んで「契約相手先」「契約金額」「契約期間」「自動更新条項の有無」を自動抽出するシステムの構築を依頼されました。抽出結果をデータベースに保存する必要があります。最も適切な構造化出力のアプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',7,0)">プロンプトで「JSON形式で回答してください」と指示する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',7,1)">JSON Outputs（output_config.format）で抽出項目のスキーマを定義する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',7,2)">Strict Tool Useでツール定義として抽出を設計する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',7,3)">Prefillテクニックでassistantメッセージに { を入れてJSON出力を強制する</div>
+        <div class="quiz-explanation" id="m12-q8-exp"></div>
+      </div>
+
+      <!-- Q9: ドメイン3 - プロンプト&構造化出力 -->
+      <div class="quiz-question" id="m12-q9">
+        <div class="q-text">Q9. 【シナリオ：構造化データ抽出】上記のシステムで、JSON Schemaに「契約金額は0以上」という制約を設けたいと考えています。Claude APIの構造化出力で正しい実装方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',8,0)">スキーマに "minimum": 0 を追加する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',8,1)">スキーマのdescriptionフィールドに「0以上の数値」と記述する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',8,2)">anyOfを使って0以上の値のみ許可するスキーマを定義する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',8,3)">enum型で許可される金額を列挙する</div>
+        <div class="quiz-explanation" id="m12-q9-exp"></div>
+      </div>
+
+      <!-- Q10: ドメイン3 - プロンプト&構造化出力 -->
+      <div class="quiz-question" id="m12-q10">
+        <div class="q-text">Q10. 【シナリオ：カスタマーサポート】カスタマーサポートエージェントに対して、「あなたは礼儀正しいカスタマーサポート担当です。技術的な質問には正確に回答し、回答できない場合は人間のオペレーターにエスカレーションしてください」という指示を設定する場所として最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',9,0)">ユーザーメッセージの冒頭に毎回含める</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',9,1)">システムプロンプト（system parameter）に設定する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',9,2)">ツール定義のdescriptionに記述する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',9,3)">JSON Schemaのdescriptionフィールドに記述する</div>
+        <div class="quiz-explanation" id="m12-q10-exp"></div>
+      </div>
+
+      <!-- Q11: ドメイン4 - ツール&MCP -->
+      <div class="quiz-question" id="m12-q11">
+        <div class="q-text">Q11. 【シナリオ：開発者の生産性向上】AIエージェントにGitHub上のイシュー管理を行わせたいと考えています。Claude Codeの環境で、GitHub APIとの連携方法として最も推奨されるアプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',10,0)">GitHub MCP Serverを設定し、MCPプロトコル経由で接続する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',10,1)">gh CLI（GitHub CLI）コマンドを使ってCLI経由で操作する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',10,2)">curl コマンドでGitHub REST APIを直接呼び出す</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',10,3)">カスタムツール定義でHTTPリクエストを送信する</div>
+        <div class="quiz-explanation" id="m12-q11-exp"></div>
+      </div>
+
+      <!-- Q12: ドメイン4 - ツール&MCP -->
+      <div class="quiz-question" id="m12-q12">
+        <div class="q-text">Q12. 【シナリオ：カスタマーサポート】AIエージェントに顧客データベースを検索するツールを提供しています。ツール定義において、AIがツールを正しく選択・使用するために最も重要な要素はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',11,0)">ツールの name をできるだけ短くする</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',11,1)">ツールの description に、いつ・どのように使うべきかを明確に記述する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',11,2)">input_schema でできるだけ多くのパラメータを必須にする</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',11,3)">ツールのレスポンス形式をJSON以外にする</div>
+        <div class="quiz-explanation" id="m12-q12-exp"></div>
+      </div>
+
+      <!-- Q13: ドメイン4 - ツール&MCP -->
+      <div class="quiz-question" id="m12-q13">
+        <div class="q-text">Q13. 【シナリオ：マルチエージェントリサーチ】MCPサーバーが提供する3つの主要なプリミティブ（基本機能）として正しい組み合わせはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',12,0)">Tools、Resources、Prompts</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',12,1)">Tools、Hooks、Commands</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',12,2)">Resources、Schemas、Validators</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',12,3)">Prompts、Agents、Pipelines</div>
+        <div class="quiz-explanation" id="m12-q13-exp"></div>
+      </div>
+
+      <!-- Q14: ドメイン5 - コンテキスト管理 -->
+      <div class="quiz-question" id="m12-q14">
+        <div class="q-text">Q14. 【シナリオ：構造化データ抽出】100ページの契約書をClaudeで分析する必要がありますが、コンテキストウィンドウに一度に収まりません。最も適切な対処法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',13,0)">コンテキストウィンドウが最も大きいモデル（Opus）を使えば解決する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',13,1)">文書をチャンク（区切り）に分割し、各チャンクを順次処理して結果を統合する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',13,2)">文書全体を要約してからClaudeに渡す（重要な詳細は失われても構わない）</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',13,3)">文書の最初と最後のページだけを処理する</div>
+        <div class="quiz-explanation" id="m12-q14-exp"></div>
+      </div>
+
+      <!-- Q15: ドメイン5 - コンテキスト管理 -->
+      <div class="quiz-question" id="m12-q15">
+        <div class="q-text">Q15. 【シナリオ：カスタマーサポート】AIエージェントが生成した回答の信頼性を高めるために、「検証-再試行ループ」を導入したいと考えています。最も効果的なアーキテクチャはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',14,0)">同一セッション内でClaudeに「この回答は正しいですか？」と確認させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',14,1)">出力を生成したインスタンスとは別の独立したインスタンスで検証する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',14,2)">max_tokensを最大値に設定して出力の完全性を保証する</div>
+        <div class="quiz-option" onclick="selectAnswer('m12',14,3)">温度（temperature）を0に設定して毎回同じ回答を生成させる</div>
+        <div class="quiz-explanation" id="m12-q15-exp"></div>
+      </div>
+
+      <button class="btn btn-accent" onclick="submitQuiz('m12')" id="m12-submit-btn">回答を確定する</button>
+      <button class="btn btn-outline" onclick="retryQuiz('m12')" id="m12-retry-btn" style="display:none">もう一度挑戦</button>
+      <div id="m12-quiz-result" class="quiz-result" style="display:none"></div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="showPage('m11')">&#8592; 前へ</button>
+    <button class="btn btn-primary" onclick="showPage('dashboard')">ダッシュボードへ</button>
+  </div>
+</div>
 
 </div><!-- /main -->
 </div><!-- /app -->
@@ -3166,6 +4596,60 @@ const QUIZ_DATA = {
       'CLAUDE.mdは「後から読まれたものが先のものを上書き（override）」します。読み込み順序はグローバル→リポジトリルート→ユーザーローカル→サブディレクトリの順で、後に読まれるサブディレクトリが最も優先度が高くなります。つまり「最も近いCLAUDE.mdが最優先」です。'
     ]
   }
+};
+
+QUIZ_DATA['m9'] = {
+  answers: [1, 2, 2, 2, 2],
+  explanations: [
+    'Anthropicが提唱するAugmented LLMの3つの構成要素は、検索（Retrieval）、ツール統合（Tool Integration）、メモリ（Memory）です。「脳（LLM）に目（検索）・手（ツール）・メモ帳（メモリ）を与えた作業者」と理解しましょう。この概念はエージェントの基本構成要素（building block）として公式ブログ「Building effective agents」で定義されています。',
+    'エージェントループの終了判定は、APIレスポンスのstop_reasonフィールドが"end_turn"かどうかを検査するのが正しい方法です。応答テキストの内容を自然言語パースして判定するのはアンチパターンです。stop_reasonが"tool_use"ならループ継続、"end_turn"ならループ終了と判断します。',
+    '入力を明確なカテゴリに分類し、それぞれの専門処理パスに振り分ける場合は、Routing（ルーティング）パターンが最適です。Prompt Chainingは順次処理、Orchestrator-Workersはサブタスクが動的に変わる場合、Evaluator-Optimizerは反復改善が必要な場合に使います。',
+    '決定論的なビジネスルールの遵守が必要な場面では、PostToolUseフックやプログラム的ゲート（Programmatic Enforcement）で100%の遵守を保証する必要があります。プロンプト指示だけでは遵守率は高いものの100%ではなく、金融操作のような高リスクな場面では不十分です。',
+    'Orchestrator-WorkersとParallelizationの最も重要な違いは、サブタスクの決定方法です。Parallelizationではサブタスクが事前に決まっていますが、Orchestrator-Workersではサブタスクが入力に応じて動的に決まります。たとえば、複数ファイルのコード修正では対象ファイル数がタスクにより変動するため、Orchestrator-Workersが適しています。'
+  ]
+};
+
+QUIZ_DATA['m10'] = {
+  answers: [1, 1, 1, 1, 1],
+  explanations: [
+    'Routing（ルーティング）は入力を分類し、適切な専門処理に振り分けるパターンです。カスタマーサポートでの問い合わせ振り分けは、Routingの代表的なユースケースです。Prompt Chainingは順次処理、Evaluator-Optimizerは生成→評価ループ、Voting は同じタスクの多数決であり、この場面には適しません。',
+    'Agent-as-ToolとHandoffの最大の違いは「制御権」です。Agent-as-Toolは呼び出し元が制御権を保持したまま専門処理を委任し、Handoffは制御権が移譲先に完全に移ります。Agent-as-Toolは「電話で専門家に相談」、Handoffは「電話を専門部署に転送」と覚えましょう。',
+    'Sectioningは異なるサブタスクを複数エージェントが並行実行する方式（例: コードレビュー + セキュリティチェック + パフォーマンス分析を同時に）。Votingは同じタスクを複数エージェントが独立して実行し、結果を照合する方式（例: 3つのエージェントが分類を行い多数決で判断）。どちらもParallelizationの一種ですが、タスクの同質性が異なります。',
+    'Anthropicは「Start with the simplest solution（最もシンプルな方法から始めよ）」と推奨しています。まず単一のLLM呼び出しで試し、不十分なら段階的にプロンプトチェーン→ワークフロー→エージェントと複雑さを増やすのが正しいアプローチです。いきなりマルチエージェントで設計するのは過剰設計です。',
+    'Agent SDKのGuardrailsはエージェントの通常処理と並行して（parallel）実行されます。問題を検出した場合は処理を中断します。入力ガードレール（InputGuardrail）と出力ガードレール（OutputGuardrail）の両方が存在し、それぞれユーザー入力の検証とエージェント出力の検証を担当します。CLAUDE.mdのルールとは異なるプログラム的な安全機構です。'
+  ]
+};
+
+QUIZ_DATA['m11'] = {
+  answers: [1, 1, 2, 1, 1],
+  explanations: [
+    'コンテキストウィンドウは入力トークンと出力トークンの合計の上限です。Claudeは200,000トークンのウィンドウを持ちます。入力が大きいほど出力に使える余地が減るため、コンテキストの効率的な利用が重要です。',
+    'Contextual RetrievalはAnthropicが提唱した手法で、各チャンクにドキュメント全体の文脈説明を付加してからEmbeddingすることで、検索精度を最大67%向上させます。チャンク単体では失われがちな文脈情報を補完する点が特徴です。',
+    '429 Rate Limitは一時的なエラーであり、retry-afterヘッダーに従って指定された時間だけ待機してからリトライするのが正しい対応です。即座の再送信はサーバーに負荷をかけ、状況を悪化させます。',
+    '"Lost in the Middle"問題は、コンテキストの中央部に配置された情報が見落とされやすい現象です。対策として、重要情報はコンテキストの先頭または末尾に配置します。Anthropicは長文データを先頭に、質問を末尾に配置することで品質が最大30%向上すると報告しています。',
+    'プロンプトキャッシングのデフォルト有効期限は5分間です。最後にアクセスされてから5分間有効で、使い続ける限り延長されます。キャッシュヒット時は入力トークンコストが90%削減されますが、初回書き込み時は25%増のコストがかかります。'
+  ]
+};
+
+QUIZ_DATA['m12'] = {
+  answers: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
+  explanations: [
+    'ルーティング（Routing）パターンは、入力内容を分析して適切な処理先に振り分けるパターンです。カスタマーサポートでは問い合わせ内容に応じて専門チームに振り分ける必要があるため、ルーティングが最適です。シーケンシャルはすべてのチームを順に通す非効率な方法、パラレルは同じ問い合わせをすべてのチームで並列処理する不必要なアプローチです。',
+    'フィードバックループ（Feedback Loop）は、後段の処理結果を前段に戻して改善を繰り返すパターンです。分析結果が不十分な場合にデータ収集を追加依頼する仕組みはまさにフィードバックループです。シーケンシャルパイプラインは一方向の処理で後戻りしません。',
+    'Human-in-the-Loop（人間を介在させる設計）は、高額な返金のような重要な判断にAIだけで自動処理させるリスクを軽減します。閾値を超える判断は人間の承認を必要とすることで、AIの利便性と人間の判断力を組み合わせます。全自動化でも全手動化でもなく、適切なバランスが重要です。',
+    'タスク分解（Decomposition）では、依存関係のあるステップを順次実行し、各ステップの完了を検証してから次に進むのがベストプラクティスです。「依存関係の分析」なしに「コード変更」はできないため、並列実行は不適切です。1つのプロンプトで一度に実行すると、コンテキストの消費やエラー時の切り分けが困難になります。',
+    'チーム全員に共通のコーディング規約を適用するには、プロジェクトルートのCLAUDE.mdに記述してgit管理するのが正解です。~/.claude/CLAUDE.md は個人のグローバル設定用で、チーム共有には不向きです。settings.local.jsonは個人用かつ機械的設定用です。',
+    'CI/CDでClaude Codeを使うには、GitHub ActionsのワークフローでANTHROPIC_API_KEYを環境変数に設定し、--print モード（非対話モード）で実行します。CLAUDE.mdはあくまで指示書であり、CI実行のトリガーにはなりません。Hooksはローカル環境のClaude Code内のイベントに対するもので、GitHub上のPRイベントとは別です。',
+    'PreToolUseフックでコマンドをブロックするには、stderrにブロック理由を出力し、非ゼロの終了コードで終了します。非ゼロ終了コードがブロックのトリガー、stderrの内容がClaudeへのフィードバックになります。stdoutは異なる用途（ツール結果の変更）に使われます。',
+    'データ抽出のようにAIの応答全体を構造化データとして使いたい場合は、JSON Outputs（output_config.format）が最適です。制約付きデコーディングにより100%スキーマ準拠が保証されます。Strict Tool Useはエージェントのツール呼び出し用、Prefillは最新モデルで非推奨です。プロンプトだけの指示では形式の保証がありません。',
+    'Claude APIの構造化出力ではminimum/maximum等の数値制約はサポートされていません。代わりにdescriptionフィールドに自然言語で制約を記述します。anyOfや$refもサポート対象外です。descriptionは「用紙の備考欄に注意書きを書く」ようなもので、Claudeはその指示に従います。',
+    'エージェントの振る舞い（役割、応答方針、制約）を定義するには、システムプロンプト（system parameter）が最適です。システムプロンプトはすべての会話ターンに影響し、一貫した振る舞いを実現します。ユーザーメッセージに毎回含めるのは非効率で、ツール定義やJSON Schemaは別の目的のためのものです。',
+    'Claude Codeの環境では「CLI代替可能なツールはCLIを使う」がベストプラクティスです。GitHub操作にはgh CLI（GitHub CLI）が利用可能なため、MCPサーバーを別途設定するよりCLI経由が推奨されます。MCPはCLI代替がないツール（Figma等）にのみ使用します。不要なMCP接続はコンテキストを消費します。',
+    'ツールのdescription（説明文）は、AIがツールを正しく選択・使用するための最も重要な要素です。descriptionに「いつ使うべきか」「どのように使うべきか」「何を返すか」を明確に記述することで、AIは適切なタイミングでツールを選択できます。名前の短さやパラメータの数は選択精度に直結しません。',
+    'MCPサーバーが提供する3つの主要なプリミティブ（基本機能）は、Tools（ツール：アクションの実行）、Resources（リソース：データの提供）、Prompts（プロンプト：テンプレートの提供）です。Hooks/CommandsはClaude Codeの機能であり、MCPのプリミティブではありません。',
+    'コンテキストウィンドウに収まらない大きな文書は、チャンク（区切り）に分割して順次処理し、結果を統合するのが標準的なアプローチです。Opusでも無限ではないため、分割処理のスキルは必要です。最初と最後だけ処理したり、詳細を失う要約は情報の欠落につながります。',
+    '検証-再試行ループでは、出力を生成したインスタンスとは別の独立したインスタンスで検証するのが最も効果的です。同一セッション内での自己レビューは、同じバイアスや誤りを引き継ぐリスクがあります。「ダブルチェック体制」として別の視点から検証することで信頼性が向上します。temperatureの設定は出力の一貫性には影響しますが、正確性の検証にはなりません。'
+  ]
 };
 
 // ===================== STATE =====================
