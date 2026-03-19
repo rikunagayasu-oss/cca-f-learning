@@ -43,11 +43,38 @@
   - 実践パターン（データ抽出・分類・エンティティ抽出）
   - 用語集（9語）・確認クイズ（5問）
 
+- [x] Module 5「ツール設計の基礎」のコンテンツ作成
+  - Tool Use（Function Calling）の4ステップフロー
+  - ツール定義（name, description, input_schema）の設計ベストプラクティス
+  - Tool Choice（auto/any/tool/none）とStrict Mode
+  - エラーハンドリング（is_error）とアンチパターン
+  - 用語集（8語）・確認クイズ（5問）
+- [x] Module 6「MCP統合」のコンテンツ作成
+  - MCPの概念とM×N問題の解消
+  - Host/Client/Serverアーキテクチャ（1:1関係）
+  - 3つのプリミティブ（Resources/Tools/Prompts）と制御主体
+  - MCP vs Tool Useの補完関係
+  - トランスポート（stdio/Streamable HTTP）
+  - 用語集（11語）・確認クイズ（5問）
+- [x] Module 7「Claude Code入門」のコンテンツ作成
+  - エージェント型ツールの位置づけ
+  - 内蔵ツールと権限（読み取り専用=不要、変更系=必要）
+  - 5つの権限モードと設定ファイル優先順位
+  - CLIコマンド・フラグ（-p, --max-turns等）
+  - サブエージェント（Explore/Plan/General-purpose）とHooks
+  - 用語集（8語）・確認クイズ（5問）
+- [x] Module 8「CLAUDE.mdとワークフロー」のコンテンツ作成
+  - CLAUDE.mdの3層階層構造と読み込み優先順位
+  - settings.json vs CLAUDE.mdの使い分け
+  - Hooks/カスタムコマンド/スキルによるワークフロー設計
+  - チーム開発・CI/CDでの運用パターン
+  - 用語集（8語）・確認クイズ（5問）
+
 ## 次にやること
 
-- [ ] Module 5「ツール設計の基礎」のコンテンツ作成
-- [ ] Module 6「MCP統合」のコンテンツ作成
-- [ ] 以降、M7〜M12を順次作成
+- [ ] Module 9「エージェントアーキテクチャ」のコンテンツ作成
+- [ ] Module 10「マルチエージェント」のコンテンツ作成
+- [ ] 以降、M11〜M12を順次作成
 
 ## 作業の進め方
 

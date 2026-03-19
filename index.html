@@ -2008,13 +2008,1048 @@
   </div>
 </div>
 
-<div id="page-m5" style="display:none"><div class="module-header"><span class="week-badge">Week 5</span><h1>Module 5: ツール設計の基礎</h1><p class="subtitle">Claudeに外部機能を与える仕組みを理解する</p><span class="domain-tag">ドメイン4: ツール & MCP (18%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m4')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m6')">次へ &#8594;</button></div></div>
+<div id="page-m5" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 5</span>
+    <h1>Module 5: ツール設計の基礎</h1>
+    <p class="subtitle">Claudeに外部機能を与える仕組みを理解する</p>
+    <span class="domain-tag">ドメイン4: ツール &amp; MCP (18%)</span>
+  </div>
 
-<div id="page-m6" style="display:none"><div class="module-header"><span class="week-badge">Week 5</span><h1>Module 6: MCP統合</h1><p class="subtitle">Model Context Protocolでツールを標準化する</p><span class="domain-tag">ドメイン4: ツール & MCP (18%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m5')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m7')">次へ &#8594;</button></div></div>
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>ツール利用（Tool Use）の4ステップ通信フローを理解する</li>
+      <li>ツール定義（name, description, input_schema）の設計ベストプラクティスを身につける</li>
+      <li>ツール選択の制御（Tool Choice）と厳密モード（Strict Mode）の違いを理解する</li>
+      <li>エラーハンドリングとツール設計のアンチパターンを知る</li>
+    </ul>
+  </div>
 
-<div id="page-m7" style="display:none"><div class="module-header"><span class="week-badge">Week 6</span><h1>Module 7: Claude Code入門</h1><p class="subtitle">開発者向けCLIツールの基本を理解する</p><span class="domain-tag">ドメイン2: Claude Code (20%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m6')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m8')">次へ &#8594;</button></div></div>
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m5','s1',this)">Tool Useとは</button>
+    <button class="section-tab" onclick="showSection('m5','s2',this)">ツール定義の設計</button>
+    <button class="section-tab" onclick="showSection('m5','s3',this)">実行フローと制御</button>
+    <button class="section-tab" onclick="showSection('m5','s4',this)">エラー処理と注意点</button>
+    <button class="section-tab" onclick="showSection('m5','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m5','s6',this)">クイズ</button>
+  </div>
 
-<div id="page-m8" style="display:none"><div class="module-header"><span class="week-badge">Week 6</span><h1>Module 8: CLAUDE.mdとワークフロー</h1><p class="subtitle">設定ファイル階層とCI/CD統合</p><span class="domain-tag">ドメイン2: Claude Code (20%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m7')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m9')">次へ &#8594;</button></div></div>
+  <!-- Section 1: Tool Useとは -->
+  <div id="m5-s1" class="card">
+    <h2>Tool Use（ツール利用）とは何か</h2>
+    <p>Claude自体は、天気を調べたりデータベースを検索したりすることができません。しかし「ツール」を定義して渡すことで、Claudeは<strong>「このツールを使いたい」</strong>と意思表示し、外部の機能を間接的に利用できるようになります。</p>
+
+    <p>これは、レストランの注文に似ています。お客さん（ユーザー）が「今日のおすすめは？」と聞くと、ウェイター（Claude）は自分では厨房に入れませんが、<strong>「シェフに聞いてきます」と伝票を書いて渡す</strong>ことができます。開発者のプログラムがその伝票を受け取り、実際にシェフ（外部API）に問い合わせて結果を返します。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Tool Use（ツール利用 / Function Calling）：</strong>Claudeが外部のツールやAPIを呼び出すための仕組み。Claude自身がツールを実行するのではなく、「どのツールを、どのパラメータで呼ぶべきか」をJSON形式で返します。実際の実行はクライアント側（開発者のコード）が行います。</p>
+    </div>
+
+    <h3>なぜTool Useが重要なのか</h3>
+    <p>Claudeは学習データに基づいて回答しますが、以下のようなことは単独ではできません。</p>
+    <ul>
+      <li><strong>リアルタイム情報の取得</strong> — 今日の天気、最新の株価など</li>
+      <li><strong>外部システムへの操作</strong> — メール送信、データベース更新、ファイル作成</li>
+      <li><strong>計算の正確性</strong> — 複雑な数値計算を電卓ツールに委託</li>
+      <li><strong>社内データへのアクセス</strong> — 顧客管理システム、在庫管理など</li>
+    </ul>
+    <p>ツールを使うことで、Claudeは「知識」だけでなく「行動」もできるAIアシスタントになります。これが<strong>エージェント（Agent）</strong>の基盤技術です。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「Claude自身はツールを実行しない」という点が頻出します。Claudeの役割は「どのツールを使うべきか判断し、パラメータを生成すること」であり、実行はクライアント側が担当します。この責任分離を正確に理解しておきましょう。</p>
+    </div>
+
+    <h3>Tool Useの全体像</h3>
+    <p>Tool Useは、Messages APIの<code>tools</code>パラメータを通じて利用します。開発者がAPIリクエスト時に「利用可能なツールの一覧」を定義して渡すと、Claudeはユーザーの質問に応じて適切なツールを選択し、呼び出しに必要な引数を生成します。</p>
+
+    <table class="compare-table">
+      <tr><th>役割</th><th>担当者</th><th>やること</th></tr>
+      <tr><td>ツール定義</td><td>開発者</td><td>どんなツールが使えるかをJSON形式で記述</td></tr>
+      <tr><td>ツール選択</td><td>Claude</td><td>ユーザーの質問に最適なツールと引数を判断</td></tr>
+      <tr><td>ツール実行</td><td>開発者のコード</td><td>Claudeが選んだツールを実際に実行</td></tr>
+      <tr><td>結果の解釈</td><td>Claude</td><td>ツール実行結果を受け取り、ユーザー向けに回答</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 2: ツール定義の設計 -->
+  <div id="m5-s2" class="card" style="display:none">
+    <h2>ツール定義の設計</h2>
+    <p>ツールを使うには、まず「どんなツールがあるか」をClaudeに伝える必要があります。これを<strong>ツール定義（Tool Definition）</strong>と呼びます。ツール定義はJSON形式で記述し、APIリクエストの<code>tools</code>パラメータに渡します。</p>
+
+    <h3>ツール定義の3つの要素</h3>
+    <p>すべてのツール定義は、以下の3つの要素で構成されます。</p>
+
+    <div class="concept-box">
+      <div class="label">ツール定義の構造</div>
+      <p><strong>1. name（名前）：</strong>ツールの識別名。英数字とアンダースコアで記述（例：<code>get_weather</code>）。動詞＋名詞の形が推奨されます。</p>
+      <p><strong>2. description（説明）：</strong>ツールの用途を自然言語で記述。Claudeがツールを選ぶ際の最大の判断材料になります。</p>
+      <p><strong>3. input_schema（入力スキーマ）：</strong>ツールに渡すパラメータの定義。JSON Schema形式で、型・必須/任意・選択肢（enum）などを指定します。</p>
+    </div>
+
+    <h3>ツール定義の具体例</h3>
+    <p>たとえば「天気を取得するツール」は以下のように定義します。</p>
+    <pre style="background:#F3F4F6;padding:1rem;border-radius:8px;font-size:.85rem;overflow-x:auto;margin:1rem 0;">
+{
+  "name": "get_weather",
+  "description": "指定された場所の現在の天気情報を取得する。
+    ユーザーが天気について質問した場合に使用する。",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "location": {
+        "type": "string",
+        "description": "都市名（例: Tokyo, Japan）"
+      },
+      "unit": {
+        "type": "string",
+        "enum": ["celsius", "fahrenheit"],
+        "description": "温度の単位。デフォルトはcelsius"
+      }
+    },
+    "required": ["location"]
+  }
+}</pre>
+
+    <h3>descriptionの書き方 — 最も重要な要素</h3>
+    <p>Claudeがどのツールを使うかを判断する最大の材料は<code>description</code>です。履歴書の「職務経歴」のようなもので、ここが曖昧だとClaudeは正しくツールを選べません。</p>
+
+    <table class="compare-table">
+      <tr><th>パターン</th><th>悪い例</th><th>良い例</th></tr>
+      <tr><td>曖昧すぎる</td><td>「データを処理する」</td><td>「顧客IDから注文履歴を取得する。過去90日分の注文を新しい順で返す」</td></tr>
+      <tr><td>使い分け不明</td><td>「検索する」</td><td>「社内ナレッジベースを全文検索する。外部Web検索にはweb_searchを使うこと」</td></tr>
+      <tr><td>制約の欠如</td><td>「メールを送る」</td><td>「メールを送信する。送信前に必ずユーザーの確認を得ること」</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">descriptionには「いつ使うべきか」だけでなく「いつ使うべきでないか」も記載するのがベストプラクティスです。特に似た機能のツールが複数ある場合、使い分けの基準を明記することでClaudeの選択精度が向上します。</p>
+    </div>
+
+    <h3>input_schemaの設計パターン</h3>
+    <p>パラメータの定義にもベストプラクティスがあります。</p>
+    <ul>
+      <li><strong>enum（列挙型）</strong>を活用して、選択肢を限定する（例：<code>"enum": ["celsius", "fahrenheit"]</code>）</li>
+      <li><strong>required（必須）</strong>で必ず指定してほしいパラメータを明示する</li>
+      <li><strong>description</strong>を各パラメータにも書く — 型だけでは意味が伝わらない</li>
+      <li>パラメータ名は明確にする（<code>q</code>より<code>search_query</code>が良い）</li>
+    </ul>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">ツール数が多すぎるとClaudeの選択精度が下がります。1つのリクエストに渡すツール数は必要最小限にとどめましょう。関連する機能はまとめるか、リクエストごとに使うツールを絞り込むのが効果的です。</p>
+    </div>
+  </div>
+
+  <!-- Section 3: 実行フローと制御 -->
+  <div id="m5-s3" class="card" style="display:none">
+    <h2>ツール実行フローと制御</h2>
+    <p>Tool Useは、4つのステップで動作します。この流れを正確に理解することがCCA-F試験の鍵です。</p>
+
+    <h3>4ステップの通信フロー</h3>
+    <div class="concept-box">
+      <div class="label">Tool Use 4ステップフロー</div>
+      <p><strong>Step 1（リクエスト）：</strong>開発者がtoolsパラメータ付きでAPIリクエストを送信。ユーザーのメッセージと利用可能なツール一覧を渡す。</p>
+      <p><strong>Step 2（ツール呼び出し要求）：</strong>Claudeが<code>tool_use</code>ブロックを含むレスポンスを返す。<code>stop_reason</code>は<code>"tool_use"</code>になる。</p>
+      <p><strong>Step 3（ツール実行と結果送信）：</strong>クライアントがツールを実行し、結果を<code>tool_result</code>としてAPIに再送信する。</p>
+      <p><strong>Step 4（最終回答）：</strong>Claudeがtool_resultを踏まえてユーザー向けの最終回答を生成。<code>stop_reason</code>は<code>"end_turn"</code>になる。</p>
+    </div>
+
+    <p>この流れを図にすると、以下のようになります。</p>
+    <table class="compare-table">
+      <tr><th>ステップ</th><th>方向</th><th>内容</th><th>stop_reason</th></tr>
+      <tr><td>1</td><td>開発者 → API</td><td>messages + tools定義を送信</td><td>-</td></tr>
+      <tr><td>2</td><td>API → 開発者</td><td>tool_use ブロック（ツール名+引数）</td><td><code>tool_use</code></td></tr>
+      <tr><td>3</td><td>開発者 → API</td><td>tool_result ブロック（実行結果）</td><td>-</td></tr>
+      <tr><td>4</td><td>API → 開発者</td><td>最終的なテキスト回答</td><td><code>end_turn</code></td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><code>stop_reason</code>の値は頻出です。<code>"tool_use"</code>はClaudeがツール呼び出しを要求している状態、<code>"end_turn"</code>はClaudeが最終回答を返した状態を示します。また、<code>tool_use_id</code>でリクエストとレスポンスを紐付ける点も重要です。</p>
+    </div>
+
+    <h3>tool_use_id — リクエストの紐付け</h3>
+    <p>Claudeがツール呼び出しを返す際、各ツール呼び出しに一意の<code>tool_use_id</code>（例：<code>toolu_abc123</code>）が付与されます。開発者がtool_resultを返す際は、この<strong>IDを必ず一致させる</strong>必要があります。荷物の追跡番号のようなもので、「どの注文に対する回答か」を紐付けます。</p>
+
+    <h3>並列ツール呼び出し（Parallel Tool Use）</h3>
+    <p>Claudeは1回のレスポンスで<strong>複数のツールを同時に呼び出す</strong>ことがあります。たとえば「東京と大阪の天気を教えて」と聞くと、<code>get_weather</code>を2回分まとめて返すことがあります。開発者は両方のtool_resultを1つのリクエストにまとめて返します。</p>
+
+    <h3>連鎖ツール呼び出し（Chained Tool Use）</h3>
+    <p>ツールの結果を見て、さらに別のツールを呼ぶこともあります。たとえば「顧客Aの最新注文を確認して、在庫があれば発送手続きをして」という指示では、まず注文検索ツール → 次に在庫確認ツール → 最後に発送ツールと、段階的に進みます。</p>
+
+    <h3>Tool Choice — ツール選択の制御</h3>
+    <p>開発者は<code>tool_choice</code>パラメータで、Claudeのツール選択を制御できます。</p>
+
+    <div class="concept-box">
+      <div class="label">tool_choice の4つのモード</div>
+      <p><strong>auto（自動）：</strong>デフォルト。Claudeが自律的にツールを使うか否かを判断する。</p>
+      <p><strong>any（いずれかを強制）：</strong>必ずいずれかのツールを使用する。テキストのみの応答を禁止。</p>
+      <p><strong>tool（特定ツール指定）：</strong>指定したツールを必ず使用する。特定のツールを確実に呼ばせたい場合に使う。</p>
+      <p><strong>none（ツール禁止）：</strong>ツールを一切使用しない。ツールを渡しているが使わせたくない場合に使う。</p>
+    </div>
+
+    <h3>Strict Mode（厳密モード）</h3>
+    <p>ツール定義に<code>"strict": true</code>を追加すると、Claudeの出力が<code>input_schema</code>に<strong>100%準拠する</strong>ことが保証されます。</p>
+
+    <table class="compare-table">
+      <tr><th>項目</th><th>通常モード</th><th>Strict Mode</th></tr>
+      <tr><td>スキーマ準拠</td><td>概ね従うが、稀に逸脱あり</td><td>100%準拠が保証される</td></tr>
+      <tr><td>追加フィールド</td><td>稀にスキーマ外のフィールドが出る</td><td><code>additionalProperties: false</code>が強制</td></tr>
+      <tr><td>必須フィールド</td><td>通常のrequired制約</td><td>全フィールドがrequiredに含まれる必要あり</td></tr>
+      <tr><td>オプショナル項目</td><td>requiredから除外</td><td>型に<code>null</code>を含めて対応（例：<code>"type": ["string", "null"]</code>）</td></tr>
+      <tr><td>レイテンシ</td><td>通常</td><td>若干増加する場合あり</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">Strict Modeでは全プロパティが<code>required</code>に含まれる必要があります。オプショナルなフィールドは型に<code>null</code>を含め、Claudeが「該当なし」の場合に<code>null</code>を返せるようにします。</p>
+    </div>
+  </div>
+
+  <!-- Section 4: エラー処理と注意点 -->
+  <div id="m5-s4" class="card" style="display:none">
+    <h2>エラーハンドリングとアンチパターン</h2>
+    <p>ツールの実行は常に成功するとは限りません。APIがダウンしていたり、パラメータが不正だったりする場合のエラー処理もTool Useの重要な要素です。</p>
+
+    <h3>is_error フラグ</h3>
+    <p>ツール実行でエラーが発生した場合、<code>tool_result</code>に<code>"is_error": true</code>を設定してClaudeに返します。</p>
+
+    <div class="concept-box">
+      <div class="label">エラー通知の仕組み</div>
+      <p><code>is_error: true</code>を設定すると、Claudeはエラーを認識して適切な<strong>リカバリー</strong>を試みます。たとえば：</p>
+      <p>- 別のパラメータで再試行する</p>
+      <p>- ユーザーに追加情報を求める</p>
+      <p>- 代替手段を提案する</p>
+      <p>エラーメッセージは具体的に書きましょう。「エラーが発生しました」ではなく「指定された都市名 'Toko' が見つかりません。正しい都市名を指定してください」のように、何が問題で、どうすれば解決するかを示します。</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><code>is_error</code>を省略してエラー文字列だけ返しても動作しますが、<code>is_error: true</code>を明示する方がClaudeの判断精度が向上します。CCA-F試験ではベストプラクティスとして<code>is_error: true</code>の設定を推奨する選択肢が正解になりやすいです。</p>
+    </div>
+
+    <h3>tool_resultの返却は必須</h3>
+    <p>Claudeが<code>tool_use</code>を返したら、<strong>必ず対応する<code>tool_result</code>を返す必要があります</strong>。これを省略するとAPIエラーになります。注文した料理が来なければお客さんは困ります。エラーであっても「エラーだった」という結果を返すことが必要です。</p>
+
+    <h3>ツール設計のアンチパターン</h3>
+    <table class="compare-table">
+      <tr><th>アンチパターン</th><th>問題点</th><th>解決策</th></tr>
+      <tr><td>巨大すぎるツール</td><td>1つに多機能を詰め込み、用途が不明確に</td><td>単一責任の原則で分割する</td></tr>
+      <tr><td>descriptionが曖昧</td><td>Claudeがツール選択を誤る</td><td>「いつ使うか」「いつ使わないか」を明記</td></tr>
+      <tr><td>パラメータ説明の欠如</td><td>Claudeが不適切な値を生成する</td><td>各パラメータに具体的な説明・例を付与</td></tr>
+      <tr><td>ツール数の肥大化</td><td>選択精度が低下する</td><td>リクエストごとに必要なツールだけ渡す</td></tr>
+      <tr><td>戻り値が巨大すぎる</td><td>コンテキストウィンドウを圧迫</td><td>必要な情報だけを含むよう結果を整形する</td></tr>
+    </table>
+
+    <h3>system promptとの連携</h3>
+    <p>system promptでツールの使い方を補足的に指示することも有効です。たとえば「ユーザーが価格を聞いた場合は必ず<code>get_pricing</code>ツールを使い、推測で回答しないこと」のような指示を加えることで、ツール使用の精度を高められます。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">ツールのdescriptionだけでなく、system promptでもツールの利用ルールを補強できます。特に「ツールを使わずに推測してはいけない」というルールは、正確性が求められるビジネスシナリオ（在庫確認、価格表示など）で重要なパターンです。</p>
+    </div>
+
+    <h3>プロンプトキャッシングとTool Use</h3>
+    <p>ツール定義は毎回のリクエストに含めますが、<strong>プロンプトキャッシング（Prompt Caching）</strong>を使えばツール定義部分をキャッシュし、コストとレイテンシを削減できます。tools配列に<code>cache_control</code>を付与することで、繰り返し送信されるツール定義のトークンコストを抑えられます。</p>
+  </div>
+
+  <!-- Section 5: 用語集 -->
+  <div id="m5-s5" class="card" style="display:none">
+    <h2>ツール設計 用語集</h2>
+    <p>このモジュールで登場した重要な用語をまとめています。試験は英語のため、英語表記も併記しています。</p>
+
+    <div class="glossary-item">
+      <div class="glossary-term">ツール利用</div>
+      <div class="glossary-en">Tool Use / Function Calling</div>
+      <div class="glossary-def">Claudeが外部ツールを呼び出すための仕組み。Claude自身はツールを実行せず、呼び出しのリクエスト（ツール名+引数）を返す。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ツール定義</div>
+      <div class="glossary-en">Tool Definition</div>
+      <div class="glossary-def">利用可能なツールの名前・説明・パラメータをJSON形式で記述したもの。APIリクエストのtoolsパラメータで渡す。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">入力スキーマ</div>
+      <div class="glossary-en">Input Schema</div>
+      <div class="glossary-def">ツールに渡すパラメータの構造を定義したJSON Schema。型、必須項目、選択肢（enum）などを指定する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ツール選択</div>
+      <div class="glossary-en">Tool Choice</div>
+      <div class="glossary-def">Claudeのツール使用を制御するパラメータ。auto（自動）、any（いずれかを強制）、tool（特定指定）、none（禁止）の4モードがある。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">厳密モード</div>
+      <div class="glossary-en">Strict Mode</div>
+      <div class="glossary-def">ツール定義にstrict: trueを設定し、出力がinput_schemaに100%準拠することを保証するモード。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">停止理由</div>
+      <div class="glossary-en">stop_reason</div>
+      <div class="glossary-def">APIレスポンスに含まれる、Claudeが応答を終了した理由。"tool_use"はツール呼び出し要求、"end_turn"は最終回答を意味する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">並列ツール呼び出し</div>
+      <div class="glossary-en">Parallel Tool Use</div>
+      <div class="glossary-def">Claudeが1回のレスポンスで複数のツールを同時に呼び出すこと。独立した複数の問い合わせを効率的に処理できる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">エラーフラグ</div>
+      <div class="glossary-en">is_error</div>
+      <div class="glossary-def">tool_resultでツール実行がエラーだったことをClaudeに伝えるフラグ。trueに設定するとClaudeがリカバリーを試みる。</div>
+    </div>
+  </div>
+
+  <!-- Section 6: クイズ -->
+  <div id="m5-s6" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 5 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
+
+      <div class="quiz-question" id="m5-q1">
+        <div class="q-text">Q1. Claude APIのTool Useにおいて、ツールを実際に実行するのは誰ですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',0,0)">Claude（AIモデル）がツールを直接実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',0,1)">開発者のクライアントコードがツールを実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',0,2)">Anthropicのサーバーがツールを実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',0,3)">ユーザーが手動でツールを実行する</div>
+        <div class="quiz-explanation" id="m5-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q2">
+        <div class="q-text">Q2. Claudeがツール呼び出しを要求した場合、APIレスポンスのstop_reasonにはどの値が設定されますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',1,0)">end_turn</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',1,1)">tool_use</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',1,2)">tool_call</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',1,3)">function_call</div>
+        <div class="quiz-explanation" id="m5-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q3">
+        <div class="q-text">Q3. ツール定義のdescriptionに含めるべきベストプラクティスとして、最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',2,0)">ツール名だけで十分なので、descriptionは空でもよい</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',2,1)">技術的な実装詳細（使用しているライブラリ、内部構造など）を記載する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',2,2)">「いつ使うべきか」と「いつ使うべきでないか」の両方を記載する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',2,3)">パラメータの一覧を繰り返し記載する</div>
+        <div class="quiz-explanation" id="m5-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q4">
+        <div class="q-text">Q4. tool_choiceパラメータを{"type": "any"}に設定した場合、Claudeの動作はどうなりますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',3,0)">Claudeが自律的にツールを使うか否かを判断する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',3,1)">ツールを一切使用しない</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',3,2)">必ずいずれかのツールを使用する（テキストのみの応答を禁止）</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',3,3)">指定された特定のツールのみを使用する</div>
+        <div class="quiz-explanation" id="m5-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q5">
+        <div class="q-text">Q5. ツール実行でエラーが発生した場合のベストプラクティスはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',4,0)">tool_resultを返さず、次のリクエストを送信する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',4,1)">is_error: trueを設定し、具体的なエラーメッセージをtool_resultで返す</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',4,2)">エラーを無視して空文字列のtool_resultを返す</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',4,3)">APIセッションを終了して最初からやり直す</div>
+        <div class="quiz-explanation" id="m5-q5-exp"></div>
+      </div>
+
+      <div id="m5-quiz-result" class="quiz-result" style="display:none"></div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="submitQuiz('m5')" id="m5-submit-btn">回答を確定する</button>
+        <button class="btn btn-outline" onclick="retryQuiz('m5')" id="m5-retry-btn" style="display:none">もう一度挑戦</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="btn-group" style="margin-top:2rem; justify-content: space-between;">
+    <button class="btn btn-outline" onclick="showPage('m4')">&#8592; 前のモジュールへ</button>
+    <button class="btn btn-primary" onclick="showPage('m6')">次のモジュールへ &#8594;</button>
+  </div>
+</div>
+
+<div id="page-m6" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 5</span>
+    <h1>Module 6: MCP統合</h1>
+    <p class="subtitle">Model Context Protocolで、AIと外部ツールを「共通規格」でつなぐ</p>
+    <span class="domain-tag">ドメイン4: ツール設計とMCP統合 (18%)</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>MCPとは何か — AIとツールをつなぐ「USB規格」の考え方</li>
+      <li>Host・Client・Serverの3つの役割とアーキテクチャ</li>
+      <li>3つのプリミティブ（Resources / Tools / Prompts）の違いと制御主体</li>
+      <li>Tool Use（Function Calling）との違いと補完関係</li>
+      <li>トランスポート方式（stdio / HTTP）の使い分け</li>
+    </ul>
+  </div>
+
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m6','s1',this)">MCPとは</button>
+    <button class="section-tab" onclick="showSection('m6','s2',this)">アーキテクチャ</button>
+    <button class="section-tab" onclick="showSection('m6','s3',this)">3つのプリミティブ</button>
+    <button class="section-tab" onclick="showSection('m6','s4',this)">Tool Useとの違い</button>
+    <button class="section-tab" onclick="showSection('m6','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m6','s6',this)">クイズ</button>
+  </div>
+
+  <div id="m6-s1" class="card">
+    <h2>MCPとは何か</h2>
+    <p>MCP（Model Context Protocol / モデルコンテキストプロトコル）は、Anthropicが2024年11月に公開した<strong>オープンプロトコル（通信規約）</strong>です。AIモデルと外部のツールやデータソースを、<strong>標準化された方法で接続する</strong>ために設計されました。</p>
+    <h3>MCPが解決する問題 — 「M×N問題」</h3>
+    <p>MCPが登場する前は、AIアプリケーションが外部サービスに接続するたびに、<strong>サービスごとに専用のコード</strong>を書く必要がありました。AIアプリがM個、接続先サービスがN個あると、M×N通りの接続コードが必要になります。これを「M×N問題」と呼びます。</p>
+    <p>MCPは、この問題を解決します。共通のプロトコルを定めることで、各AIアプリはMCPクライアントを1つ実装するだけ、各サービスはMCPサーバーを1つ実装するだけで済みます。必要な実装は<strong>M+N個</strong>に削減されます。</p>
+    <div class="concept-box">
+      <div class="label">たとえ話で理解する</div>
+      <p>MCPは<strong>「USB-C規格」</strong>のようなものです。USB-Cが登場する前は、スマートフォンのメーカーごとに異なる充電ケーブルが必要でした。USB-Cという共通規格ができたことで、どのメーカーのデバイスも同じケーブルで充電できるようになりました。MCPも同じ発想で、AIアプリと外部ツールの間に「共通の差し込み口」を作ります。</p>
+    </div>
+    <h3>MCPの特徴</h3>
+    <p><strong>オープンソース：</strong>MCPの仕様はオープンソースとして公開されており、誰でも自由にMCPサーバーやクライアントを作成できます。Anthropic専用の技術ではなく、他のAIプロバイダーも採用できる標準規格です。</p>
+    <p><strong>JSON-RPC 2.0ベース：</strong>MCPの通信メッセージは、JSON-RPC 2.0という広く使われている形式に基づいています。</p>
+    <p><strong>能力交渉（Capability Negotiation）：</strong>接続時にサーバーが「私はこういうことができます」と自分の能力を宣言します。</p>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「MCPは何を解決するか」「MCPの基本的な性質」が問われます。「M×N問題の解消」「オープンプロトコルである」「JSON-RPC 2.0ベース」はキーワードとして押さえましょう。</p>
+    </div>
+  </div>
+
+  <div id="m6-s2" class="card" style="display:none">
+    <h2>MCPのアーキテクチャ</h2>
+    <p>MCPのアーキテクチャは、<strong>3つの役割</strong>と<strong>2つのトランスポート方式</strong>で構成されています。</p>
+    <h3>3つの役割: Host / Client / Server</h3>
+    <table class="compare-table">
+      <tr><th>役割</th><th>英語名</th><th>説明</th><th>具体例</th></tr>
+      <tr><td><strong>ホスト</strong></td><td>Host</td><td>ユーザーが直接操作するAIアプリケーション。内部にクライアントを持つ</td><td>Claude Desktop, Cursor, Claude Code</td></tr>
+      <tr><td><strong>クライアント</strong></td><td>Client</td><td>ホスト内部で動作し、1つのサーバーと1:1で接続を維持するプロトコル処理層</td><td>ホスト内部のMCP接続モジュール</td></tr>
+      <tr><td><strong>サーバー</strong></td><td>Server</td><td>外部のデータやツールへのアクセスを提供するプログラム</td><td>Filesystem Server, GitHub Server</td></tr>
+    </table>
+    <div class="concept-box">
+      <div class="label">重要: 1:1の関係</div>
+      <p>MCPクライアントとMCPサーバーは<strong>1:1の関係</strong>です。1つのクライアントは1つのサーバーとだけ接続します。ホストが<strong>複数のクライアントを持つ</strong>ことで複数サーバーに接続します。</p>
+    </div>
+    <h3>トランスポート方式</h3>
+    <table class="compare-table">
+      <tr><th>方式</th><th>仕組み</th><th>用途</th><th>たとえ</th></tr>
+      <tr><td><strong>stdio</strong>（標準入出力）</td><td>ホストがサーバーをサブプロセスとして起動し、stdin/stdoutで通信</td><td>ローカル実行向け</td><td>同じ建物内のインターホン</td></tr>
+      <tr><td><strong>Streamable HTTP</strong></td><td>HTTP経由でリクエスト/レスポンスとストリーミングの両方を扱う</td><td>リモート接続向け</td><td>電話回線で遠方とも通話可能</td></tr>
+    </table>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">「stdioはローカル専用、HTTPはリモート対応」という使い分けは頻出が予想されます。また「Client:Server = 1:1」「Host は複数のClientを持てる」という関係も重要です。</p>
+    </div>
+    <h3>通信の流れ（具体例）</h3>
+    <p>ユーザーがClaude Desktopで「このフォルダのファイル一覧を見せて」と聞いた場合：</p>
+    <ol>
+      <li>ホスト内のLLM（Claude）が「ファイル一覧を取得するツールを使おう」と判断</li>
+      <li>クライアントがFilesystem MCPサーバーに <code>list_directory</code> ツールの呼び出しを送信</li>
+      <li>MCPサーバーがローカルファイルシステムにアクセスし、一覧を取得</li>
+      <li>結果をクライアント経由でホストに返送</li>
+      <li>LLMが結果を解釈し、ユーザーに自然言語で回答</li>
+    </ol>
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">MCPサーバーはLLM（AIモデル）を内蔵していません。サーバーの役割はあくまで「外部ツールやデータへのアクセスを提供する」ことです。AIの推論はすべてホスト側のLLMが行います。</p>
+    </div>
+  </div>
+
+  <div id="m6-s3" class="card" style="display:none">
+    <h2>MCPの3つのプリミティブ</h2>
+    <p>MCPサーバーが提供できる機能は、<strong>3つのプリミティブ（Primitives / 基本要素）</strong>に分類されます。</p>
+    <h3>1. Resources（リソース）— データの公開</h3>
+    <p>MCPサーバーが持つ<strong>読み取り用のデータ</strong>です。ファイルの内容、データベースのレコード、APIの応答など。</p>
+    <div class="concept-box">
+      <div class="label">制御主体: アプリケーション（ホスト）</div>
+      <p>Resourcesは<strong>アプリケーション側が制御</strong>します。図書館で利用者が「この本を見せてください」と指定して取り出すイメージです。</p>
+    </div>
+    <h3>2. Tools（ツール）— アクションの実行</h3>
+    <p>MCPサーバーが公開する<strong>実行可能な操作</strong>です。</p>
+    <div class="concept-box">
+      <div class="label">制御主体: モデル（LLM）</div>
+      <p>Toolsは<strong>モデル（LLM）が制御</strong>します。工具箱で職人が作業内容に応じて工具を選ぶイメージです。</p>
+    </div>
+    <h3>3. Prompts（プロンプト）— テンプレートの提供</h3>
+    <p>MCPサーバーが提供する<strong>再利用可能なプロンプトテンプレート</strong>です。</p>
+    <div class="concept-box">
+      <div class="label">制御主体: ユーザー</div>
+      <p>Promptsは<strong>ユーザーが制御</strong>します。定型文テンプレート集からユーザーが選んで使うイメージです。</p>
+    </div>
+    <h3>制御主体のまとめ</h3>
+    <table class="compare-table">
+      <tr><th>プリミティブ</th><th>英語名</th><th>内容</th><th>制御主体</th><th>たとえ</th></tr>
+      <tr><td><strong>リソース</strong></td><td>Resources</td><td>読み取り用データの公開</td><td>アプリケーション</td><td>図書館の本棚</td></tr>
+      <tr><td><strong>ツール</strong></td><td>Tools</td><td>実行可能なアクション</td><td>モデル（LLM）</td><td>工具箱</td></tr>
+      <tr><td><strong>プロンプト</strong></td><td>Prompts</td><td>再利用テンプレート</td><td>ユーザー</td><td>定型文集</td></tr>
+    </table>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">3つのプリミティブの<strong>制御主体の違い</strong>は試験で最も問われやすいポイントです。「Resources = アプリケーション」「Tools = モデル」「Prompts = ユーザー」を確実に覚えましょう。</p>
+    </div>
+    <h3>補足: Sampling（サンプリング）</h3>
+    <p>MCPにはもう一つ、<strong>Sampling</strong>という仕組みがあります。MCPサーバーがクライアントを通じて<strong>LLMに推論をリクエスト</strong>できる逆方向の通信です。部下（サーバー）が上司（LLM）に「判断をお願いします」と相談するイメージです。</p>
+  </div>
+
+  <div id="m6-s4" class="card" style="display:none">
+    <h2>MCP と Tool Use の違い</h2>
+    <p>Module 5で学んだ<strong>Tool Use（Function Calling）</strong>と<strong>MCP</strong>は、どちらもAIにツールを使わせる仕組みですが、位置づけが異なります。</p>
+    <h3>比較表</h3>
+    <table class="compare-table">
+      <tr><th>項目</th><th>Tool Use</th><th>MCP</th></tr>
+      <tr><td><strong>ツール定義の場所</strong></td><td>各APIリクエストに毎回含める</td><td>MCPサーバーが自ら宣言</td></tr>
+      <tr><td><strong>標準化</strong></td><td>プロバイダーごとに独自仕様</td><td>オープンな標準プロトコル</td></tr>
+      <tr><td><strong>再利用性</strong></td><td>アプリごとにツール定義を記述</td><td>一度作ったサーバーをどのホストでも再利用</td></tr>
+      <tr><td><strong>対応範囲</strong></td><td>ツール呼び出しのみ</td><td>ツール + リソース + プロンプト</td></tr>
+      <tr><td><strong>エコシステム</strong></td><td>自社開発が中心</td><td>コミュニティ製サーバーが多数</td></tr>
+    </table>
+    <div class="concept-box">
+      <div class="label">最重要ポイント: 補完関係</div>
+      <p>MCPはTool Useを<strong>置き換えるものではなく、補完するもの</strong>です。MCPサーバーが提供するツールは、最終的にはホスト内でTool Useの仕組みを通じてLLMに提示されます。</p>
+    </div>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">「MCPはTool Useを置き換える」は<strong>誤り</strong>です。両者は補完関係にあり、MCPがツールの「接続規格」、Tool Useがツールの「呼び出し仕組み」です。</p>
+    </div>
+    <h3>実用的なMCPサーバーの例</h3>
+    <table class="compare-table">
+      <tr><th>サーバー名</th><th>機能</th></tr>
+      <tr><td><strong>Filesystem</strong></td><td>ローカルファイルの読み書き・ディレクトリ操作</td></tr>
+      <tr><td><strong>GitHub</strong></td><td>リポジトリ操作、Issue/PR作成、コード検索</td></tr>
+      <tr><td><strong>Slack</strong></td><td>メッセージ送信、チャンネル履歴取得</td></tr>
+      <tr><td><strong>PostgreSQL / SQLite</strong></td><td>データベースクエリの実行</td></tr>
+      <tr><td><strong>Puppeteer</strong></td><td>ブラウザ操作、スクリーンショット取得</td></tr>
+      <tr><td><strong>Brave Search</strong></td><td>Web検索</td></tr>
+    </table>
+    <div class="warn-box">
+      <div class="label">セキュリティに関する注意</div>
+      <p style="margin-top:.25rem;">MCPサーバーには<strong>最小権限の原則（Principle of Least Privilege）</strong>を適用すべきです。ツール実行前にユーザー確認を挟む<strong>Human-in-the-loop</strong>設計が推奨されます。</p>
+    </div>
+  </div>
+
+  <div id="m6-s5" class="card" style="display:none">
+    <h2>用語集</h2>
+    <p>Module 6で登場した重要用語をまとめました。</p>
+    <div class="glossary-item"><div class="glossary-term">MCP</div><div class="glossary-en">Model Context Protocol</div><div class="glossary-def">AIモデルと外部ツール・データソースを接続するためのオープンな標準プロトコル。</div></div>
+    <div class="glossary-item"><div class="glossary-term">MCPホスト</div><div class="glossary-en">MCP Host</div><div class="glossary-def">ユーザーが直接操作するAIアプリケーション。内部にMCPクライアントを持つ。</div></div>
+    <div class="glossary-item"><div class="glossary-term">MCPクライアント</div><div class="glossary-en">MCP Client</div><div class="glossary-def">ホスト内部で動作し、1つのMCPサーバーと1:1接続を維持するプロトコル処理層。</div></div>
+    <div class="glossary-item"><div class="glossary-term">MCPサーバー</div><div class="glossary-en">MCP Server</div><div class="glossary-def">外部のデータやツールへのアクセスを提供するプログラム。</div></div>
+    <div class="glossary-item"><div class="glossary-term">プリミティブ</div><div class="glossary-en">Primitives</div><div class="glossary-def">MCPの基本要素。Resources、Tools、Promptsの3種類。</div></div>
+    <div class="glossary-item"><div class="glossary-term">サンプリング</div><div class="glossary-en">Sampling</div><div class="glossary-def">MCPサーバーがクライアントを通じてLLMにテキスト生成をリクエストする逆方向の仕組み。</div></div>
+    <div class="glossary-item"><div class="glossary-term">能力交渉</div><div class="glossary-en">Capability Negotiation</div><div class="glossary-def">MCP接続時にサーバーが自分の能力を宣言する仕組み。</div></div>
+    <div class="glossary-item"><div class="glossary-term">stdio</div><div class="glossary-en">Standard Input/Output</div><div class="glossary-def">MCPのトランスポート方式の一つ。ローカル実行向け。</div></div>
+    <div class="glossary-item"><div class="glossary-term">JSON-RPC 2.0</div><div class="glossary-en">JSON Remote Procedure Call 2.0</div><div class="glossary-def">MCPの通信メッセージ形式。</div></div>
+    <div class="glossary-item"><div class="glossary-term">最小権限の原則</div><div class="glossary-en">Principle of Least Privilege</div><div class="glossary-def">MCPサーバーに必要最小限のアクセス権限のみを与えるセキュリティ設計の原則。</div></div>
+    <div class="glossary-item"><div class="glossary-term">Human-in-the-loop</div><div class="glossary-en">Human-in-the-loop</div><div class="glossary-def">ツール実行前に人間の確認を挟む設計パターン。</div></div>
+  </div>
+
+  <div id="m6-s6" class="card" style="display:none">
+    <h2>確認クイズ</h2>
+    <p>Module 6の内容を確認しましょう。全5問、すべて4択です。</p>
+    <div class="quiz-section" id="m6-quiz">
+      <div class="quiz-question" id="m6-q1">
+        <div class="q-text">Q1. MCPが解決する主な課題は何ですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',0,0)">AIモデルの推論速度を高速化する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',0,1)">AIアプリごと・サービスごとに個別の接続コードが必要になるM×N問題を解消する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',0,2)">Tool Use（Function Calling）の仕組みを完全に置き換える</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',0,3)">MCPサーバー内にLLMを内蔵して推論を分散させる</div>
+        <div class="quiz-explanation" id="m6-q1-exp"></div>
+      </div>
+      <div class="quiz-question" id="m6-q2">
+        <div class="q-text">Q2. MCPアーキテクチャにおいて、MCPクライアントとMCPサーバーの接続関係はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',1,0)">1つのクライアントが複数のサーバーに同時接続する（1:N）</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',1,1)">複数のクライアントが1つのサーバーを共有する（N:1）</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',1,2)">1つのクライアントが1つのサーバーと接続する（1:1）</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',1,3)">クライアントとサーバーは自由に多対多で接続する（N:N）</div>
+        <div class="quiz-explanation" id="m6-q2-exp"></div>
+      </div>
+      <div class="quiz-question" id="m6-q3">
+        <div class="q-text">Q3. MCPの3つのプリミティブ（Resources, Tools, Prompts）について、それぞれの制御主体の正しい組み合わせはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',2,0)">Resources=モデル、Tools=アプリケーション、Prompts=ユーザー</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',2,1)">Resources=アプリケーション、Tools=モデル、Prompts=ユーザー</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',2,2)">Resources=ユーザー、Tools=モデル、Prompts=アプリケーション</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',2,3)">Resources=アプリケーション、Tools=ユーザー、Prompts=モデル</div>
+        <div class="quiz-explanation" id="m6-q3-exp"></div>
+      </div>
+      <div class="quiz-question" id="m6-q4">
+        <div class="q-text">Q4. ある企業がClaude Desktopから社内のファイルサーバーとGitHubの両方にMCP経由でアクセスしたいと考えています。正しいアーキテクチャはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',3,0)">1つのMCPサーバーで両方のデータソースを処理する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',3,1)">ホスト内に2つのMCPクライアントを持ち、それぞれがFilesystem MCPサーバーとGitHub MCPサーバーに1:1で接続する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',3,2)">1つのMCPクライアントから2つのサーバーに同時接続する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',3,3)">stdioトランスポートでリモートのGitHub MCPサーバーに接続する</div>
+        <div class="quiz-explanation" id="m6-q4-exp"></div>
+      </div>
+      <div class="quiz-question" id="m6-q5">
+        <div class="q-text">Q5. MCPとTool Use（Function Calling）の関係について正しい記述はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',4,0)">MCPはTool Useを完全に置き換える新しい仕組みである</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',4,1)">Tool UseはMCPの一部であり、MCPなしでは使えない</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',4,2)">MCPはTool Useを補完する関係にあり、MCPサーバーのツールは最終的にTool Useの仕組みでLLMに提示される</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',4,3)">MCPとTool Useは競合する仕組みであり、同時に使うことはできない</div>
+        <div class="quiz-explanation" id="m6-q5-exp"></div>
+      </div>
+      <button class="btn btn-accent" onclick="submitQuiz('m6')" id="m6-submit-btn">回答を確定する</button>
+      <button class="btn btn-outline" onclick="retryQuiz('m6')" id="m6-retry-btn" style="display:none">もう一度挑戦</button>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="showPage('m5')">&#8592; 前へ</button>
+    <button class="btn btn-primary" onclick="showPage('m7')">次へ &#8594;</button>
+  </div>
+</div>
+
+<div id="page-m7" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 6</span>
+    <h1>Module 7: Claude Code入門</h1>
+    <p class="subtitle">開発者向けエージェント型コーディングツールの基本を理解する</p>
+    <span class="domain-tag">ドメイン2: Claude Code (20%)</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>Claude Codeとは何か — エージェント型コーディングツールの位置づけ</li>
+      <li>基本操作と内蔵ツール — Read/Write/Edit/Bash等の役割と権限</li>
+      <li>権限モデル（Permission Model） — 5つのモードと設定の優先順位</li>
+      <li>CLIコマンドとフラグ — 対話型/ヘッドレス/CI統合の使い分け</li>
+      <li>サブエージェントの仕組みと活用パターン</li>
+    </ul>
+  </div>
+
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m7','s1',this)">Claude Codeとは</button>
+    <button class="section-tab" onclick="showSection('m7','s2',this)">内蔵ツールと権限</button>
+    <button class="section-tab" onclick="showSection('m7','s3',this)">CLIとワークフロー</button>
+    <button class="section-tab" onclick="showSection('m7','s4',this)">サブエージェント</button>
+    <button class="section-tab" onclick="showSection('m7','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m7','s6',this)">クイズ</button>
+  </div>
+
+  <div id="m7-s1" class="card">
+    <h2>Claude Codeとは何か</h2>
+    <p>Claude Code（クロード・コード）は、Anthropicが提供する<strong>エージェント型コーディングツール</strong>です。普通のチャットAIとの違いは、「会話するだけ」ではなく、<strong>実際にファイルを読み書きし、コマンドを実行し、Gitを操作できる</strong>点です。</p>
+    <p>たとえるなら、普通のAIチャットが「電話で相談できるアドバイザー」なら、Claude Codeは「実際にオフィスに来て一緒に作業してくれる同僚」です。</p>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>エージェント型ツール（Agentic Tool）：</strong>単に質問に答えるだけでなく、ツールを使いながら自律的にタスクを遂行するAIシステム。Claude Codeはファイル操作・コマンド実行・Git操作・Web検索など、多数のツールを駆使して開発作業を行う。</p>
+    </div>
+    <h3>利用できる環境</h3>
+    <table class="compare-table">
+      <tr><th>環境</th><th>説明</th><th>特徴</th></tr>
+      <tr><td><strong>ターミナル（CLI）</strong></td><td><code>claude</code>コマンドで起動</td><td>最も柔軟。CI/CD統合にも使用</td></tr>
+      <tr><td><strong>VS Code拡張</strong></td><td>エディタ内で直接利用</td><td>コードと並行して操作</td></tr>
+      <tr><td><strong>JetBrains拡張</strong></td><td>IntelliJ系IDE対応</td><td>Java/Kotlin開発者向け</td></tr>
+      <tr><td><strong>Webブラウザ</strong></td><td>claude.ai上で利用</td><td>インストール不要</td></tr>
+    </table>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Native Installは自動更新対応です。<code>npm install -g</code>でのインストールはAnthropicが非推奨としています。特に<code>sudo npm install -g</code>はセキュリティリスクがあるため避けるべきです。</p>
+    </div>
+  </div>
+
+  <div id="m7-s2" class="card" style="display:none">
+    <h2>内蔵ツールと権限モデル</h2>
+    <p>Claude Codeには多数の内蔵ツール（Built-in Tools）があり、それぞれに<strong>権限が必要かどうか</strong>が決まっています。</p>
+    <h3>主要な内蔵ツール</h3>
+    <table class="compare-table">
+      <tr><th>ツール</th><th>役割</th><th>権限</th></tr>
+      <tr><td><strong>Read</strong></td><td>ファイルの読み取り</td><td>不要</td></tr>
+      <tr><td><strong>Grep</strong></td><td>パターン検索</td><td>不要</td></tr>
+      <tr><td><strong>Glob</strong></td><td>ファイルパターンマッチ</td><td>不要</td></tr>
+      <tr><td><strong>Agent</strong></td><td>サブエージェント起動</td><td>不要</td></tr>
+      <tr><td><strong>Write</strong></td><td>ファイル作成・上書き</td><td><strong>必要</strong></td></tr>
+      <tr><td><strong>Edit</strong></td><td>ファイルの部分編集</td><td><strong>必要</strong></td></tr>
+      <tr><td><strong>Bash</strong></td><td>シェルコマンド実行</td><td><strong>必要</strong></td></tr>
+      <tr><td><strong>WebFetch</strong></td><td>URL取得</td><td><strong>必要</strong></td></tr>
+      <tr><td><strong>WebSearch</strong></td><td>Web検索</td><td><strong>必要</strong></td></tr>
+    </table>
+    <div class="concept-box">
+      <div class="label">覚え方のコツ</div>
+      <p>「<strong>読むだけ</strong>」のツール（Read, Grep, Glob）は権限不要。「<strong>変更する・外部にアクセスする</strong>」ツール（Write, Edit, Bash, WebFetch）は権限必要。</p>
+    </div>
+    <h3>5つの権限モード（Permission Modes）</h3>
+    <table class="compare-table">
+      <tr><th>モード</th><th>動作</th><th>使い所</th></tr>
+      <tr><td><strong>plan</strong></td><td>分析のみ。ファイル変更・コマンド実行不可</td><td>安全にコードを調査したい場合</td></tr>
+      <tr><td><strong>default</strong></td><td>変更ツール使用時に都度確認を表示</td><td>通常の開発作業</td></tr>
+      <tr><td><strong>acceptEdits</strong></td><td>ファイル編集を自動承認。Bashは確認あり</td><td>信頼できるコード変更作業</td></tr>
+      <tr><td><strong>dontAsk</strong></td><td>権限プロンプトを自動拒否。事前許可ツールのみ</td><td>制限的な環境</td></tr>
+      <tr><td><strong>bypassPermissions</strong></td><td>全権限チェックをスキップ</td><td>コンテナ内の自動化</td></tr>
+    </table>
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;"><code>bypassPermissions</code>モードは、コンテナなどの隔離環境でのみ使用すべきです。CLIフラグでは<code>--dangerously-skip-permissions</code>という名前になっており、名前自体が「危険」であることを示しています。</p>
+    </div>
+    <h3>権限の評価順序</h3>
+    <p>権限ルールは<strong>deny &rarr; ask &rarr; allow</strong>の順で評価されます。deny（拒否）が常に最優先です。</p>
+    <h3>設定ファイルの優先順位</h3>
+    <table class="compare-table">
+      <tr><th>優先度</th><th>場所</th><th>スコープ</th></tr>
+      <tr><td>1（最強）</td><td>Managed settings（IT管理者配布）</td><td>組織全体（上書き不可）</td></tr>
+      <tr><td>2</td><td>CLIフラグ（<code>--allowedTools</code>等）</td><td>セッション限定</td></tr>
+      <tr><td>3</td><td><code>.claude/settings.local.json</code></td><td>プロジェクトローカル（gitignore）</td></tr>
+      <tr><td>4</td><td><code>.claude/settings.json</code></td><td>プロジェクト共有（Git管理）</td></tr>
+      <tr><td>5（最弱）</td><td><code>~/.claude/settings.json</code></td><td>ユーザー全体</td></tr>
+    </table>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">権限の評価順序（deny &gt; ask &gt; allow）と設定ファイルの優先順位は、CCA-F試験で頻出テーマです。特に「Managed settingsは上書き不可」「denyルールは常に最優先」という点を押さえましょう。</p>
+    </div>
+  </div>
+
+  <div id="m7-s3" class="card" style="display:none">
+    <h2>CLIコマンドとワークフロー</h2>
+    <h3>基本コマンド</h3>
+    <table class="compare-table">
+      <tr><th>コマンド</th><th>説明</th></tr>
+      <tr><td><code>claude</code></td><td>対話型セッションを開始</td></tr>
+      <tr><td><code>claude "質問文"</code></td><td>初期プロンプト付きで対話セッション開始</td></tr>
+      <tr><td><code>claude -p "質問文"</code></td><td>ヘッドレスモード（非対話）。回答後に終了</td></tr>
+      <tr><td><code>claude -c</code></td><td>直前のセッションを続行</td></tr>
+      <tr><td><code>claude doctor</code></td><td>インストール状態を検証</td></tr>
+      <tr><td><code>claude mcp</code></td><td>MCPサーバー設定</td></tr>
+    </table>
+    <div class="concept-box">
+      <div class="label">対話型 vs ヘッドレス</div>
+      <p><strong>対話型（Interactive）：</strong><code>claude</code>で起動。開発者がリアルタイムに指示を出しながら作業する。<br>
+      <strong>ヘッドレス（Headless）：</strong><code>claude -p</code>で起動。CI/CDパイプラインやスクリプトからの自動実行に使う。</p>
+    </div>
+    <h3>主要なCLIフラグ</h3>
+    <table class="compare-table">
+      <tr><th>フラグ</th><th>説明</th><th>使い所</th></tr>
+      <tr><td><code>--print</code>, <code>-p</code></td><td>ヘッドレスモード</td><td>CI/CD、スクリプト連携</td></tr>
+      <tr><td><code>--permission-mode</code></td><td>権限モード指定</td><td>安全性レベル調整</td></tr>
+      <tr><td><code>--model</code></td><td>モデル指定（sonnet, opus等）</td><td>タスクに応じたモデル選択</td></tr>
+      <tr><td><code>--output-format</code></td><td>出力形式（text, json, stream-json）</td><td>プログラムからの結果処理</td></tr>
+      <tr><td><code>--max-turns</code></td><td>エージェントターン数制限</td><td>暴走防止（-p時のみ）</td></tr>
+      <tr><td><code>--max-budget-usd</code></td><td>API費用上限</td><td>コスト管理（-p時のみ）</td></tr>
+      <tr><td><code>--system-prompt</code></td><td>システムプロンプト完全置換</td><td>カスタム動作の定義</td></tr>
+      <tr><td><code>--worktree</code>, <code>-w</code></td><td>git worktreeで隔離実行</td><td>変更のサンドボックス化</td></tr>
+    </table>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><code>-p</code>（<code>--print</code>）フラグはCI/CD統合の鍵です。<code>--max-turns</code>や<code>--max-budget-usd</code>で暴走とコストを制限できることも重要です。これらのフラグは<code>-p</code>モード時のみ有効です。</p>
+    </div>
+    <h3>チェックポイント機能</h3>
+    <p>Claude Codeはファイル変更前の状態を<strong>自動保存（チェックポイント）</strong>します。<code>/rewind</code>コマンドで以前の状態に復元できます。</p>
+  </div>
+
+  <div id="m7-s4" class="card" style="display:none">
+    <h2>サブエージェントの仕組み</h2>
+    <p>Claude Codeには<strong>サブエージェント（Sub-agents）</strong>機能があります。メインのClaude Codeが「上司」、サブエージェントは「特定の仕事を任された部下」です。</p>
+    <h3>組み込みサブエージェント</h3>
+    <table class="compare-table">
+      <tr><th>エージェント</th><th>モデル</th><th>利用ツール</th><th>用途</th></tr>
+      <tr><td><strong>Explore</strong></td><td>Haiku（高速・低コスト）</td><td>読み取り専用</td><td>コードベースの探索・検索</td></tr>
+      <tr><td><strong>Plan</strong></td><td>メインと同じ</td><td>読み取り専用</td><td>プランモードでの調査</td></tr>
+      <tr><td><strong>General-purpose</strong></td><td>メインと同じ</td><td>全ツール</td><td>複雑な多段階タスク</td></tr>
+    </table>
+    <div class="concept-box">
+      <div class="label">サブエージェントの3つの利点</div>
+      <p><strong>1. コンテキスト分離：</strong>独自のコンテキストウィンドウで動作し、メインの会話が情報過多にならない。<br>
+      <strong>2. 並列実行：</strong>複数のサブエージェントを同時に起動して並行作業が可能。<br>
+      <strong>3. 適材適所：</strong>Exploreエージェントは高速なHaikuモデルを使い、簡単な検索を低コストで行う。</p>
+    </div>
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">サブエージェントは<strong>他のサブエージェントを生成できません（ネスト不可）</strong>。1階層のみの構造です。</p>
+    </div>
+    <h3>Hooksによるライフサイクル制御</h3>
+    <table class="compare-table">
+      <tr><th>フックイベント</th><th>タイミング</th><th>ブロック可能</th></tr>
+      <tr><td><strong>PreToolUse</strong></td><td>ツール実行前</td><td>可能（exit code 2で阻止）</td></tr>
+      <tr><td><strong>PostToolUse</strong></td><td>ツール実行後</td><td>不可（既に実行済み）</td></tr>
+      <tr><td><strong>UserPromptSubmit</strong></td><td>プロンプト送信時</td><td>可能</td></tr>
+      <tr><td><strong>Stop</strong></td><td>Claude応答終了時</td><td>可能（継続強制）</td></tr>
+      <tr><td><strong>SessionStart</strong></td><td>セッション開始時</td><td>-</td></tr>
+    </table>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Exploreエージェントが読み取り専用であること、サブエージェントのネスト不可の制約、<code>PreToolUse</code>でexit code 2を返すとツール実行を阻止できるという仕組みは、安全性設計に関する問題で出題される可能性があります。</p>
+    </div>
+  </div>
+
+  <div id="m7-s5" class="card" style="display:none">
+    <h2>Module 7 用語集</h2>
+    <div class="glossary-item"><div class="glossary-term">エージェント型ツール</div><div class="glossary-en">Agentic Tool</div><div class="glossary-def">ツールを使いながら自律的にタスクを遂行するAIシステム。Claude Codeはこの代表例。</div></div>
+    <div class="glossary-item"><div class="glossary-term">権限モード</div><div class="glossary-en">Permission Mode</div><div class="glossary-def">Claude Codeのツール使用に対する承認レベル。plan, default, acceptEdits, dontAsk, bypassPermissionsの5種類。</div></div>
+    <div class="glossary-item"><div class="glossary-term">ヘッドレスモード</div><div class="glossary-en">Headless Mode</div><div class="glossary-def"><code>claude -p</code>で起動する非対話モード。CI/CD向け。</div></div>
+    <div class="glossary-item"><div class="glossary-term">サブエージェント</div><div class="glossary-en">Sub-agent</div><div class="glossary-def">メインのClaude Codeから起動される補助的なエージェント。独自のコンテキストウィンドウで動作。</div></div>
+    <div class="glossary-item"><div class="glossary-term">フック</div><div class="glossary-en">Hooks</div><div class="glossary-def">特定イベントで自動実行されるスクリプト。PreToolUseでexit code 2を返すとツール実行を阻止できる。</div></div>
+    <div class="glossary-item"><div class="glossary-term">チェックポイント</div><div class="glossary-en">Checkpoint</div><div class="glossary-def">ファイル変更前の状態を自動保存する機能。/rewindで復元可能。</div></div>
+    <div class="glossary-item"><div class="glossary-term">ワークツリー</div><div class="glossary-en">Worktree</div><div class="glossary-def">git worktreeを使ってリポジトリの隔離コピーで作業する機能。</div></div>
+    <div class="glossary-item"><div class="glossary-term">管理設定</div><div class="glossary-en">Managed Settings</div><div class="glossary-def">IT管理者が配布する上書き不可の設定。権限設定の優先順位で最も強い。</div></div>
+  </div>
+
+  <div id="m7-s6" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 7 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。</p>
+      <div class="quiz-question" id="m7-q1">
+        <div class="q-text">Q1. Claude Codeの内蔵ツールのうち、ユーザーの権限承認なしで使用できるものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',0,0)">Write（ファイル作成）</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',0,1)">Bash（コマンド実行）</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',0,2)">Read（ファイル読み取り）</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',0,3)">WebFetch（URL取得）</div>
+        <div class="quiz-explanation" id="m7-q1-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q2">
+        <div class="q-text">Q2. CI/CDパイプラインからClaude Codeを自動実行するために必要なフラグはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',1,0)">--interactive</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',1,1)">--print (-p)</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',1,2)">--batch</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',1,3)">--auto</div>
+        <div class="quiz-explanation" id="m7-q2-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q3">
+        <div class="q-text">Q3. Claude Codeの権限ルール評価順序として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',2,0)">allow &rarr; ask &rarr; deny</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',2,1)">ask &rarr; deny &rarr; allow</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',2,2)">deny &rarr; ask &rarr; allow</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',2,3)">deny &rarr; allow &rarr; ask</div>
+        <div class="quiz-explanation" id="m7-q3-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q4">
+        <div class="q-text">Q4. Exploreサブエージェントの特徴として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',3,0)">Opusモデルを使い、全ツールにアクセスできる</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',3,1)">Haikuモデルを使い、読み取り専用ツールのみアクセスできる</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',3,2)">メインと同じモデルを使い、ファイル編集ができる</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',3,3)">Sonnetモデルを使い、Bash実行ができる</div>
+        <div class="quiz-explanation" id="m7-q4-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q5">
+        <div class="q-text">Q5. Claude CodeのbypassPermissionsモードについて正しい説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',4,0)">通常の開発で生産性を上げるために推奨される</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',4,1)">コンテナなどの隔離環境でのみ使用すべきで、.gitディレクトリへの書き込みは例外的に確認がある</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',4,2)">全ての権限チェックが完全に無効化され、例外はない</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',4,3)">readonlyツールのみ許可するモードである</div>
+        <div class="quiz-explanation" id="m7-q5-exp"></div>
+      </div>
+      <div id="m7-quiz-result" class="quiz-result" style="display:none"></div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="submitQuiz('m7')" id="m7-submit-btn">回答を確定する</button>
+        <button class="btn btn-outline" onclick="retryQuiz('m7')" id="m7-retry-btn" style="display:none">もう一度挑戦</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="showPage('m6')">&#8592; 前へ</button>
+    <button class="btn btn-primary" onclick="showPage('m8')">次へ &#8594;</button>
+  </div>
+</div>
+
+<div id="page-m8" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 6</span>
+    <h1>Module 8: CLAUDE.mdとワークフロー</h1>
+    <p class="subtitle">設定ファイルの階層構造とClaude Codeの自動化を理解する</p>
+    <span class="domain-tag">ドメイン2: Claude Codeの設定とワークフロー (20%)</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>CLAUDE.mdの役割と3層の階層構造を理解する</li>
+      <li>settings.jsonとCLAUDE.mdの使い分けを把握する</li>
+      <li>Hooks・カスタムコマンド・スキルによるワークフロー設計を学ぶ</li>
+      <li>チーム開発やCI/CDでのClaude Code運用パターンを知る</li>
+    </ul>
+  </div>
+
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m8','s1',this)">CLAUDE.mdとは</button>
+    <button class="section-tab" onclick="showSection('m8','s2',this)">設定ファイル体系</button>
+    <button class="section-tab" onclick="showSection('m8','s3',this)">ワークフロー設計</button>
+    <button class="section-tab" onclick="showSection('m8','s4',this)">チーム運用とCI/CD</button>
+    <button class="section-tab" onclick="showSection('m8','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m8','s6',this)">クイズ</button>
+  </div>
+
+  <div id="m8-s1" class="card">
+    <h2>CLAUDE.md &mdash; Claude Codeの「ルールブック」</h2>
+    <p>CLAUDE.mdは、Claude Codeがプロジェクトで作業する際に<strong>自動的に読み込む指示書ファイル</strong>です。新入社員が初日に「社内ルールブック」を渡されるのと同じです。</p>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>CLAUDE.md：</strong>Markdownで書かれたClaude Code向けの指示書ファイル。プロジェクトのコーディング規約、アーキテクチャ方針、禁止事項などを記述する。起動時に自動的にシステムプロンプトの一部として読み込まれる。</p>
+    </div>
+    <h3>3層の階層構造</h3>
+    <table class="compare-table">
+      <tr><th>レベル</th><th>配置場所</th><th>共有範囲</th><th>比喩</th></tr>
+      <tr><td><strong>リポジトリ（ルート）</strong></td><td><code>PROJECT_ROOT/CLAUDE.md</code></td><td>チーム全員（git管理）</td><td>会社の就業規則</td></tr>
+      <tr><td><strong>ユーザーローカル</strong></td><td><code>PROJECT_ROOT/.claude/CLAUDE.md</code></td><td>個人のみ（.gitignore推奨）</td><td>自分のデスクの付箋</td></tr>
+      <tr><td><strong>グローバル（ホーム）</strong></td><td><code>~/.claude/CLAUDE.md</code></td><td>全プロジェクト共通・個人</td><td>自分の手帳</td></tr>
+    </table>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">グローバル &rarr; リポジトリルート &rarr; ユーザーローカル &rarr; サブディレクトリの順で読み込まれ、<strong>後から読まれたものが先のものを上書き（override）</strong>します。「最も近いCLAUDE.mdが最優先」と覚えてください。</p>
+    </div>
+    <h3>何を書くべきか・書くべきでないか</h3>
+    <table class="compare-table">
+      <tr><th>書くべきもの</th><th>書くべきでないもの</th></tr>
+      <tr><td>コーディング規約・命名規則</td><td>APIキー・パスワード・秘密鍵</td></tr>
+      <tr><td>テスト方針・PR作成ルール</td><td>巨大なコード片（コンテキスト消費）</td></tr>
+      <tr><td>アーキテクチャの概要</td><td>頻繁に変わる一時的な情報</td></tr>
+      <tr><td>禁止事項・制約</td><td>他のファイルで管理すべき詳細仕様</td></tr>
+    </table>
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">CLAUDE.mdは<strong>git管理されるファイル</strong>です。絶対にAPIキーやパスワードなどの秘密情報を書いてはいけません。また、内容が大きすぎるとコンテキストウィンドウを圧迫します。</p>
+    </div>
+  </div>
+
+  <div id="m8-s2" class="card" style="display:none">
+    <h2>Claude Codeの設定ファイル体系</h2>
+    <h3>settings.json &mdash; 機械的な設定</h3>
+    <p>settings.jsonは<strong>JSON形式の設定ファイル</strong>で、権限、MCPサーバー、環境変数などの機械的な設定を記述します。</p>
+    <table class="compare-table">
+      <tr><th>レベル</th><th>パス</th><th>git管理</th><th>用途</th></tr>
+      <tr><td><strong>グローバル</strong></td><td><code>~/.claude/settings.json</code></td><td>しない</td><td>全PJ共通の権限・MCP設定</td></tr>
+      <tr><td><strong>プロジェクト共有</strong></td><td><code>.claude/settings.json</code></td><td>する</td><td>チーム共通の権限・MCP設定</td></tr>
+      <tr><td><strong>プロジェクト個人</strong></td><td><code>.claude/settings.local.json</code></td><td>しない</td><td>個人の追加設定</td></tr>
+    </table>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>settings.json</strong> = 機械的な設定（権限、MCP、環境変数）。Claude Codeの<strong>システム</strong>が読む。<br>
+      <strong>CLAUDE.md</strong> = 自然言語の指示（方針、ルール、知識）。<strong>Claude（LLM）自身</strong>が読む。</p>
+    </div>
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">permissionsでは<strong>deny（拒否）がallow（許可）より常に優先</strong>されます。明示的に禁止されたものはallow設定があっても実行できません。</p>
+    </div>
+  </div>
+
+  <div id="m8-s3" class="card" style="display:none">
+    <h2>ワークフロー設計 &mdash; Hooks、Commands、Skills</h2>
+    <h3>Hooks（フック）&mdash; 自動チェックポイント</h3>
+    <p>特定のイベントの前後に<strong>スクリプトを自動実行</strong>する仕組み。settings.jsonで定義します。</p>
+    <table class="compare-table">
+      <tr><th>フック名</th><th>タイミング</th><th>ユースケース</th></tr>
+      <tr><td><strong>PreToolUse</strong></td><td>ツール実行前</td><td>危険なコマンドのブロック</td></tr>
+      <tr><td><strong>PostToolUse</strong></td><td>ツール実行後</td><td>ログ記録、結果の検証</td></tr>
+      <tr><td><strong>Notification</strong></td><td>通知発生時</td><td>完了音、Slack通知</td></tr>
+      <tr><td><strong>Stop</strong></td><td>Claude応答完了時</td><td>後処理、レポート生成</td></tr>
+    </table>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p>フックスクリプトが<strong>非ゼロの終了コード</strong>を返すとツール実行は<strong>ブロック</strong>されます。<strong>stderr</strong>に書いたメッセージがClaudeにフィードバックされます。</p>
+    </div>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">「PreToolUseフックで危険なコマンドをブロックする」は頻出パターンです。<strong>stderrがClaudeへのフィードバック、stdoutがツール結果の変更</strong>という区別を覚えておきましょう。</p>
+    </div>
+    <h3>Custom Slash Commands（カスタムコマンド）</h3>
+    <p><code>.claude/commands/</code> にMarkdownファイルを置くと、<code>/コマンド名</code> で呼び出せます。<code>$ARGUMENTS</code> プレースホルダーでユーザーの引数を受け取れます。</p>
+    <h3>Skills（スキルファイル）</h3>
+    <p>再利用可能な専門知識をまとめたMarkdownファイル。CLAUDE.mdから参照指示を書いて、必要な時に読み込みます。</p>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><strong>CLAUDE.md</strong> = 常に読み込まれる基本ルール / <strong>カスタムコマンド</strong> = ユーザーが明示的に呼び出すワークフロー / <strong>スキル</strong> = 特定タスク時に参照する専門知識</p>
+    </div>
+  </div>
+
+  <div id="m8-s4" class="card" style="display:none">
+    <h2>チーム開発とCI/CDでのClaude Code活用</h2>
+    <h3>チーム開発での設定管理</h3>
+    <table class="compare-table">
+      <tr><th>ファイル</th><th>git管理</th><th>理由</th></tr>
+      <tr><td><code>CLAUDE.md</code>（ルート）</td><td>する</td><td>チーム全員への共通指示書</td></tr>
+      <tr><td><code>.claude/settings.json</code></td><td>する</td><td>チーム共通の権限・MCP設定</td></tr>
+      <tr><td><code>.claude/commands/*.md</code></td><td>する</td><td>チーム共通のワークフロー</td></tr>
+      <tr><td><code>.claude/settings.local.json</code></td><td>しない</td><td>個人の好み・追加設定</td></tr>
+      <tr><td><code>.claude/CLAUDE.md</code></td><td>しない</td><td>個人メモ・実験的設定</td></tr>
+    </table>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p>共通ルール（CLAUDE.md、settings.json）はgit管理してチーム共有。個人設定（settings.local.json、.claude/CLAUDE.md）はgitignoreして個人の裁量に任せる。</p>
+    </div>
+    <h3>CI/CDパイプラインでの活用</h3>
+    <table class="compare-table">
+      <tr><th>ユースケース</th><th>説明</th><th>トリガー</th></tr>
+      <tr><td><strong>PRレビュー自動化</strong></td><td>PRが開かれた時にClaudeがコードレビュー</td><td>GitHub Actions: <code>pull_request</code></td></tr>
+      <tr><td><strong>コード生成</strong></td><td>Issueからコードを自動生成しPR作成</td><td>GitHub Actions: <code>issues</code></td></tr>
+      <tr><td><strong>テスト生成</strong></td><td>変更ファイルに対してテスト自動生成</td><td>GitHub Actions: <code>push</code></td></tr>
+    </table>
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CI/CDでは環境変数 <code>ANTHROPIC_API_KEY</code> の設定が必要。<code>--print</code> モードで非対話実行する点を覚えておきましょう。</p>
+    </div>
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;"><strong>CLI代替可能なツール（git, gh, docker等）はCLIを使う</strong>のがベストプラクティスです。MCPはCLI代替がないものにのみ使います。不要なMCP常時接続はコンテキストを消費します。</p>
+    </div>
+  </div>
+
+  <div id="m8-s5" class="card" style="display:none">
+    <h2>Module 8 用語集</h2>
+    <div class="glossary-item"><div class="glossary-term">CLAUDE.md</div><div class="glossary-en">CLAUDE.md</div><div class="glossary-def">Claude Code向けのMarkdown形式の指示書ファイル。起動時に自動で読み込まれる。</div></div>
+    <div class="glossary-item"><div class="glossary-term">settings.json</div><div class="glossary-en">settings.json</div><div class="glossary-def">Claude Codeの機械的な設定ファイル。権限、MCPサーバー、環境変数をJSON形式で定義。</div></div>
+    <div class="glossary-item"><div class="glossary-term">フック</div><div class="glossary-en">Hook</div><div class="glossary-def">特定イベントにスクリプトを自動実行する仕組み。settings.jsonで定義。</div></div>
+    <div class="glossary-item"><div class="glossary-term">カスタムスラッシュコマンド</div><div class="glossary-en">Custom Slash Command</div><div class="glossary-def">.claude/commands/ にMarkdownファイルを置いて定義する再利用可能なプロンプトテンプレート。</div></div>
+    <div class="glossary-item"><div class="glossary-term">パーミッション</div><div class="glossary-en">Permission</div><div class="glossary-def">Claude Codeがどのツール・コマンドを実行できるかの権限設定。denyが常に優先。</div></div>
+    <div class="glossary-item"><div class="glossary-term">ヘッドレスモード</div><div class="glossary-en">Headless Mode</div><div class="glossary-def">対話なしで実行するモード。--printフラグで起動。CI/CD向け。</div></div>
+    <div class="glossary-item"><div class="glossary-term">標準エラー出力</div><div class="glossary-en">stderr</div><div class="glossary-def">Hooksではstderrに書いたメッセージがClaudeにフィードバックされる。</div></div>
+    <div class="glossary-item"><div class="glossary-term">プレースホルダー</div><div class="glossary-en">Placeholder</div><div class="glossary-def">カスタムコマンドで$ARGUMENTSがユーザー入力のプレースホルダー。</div></div>
+  </div>
+
+  <div id="m8-s6" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 8 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。</p>
+      <div class="quiz-question" id="m8-q1">
+        <div class="q-text">Q1. チーム開発プロジェクトで、全メンバーに共通のコーディング規約をClaude Codeに適用したい場合、CLAUDE.mdをどこに配置すべきですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',0,0)">~/.claude/CLAUDE.md（グローバル）</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',0,1)">プロジェクトルートのCLAUDE.md（git管理）</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',0,2)">.claude/CLAUDE.md（ユーザーローカル）</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',0,3)">.claude/settings.json 内に記述する</div>
+        <div class="quiz-explanation" id="m8-q1-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q2">
+        <div class="q-text">Q2. Claude Codeのsettings.jsonで permissions.deny と permissions.allow の両方に同じコマンドが含まれている場合、どちらが優先されますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',1,0)">allowが優先される</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',1,1)">denyが優先される</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',1,2)">後に定義された方が優先される</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',1,3)">エラーになり実行できない</div>
+        <div class="quiz-explanation" id="m8-q2-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q3">
+        <div class="q-text">Q3. PreToolUseフックで危険なコマンドをブロックする場合、フックスクリプトが行うべきことはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',2,0)">stdoutにエラーメッセージを出力し、終了コード0で終了する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',2,1)">stderrにフィードバックメッセージを出力し、非ゼロの終了コードで終了する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',2,2)">CLAUDE.mdにブロック理由を書き込む</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',2,3)">settings.jsonのdenyリストに自動追加する</div>
+        <div class="quiz-explanation" id="m8-q3-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q4">
+        <div class="q-text">Q4. CI/CDパイプラインでClaude Codeを使ってPRレビューを自動化する場合、正しい実行方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',3,0)">claude コマンドを対話モードで起動しstdinからプロンプトを送る</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',3,1)">claude --print モードでANTHROPIC_API_KEYを設定して非対話実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',3,2)">CLAUDE.mdにレビュー指示を書けば自動的にCIで実行される</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',3,3)">MCPサーバー経由でGitHub APIに接続して実行する</div>
+        <div class="quiz-explanation" id="m8-q4-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q5">
+        <div class="q-text">Q5. CLAUDE.mdが複数の階層に存在する場合の読み込み優先順位として正しいものはどれですか？（高い方が優先）</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',4,0)">グローバル > リポジトリルート > ユーザーローカル > サブディレクトリ</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',4,1)">リポジトリルート > グローバル > ユーザーローカル > サブディレクトリ</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',4,2)">サブディレクトリ > ユーザーローカル > リポジトリルート > グローバル</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',4,3)">すべて同じ優先度で矛盾する場合はエラーになる</div>
+        <div class="quiz-explanation" id="m8-q5-exp"></div>
+      </div>
+      <button class="btn btn-accent" onclick="submitQuiz('m8')" id="m8-submit-btn">回答を確定する</button>
+      <button class="btn btn-outline" onclick="retryQuiz('m8')" id="m8-retry-btn" style="display:none">もう一度挑戦</button>
+      <div id="m8-quiz-result" class="quiz-result" style="display:none"></div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="showPage('m7')">&#8592; 前へ</button>
+    <button class="btn btn-primary" onclick="showPage('m9')">次へ &#8594;</button>
+  </div>
+</div>
 
 <div id="page-m9" style="display:none"><div class="module-header"><span class="week-badge">Week 7</span><h1>Module 9: エージェントアーキテクチャ</h1><p class="subtitle">自律的に動くAIシステムの設計パターン</p><span class="domain-tag">ドメイン1: エージェント設計 (27%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m8')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m10')">次へ &#8594;</button></div></div>
 
@@ -2089,6 +3124,46 @@ const QUIZ_DATA = {
       'エージェントがツール（外部API等）を呼び出す際のパラメータ形式を保証するには、Strict Tool Use（strict: true）が最適です。JSON Outputsは応答テキスト全体の構造化に適しており、ツール呼び出しのパラメータ保証には Strict Tool Use を使います。',
       'additionalProperties: false を設定すると、スキーマで定義していないフィールドが出力に含まれることを防げます。これは「余白への書き込み禁止」にあたり、予期しないデータの混入を防ぐベストプラクティスです。必須仕様ではありませんが、常に設定することが推奨されます。',
       '検証-再試行ループでは、出力を生成したインスタンスとは別の独立したインスタンスで検証することが推奨されます。同一セッション内での自己レビューでは、同じバイアスや誤りを引き継ぐ可能性があるため、「ダブルチェック体制」として別の視点から確認します。'
+    ]
+  },
+  m5: {
+    answers: [1, 1, 2, 2, 1],
+    explanations: [
+      'Claude自身はツールを実行しません。Claudeの役割は「どのツールを、どのパラメータで呼ぶべきか」を判断してJSON形式で返すことです。実際のツール実行は開発者のクライアントコード（アプリケーション）が担当します。この責任分離はTool Useの基本設計です。',
+      'Claudeがツール呼び出しを要求した場合、stop_reasonは"tool_use"に設定されます。"end_turn"はClaudeが最終回答を返した場合に設定されます。"tool_call"や"function_call"はClaude APIでは使用されません。',
+      'ツールのdescriptionにはツールの用途だけでなく、「いつ使うべきか」と「いつ使うべきでないか」の両方を記載するのがベストプラクティスです。特に似た機能のツールが複数ある場合、使い分けの基準を明記することでClaudeの選択精度が向上します。',
+      'tool_choiceを{"type": "any"}に設定すると、Claudeは必ずいずれかのツールを使用し、テキストのみの応答は返しません。"auto"は自律判断、"tool"は特定ツール指定、"none"はツール禁止です。',
+      'ツール実行でエラーが発生した場合は、is_error: trueを設定し、具体的なエラーメッセージをtool_resultとして返すのがベストプラクティスです。Claudeはエラーを認識して、別のパラメータでの再試行やユーザーへの確認など、適切なリカバリーを試みます。tool_resultの返却を省略するとAPIエラーになります。'
+    ]
+  },
+  m6: {
+    answers: [1, 2, 1, 1, 2],
+    explanations: [
+      'MCPはM×N問題を解消するために設計されたオープンプロトコルです。AIアプリごと・サービスごとに個別の接続コードを書く必要をなくし、M+N個の実装で済むようにします。MCPはTool Useを置き換えるものではなく補完するものであり、MCPサーバーにLLMは内蔵されていません。',
+      'MCPクライアントとMCPサーバーは1:1の関係です。複数のサーバーに接続したい場合は、ホストが複数のクライアントを持つことで実現します。1つのクライアントが複数のサーバーに接続することはできません。',
+      'MCPの3つのプリミティブの制御主体は、Resources=アプリケーション（application-controlled）、Tools=モデル（model-controlled）、Prompts=ユーザー（user-controlled）です。これはMCPの基本設計として非常に重要な概念です。',
+      'MCPではClient:Server=1:1の関係のため、2つのデータソースに接続するにはホスト内に2つのクライアントが必要です。stdioはローカル専用のトランスポートのためリモートのGitHubサーバーには適しません。また、最小権限の原則に従い、1つのサーバーで複数のデータソースを処理するよりも分離した設計が推奨されます。',
+      'MCPはTool Useを「補完（complement）」する関係にあります。MCPはツールの接続規格（どのツールにどう繋ぐか）を標準化し、Tool UseはLLMがそのツールをどう呼び出すかの仕組みを提供します。両者は置き換えでも競合でもなく、協調して動作します。'
+    ]
+  },
+  m7: {
+    answers: [2, 1, 2, 1, 1],
+    explanations: [
+      'Read（ファイル読み取り）は読み取り専用ツールであり、権限承認なしで使用できます。Write、Bash、WebFetchはいずれも変更や外部アクセスを伴うため、権限承認が必要です。Grep、Glob、Agentも同様に権限不要のツールです。',
+      '--print（-p）フラグはヘッドレスモードでClaude Codeを起動します。対話的な入力を待たずに、回答を返して終了するため、CI/CDパイプラインやスクリプトからの自動実行に最適です。--max-turnsや--max-budget-usdで暴走やコストも制限できます。',
+      'Claude Codeの権限ルールはdeny → ask → allowの順で評価されます。deny（拒否）が常に最優先で、明示的に拒否されたツール操作は他の設定で上書きできません。この評価順序は安全性を最優先にする設計思想に基づいています。',
+      'Exploreサブエージェントは高速・低コストのHaikuモデルを使い、読み取り専用ツール（Read, Grep, Glob等）のみアクセスできます。コードベースの探索や検索に特化しており、ファイル変更やコマンド実行はできません。',
+      'bypassPermissionsモードはコンテナなどの隔離環境でのみ使用すべきです。全権限チェックをスキップしますが、.git、.claude、.vscode、.ideaディレクトリへの書き込みは例外的に確認があります。CLIフラグでは--dangerously-skip-permissionsという名前で、危険性を示しています。'
+    ]
+  },
+  m8: {
+    answers: [1, 1, 1, 1, 2],
+    explanations: [
+      'チーム全員に共通のルールを適用するには、プロジェクトルートのCLAUDE.md（git管理）に記述します。グローバル（~/.claude/CLAUDE.md）は個人の全PJ共通設定用、ユーザーローカル（.claude/CLAUDE.md）は個人メモ用です。settings.jsonは機械的な設定（権限等）用であり、自然言語の規約には向きません。',
+      'permissions.denyは常にpermissions.allowより優先されます。これは「ブラックリスト方式」で、明示的に禁止されたコマンドは、allowに含まれていても実行できません。セキュリティの観点から、禁止事項が許可事項を上回る設計になっています。',
+      'PreToolUseフックでコマンドをブロックするには、stderrにフィードバックメッセージを出力し、非ゼロの終了コードで終了します。非ゼロ終了コードがブロックのシグナルとなり、stderrの内容がClaudeへのフィードバックとして渡されます。stdoutはツール結果の変更に使われるため、フィードバック用にはstderrを使います。',
+      'CI/CDでClaude Codeを使うには、--print（または -p）モードで非対話実行し、ANTHROPIC_API_KEYを環境変数に設定する必要があります。CLAUDE.mdはあくまで指示書であり、CI実行を自動トリガーする機能はありません。対話モードはCI/CDには不向きです。',
+      'CLAUDE.mdは「後から読まれたものが先のものを上書き（override）」します。読み込み順序はグローバル→リポジトリルート→ユーザーローカル→サブディレクトリの順で、後に読まれるサブディレクトリが最も優先度が高くなります。つまり「最も近いCLAUDE.mdが最優先」です。'
     ]
   }
 };
