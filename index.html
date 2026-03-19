@@ -970,11 +970,1043 @@
   </div>
 </div>
 
-<div id="page-m2" style="display:none"><div class="module-header"><span class="week-badge">Week 2</span><h1>Module 2: プロンプトの基本</h1><p class="subtitle">Claudeへの効果的な指示の出し方を学ぶ</p><span class="domain-tag">ドメイン3: プロンプト工学</span></div><div class="card"><h2>コンテンツ準備中</h2><p>Module 0 → M1 の順に学習を進めてください。</p></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m1')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m3')">次へ &#8594;</button></div></div>
+<div id="page-m2" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 2</span>
+    <h1>Module 2: プロンプトの基本</h1>
+    <p class="subtitle">Claudeへの効果的な指示の出し方を学ぶ</p>
+    <span class="domain-tag">ドメイン3: プロンプトエンジニアリングと構造化出力 (20%)</span>
+  </div>
 
-<div id="page-m3" style="display:none"><div class="module-header"><span class="week-badge">Week 3</span><h1>Module 3: システムプロンプト設計</h1><p class="subtitle">本番環境のためのプロンプト設計パターン</p><span class="domain-tag">ドメイン3: プロンプト工学 (20%)</span></div><div class="card"><h2>コンテンツ準備中</h2><p>Week 1-2の基礎モジュールを先に完了してください。</p></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m2')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m4')">次へ &#8594;</button></div></div>
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>プロンプトエンジニアリング（Prompt Engineering）の基本的な考え方</li>
+      <li>明確で具体的な指示の書き方と、XMLタグによる構造化</li>
+      <li>Few-shotプロンプティング &#8212; 例示で出力をコントロールする技術</li>
+      <li>Chain-of-Thought &#8212; Claudeに「段階的に考えさせる」方法</li>
+      <li>CCA-F試験で問われるプロンプト設計の実践的な判断基準</li>
+    </ul>
+  </div>
 
-<div id="page-m4" style="display:none"><div class="module-header"><span class="week-badge">Week 4</span><h1>Module 4: 構造化出力とJSON</h1><p class="subtitle">AIの出力を制御し、プログラムで処理可能にする</p><span class="domain-tag">ドメイン3: プロンプト工学 (20%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m3')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m5')">次へ &#8594;</button></div></div>
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m2','s1',this)">基本原則</button>
+    <button class="section-tab" onclick="showSection('m2','s2',this)">構造化のテクニック</button>
+    <button class="section-tab" onclick="showSection('m2','s3',this)">高度なテクニック</button>
+    <button class="section-tab" onclick="showSection('m2','s4',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m2','s5',this)">クイズ</button>
+  </div>
+
+  <!-- Section 1: 基本原則 -->
+  <div id="m2-s1" class="card">
+    <h2>プロンプトエンジニアリングとは</h2>
+    <p>プロンプトエンジニアリング（Prompt Engineering）とは、AIに対して<strong>的確な指示を設計する技術</strong>です。料理に例えるなら、AIは腕の良いシェフ。でも「何かおいしいもの作って」と言っても期待通りの料理は出てきません。「鶏もも肉を使った和風の煮込み、4人分、30分以内で」と伝えるほど、期待に合う結果が返ってきます。</p>
+
+    <div class="concept-box">
+      <div class="label">Anthropicのゴールデンルール</div>
+      <p><strong>「最小限のコンテキストしか持たない同僚にプロンプトを見せて、彼らが混乱するなら、Claudeも混乱する」</strong> &#8212; つまり、Claudeを「優秀だが背景を知らない新入社員」と思って指示すると、ちょうど良い具体度になります。</p>
+    </div>
+
+    <h3>原則1: 明確かつ直接的に（Be Clear and Direct）</h3>
+    <p>Claudeへの指示は、具体的であればあるほど良い結果が得られます。曖昧さを排除し、何をしてほしいかを明確に伝えましょう。</p>
+
+    <table class="compare-table">
+      <tr><th>悪い例</th><th>良い例</th></tr>
+      <tr>
+        <td>「このデータを分析して」</td>
+        <td>「このCSVデータの売上列を月別に集計し、前月比の増減率を表形式で出力してください」</td>
+      </tr>
+      <tr>
+        <td>「短くまとめて」</td>
+        <td>「3文以内で要約してください。専門用語は使わず、中学生にも分かる表現で」</td>
+      </tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">試験では「このプロンプトの問題点は何か？」「どう改善すべきか？」というシナリオ問題が出ます。<strong>曖昧な指示 → 具体的な指示</strong>への改善パターンを押さえておきましょう。</p>
+    </div>
+
+    <h3>原則2: コンテキスト（背景）を伝える（Add Context）</h3>
+    <p>「なぜその指示を出しているのか」という背景を添えると、Claudeはより適切な判断ができます。</p>
+    <p>例えば「省略記号（...）を使わないで」と言うだけでなく、「この文章は音声読み上げソフトで再生されるため、省略記号は読み上げできません。代わりに文を完結させてください」と伝えると、Claudeは意図を理解した上で適切に対応できます。</p>
+
+    <h3>原則3: 「やるな」ではなく「代わりにこうして」</h3>
+    <p>否定形の指示は意外と伝わりにくいものです。「専門用語を使うな」より「中学生にも分かる言葉で説明してください」の方が、Claudeは正確に従えます。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念: ロールプロンプティング（Role Prompting）</div>
+      <p>Claudeに<strong>特定の役割を与える</strong>ことで、回答のトーンや専門性を制御するテクニックです。システムプロンプト（System Prompt）で「あなたは金融アナリストです」と設定すると、Claudeはその専門家の視点で回答します。一文だけでも効果があります。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: 構造化のテクニック -->
+  <div id="m2-s2" class="card" style="display:none">
+    <h2>プロンプトを構造化する</h2>
+    <p>プロンプトが長くなると、Claudeがどこが指示でどこがデータなのか混乱することがあります。そこで活躍するのが<strong>XMLタグによる構造化</strong>です。</p>
+
+    <h3>XMLタグ構造化（XML Tag Structuring）</h3>
+    <p>XMLタグは、プロンプト内の要素を「ここからここまでが指示」「ここからここまでがデータ」と明確に区切る方法です。書類にタブを付けて整理するイメージです。</p>
+
+    <div class="concept-box">
+      <div class="label">Anthropic推奨のXMLタグ構造</div>
+      <p>Anthropicは、複雑なプロンプトでXMLタグを使うことを<strong>公式に推奨</strong>しています。これはClaude固有のベストプラクティスであり、試験でも頻出です。</p>
+      <p style="margin-top:.5rem;">よく使うタグ: <code>&lt;instructions&gt;</code>（指示）、<code>&lt;context&gt;</code>（背景情報）、<code>&lt;example&gt;</code>（例）、<code>&lt;input&gt;</code>（入力データ）、<code>&lt;documents&gt;</code>（参照資料）</p>
+    </div>
+
+    <p><strong>具体例:</strong></p>
+    <pre style="background:#f5f5f5;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.9rem;line-height:1.5"><code>&lt;documents&gt;
+  &lt;document index="1"&gt;
+    &lt;source&gt;quarterly_report.pdf&lt;/source&gt;
+    &lt;document_content&gt;
+      &#123;&#123;QUARTERLY_REPORT&#125;&#125;
+    &lt;/document_content&gt;
+  &lt;/document&gt;
+&lt;/documents&gt;
+
+&lt;instructions&gt;
+上記の四半期報告書を分析し、売上の傾向を3つ挙げてください。
+各傾向は1文で簡潔に。
+&lt;/instructions&gt;</code></pre>
+
+    <h3>Few-shotプロンプティング（Few-Shot Prompting）</h3>
+    <p>「百聞は一見にしかず」 &#8212; Claudeにも同じことが言えます。<strong>具体的な入出力例を2〜5個見せる</strong>ことで、望む形式やトーンをClaudeに伝える最も信頼性の高い手法です。</p>
+
+    <p><strong>良い例の3条件:</strong></p>
+    <ul>
+      <li><strong>関連性</strong>: 実際のユースケースに近い例を選ぶ</li>
+      <li><strong>多様性</strong>: エッジケース（境界例）も含める</li>
+      <li><strong>構造化</strong>: <code>&lt;example&gt;</code>タグで囲み、指示本文と区別する</li>
+    </ul>
+
+    <p><strong>具体例:</strong></p>
+    <pre style="background:#f5f5f5;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.9rem;line-height:1.5"><code>以下の製品レビューの感情を分析してください。
+
+&lt;examples&gt;
+  &lt;example&gt;
+    &lt;input&gt;「この商品は最高です！毎日使っています」&lt;/input&gt;
+    &lt;output&gt;感情: ポジティブ / 信頼度: 高&lt;/output&gt;
+  &lt;/example&gt;
+  &lt;example&gt;
+    &lt;input&gt;「まあまあかな。期待したほどではない」&lt;/input&gt;
+    &lt;output&gt;感情: 中立〜やや否定 / 信頼度: 中&lt;/output&gt;
+  &lt;/example&gt;
+  &lt;example&gt;
+    &lt;input&gt;「最悪。二度と買わない」&lt;/input&gt;
+    &lt;output&gt;感情: ネガティブ / 信頼度: 高&lt;/output&gt;
+  &lt;/example&gt;
+&lt;/examples&gt;
+
+&lt;input&gt;「デザインは好きだけど、すぐ壊れた」&lt;/input&gt;</code></pre>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Few-shotの例は<strong>3〜5個が最適</strong>とされています。試験では「例をいくつ含めるべきか」「例の選び方で何を重視すべきか」が問われます。答えは<strong>関連性（Relevance）と多様性（Diversity）</strong>です。</p>
+    </div>
+
+    <h3>長文コンテキストの配置ルール（Long Context Prompting）</h3>
+    <p>20,000トークン以上の長い文書をClaudeに読ませる場合、<strong>データをプロンプトの上部に、指示を下部に配置</strong>すると、最大30%品質が向上するとAnthropicが報告しています。</p>
+    <p>イメージとしては、まず資料を机に広げてから（上部=データ）、「この中から要点を見つけて」と指示する（下部=質問）流れです。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">長文コンテキスト内の情報を参照させる場合は、Claudeにまず<strong>関連箇所を引用（Quote）</strong>させてから回答させると、正確性が大きく向上します。これを「グラウンディング（Grounding）」と呼びます。</p>
+    </div>
+  </div>
+
+  <!-- Section 3: 高度なテクニック -->
+  <div id="m2-s3" class="card" style="display:none">
+    <h2>高度なプロンプトテクニック</h2>
+
+    <h3>Chain-of-Thought（思考の連鎖）</h3>
+    <p>人間も複雑な問題を解くとき、いきなり答えを出さず順を追って考えます。Claudeも同じで、<strong>「ステップバイステップで考えてください」</strong>と指示するだけで、推論の正確さが大きく向上します。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念: Extended Thinking / Adaptive Thinking</div>
+      <p>Anthropic APIでは、Claudeに「内部で深く考える時間」を与える<strong>Extended Thinking</strong>機能があります。最新版では<strong>Adaptive Thinking</strong>（適応的思考）として、タスクの難易度に応じてClaudeが自動で思考量を調整します。</p>
+      <p style="margin-top:.5rem;">設定例: <code>thinking: {"type": "adaptive"}</code> + <code>output_config: {"effort": "high"}</code></p>
+    </div>
+
+    <p><strong>Chain-of-Thoughtの実装方法:</strong></p>
+    <table class="compare-table">
+      <tr><th>方法</th><th>説明</th><th>使いどころ</th></tr>
+      <tr>
+        <td>「ステップバイステップで」と指示</td>
+        <td>最もシンプル。プロンプトに一文追加するだけ</td>
+        <td>一般的な推論タスク</td>
+      </tr>
+      <tr>
+        <td>思考タグで分離</td>
+        <td><code>&lt;thinking&gt;</code>と<code>&lt;answer&gt;</code>タグで推論と回答を分ける</td>
+        <td>推論過程を確認したいとき</td>
+      </tr>
+      <tr>
+        <td>Extended / Adaptive Thinking</td>
+        <td>API設定でClaudeに内部思考時間を付与</td>
+        <td>高精度が必要な本番システム</td>
+      </tr>
+    </table>
+
+    <h3>プロンプトチェーニング（Prompt Chaining）</h3>
+    <p>一つの大きなタスクを<strong>複数の小さなステップに分割</strong>し、各ステップの出力を次のステップの入力にする手法です。工場の組立ラインのように、各工程で品質チェックができる利点があります。</p>
+
+    <p><strong>最も一般的なパターン: 自己修正（Self-Correction）</strong></p>
+    <ol>
+      <li>ステップ1: ドラフトを生成する</li>
+      <li>ステップ2: 基準に照らしてレビューする</li>
+      <li>ステップ3: レビュー結果に基づいて改善する</li>
+    </ol>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">プロンプトチェーニングは、ドメイン3の「検証再試行ループ（Validation-Retry Loop）」と密接に関連します。出力をJSON等で構造化 → 検証 → 不合格なら再生成、というパターンは試験の頻出テーマです。</p>
+    </div>
+
+    <h3>構造化出力（Structured Output）</h3>
+    <p>Claudeの出力を<strong>JSON等の決まった形式に制御する</strong>技術です。人間が読むだけなら自由な文章でも良いですが、プログラムが処理する場合は正確なフォーマットが必要です。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念: tool_use による構造化出力</div>
+      <p>Anthropic APIでは、<strong>ツール使用（tool_use）</strong>機能を活用して、Claudeの出力をJSONスキーマに準拠させることができます。分類タスクでは、有効なラベルを<code>enum</code>フィールドに定義したツールを使うと、出力が確実にそのラベルのいずれかになります。</p>
+    </div>
+
+    <h3>テクニック選択の判断基準</h3>
+    <table class="compare-table">
+      <tr><th>状況</th><th>推奨テクニック</th></tr>
+      <tr><td>出力の形式・トーンを揃えたい</td><td>Few-shot Prompting</td></tr>
+      <tr><td>複雑な推論が必要</td><td>Chain-of-Thought / Extended Thinking</td></tr>
+      <tr><td>複数のデータや指示が混在</td><td>XMLタグ構造化</td></tr>
+      <tr><td>プログラムが出力を処理する</td><td>Structured Output（tool_use / JSONスキーマ）</td></tr>
+      <tr><td>品質保証が必要な本番システム</td><td>Prompt Chaining + Validation-Retry Loop</td></tr>
+      <tr><td>専門家の視点で回答させたい</td><td>Role Prompting（システムプロンプト）</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">ドメイン3は「プロンプトエンジニアリング<strong>と構造化出力</strong>」です。構造化出力（JSONスキーマ設計、tool_use）の詳細はModule 4で扱いますが、ここでは「プロンプト設計と構造化出力は一体のスキル」であることを押さえておきましょう。</p>
+    </div>
+  </div>
+
+  <!-- Section 4: 用語集 -->
+  <div id="m2-s4" class="card" style="display:none">
+    <h2>用語集 &#8212; Module 2</h2>
+    <p>試験は英語で実施されます。日本語で概念を理解したら、英語の用語名もセットで覚えましょう。</p>
+
+    <div class="glossary-item">
+      <span class="glossary-term">プロンプト</span>
+      <span class="glossary-en">Prompt</span>
+      <p class="glossary-def">AIに与える入力テキスト（指示、質問、コンテキストなど）のこと。料理のレシピの注文書に相当。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">プロンプトエンジニアリング</span>
+      <span class="glossary-en">Prompt Engineering</span>
+      <p class="glossary-def">AIから望ましい出力を得るために、プロンプトを設計・最適化する技術。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">システムプロンプト</span>
+      <span class="glossary-en">System Prompt</span>
+      <p class="glossary-def">会話の最初にClaudeの振る舞いを設定するプロンプト。役割、制約、出力形式などを定義する。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">Few-shotプロンプティング</span>
+      <span class="glossary-en">Few-Shot Prompting</span>
+      <p class="glossary-def">入出力の例を数個（通常3〜5個）提示し、望むパターンをClaudeに学習させる手法。Anthropicは「Multishot Prompting」とも呼ぶ。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">思考の連鎖</span>
+      <span class="glossary-en">Chain-of-Thought (CoT)</span>
+      <p class="glossary-def">Claudeに段階的に推論させることで正確性を高めるテクニック。「ステップバイステップで考えて」と指示するだけでも効果がある。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">拡張思考</span>
+      <span class="glossary-en">Extended Thinking / Adaptive Thinking</span>
+      <p class="glossary-def">API設定でClaudeに内部思考時間を与え、複雑な問題でより深い推論を行わせる機能。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">ロールプロンプティング</span>
+      <span class="glossary-en">Role Prompting</span>
+      <p class="glossary-def">Claudeに特定の役割（専門家、アナリスト等）を割り当て、回答のトーンや専門性を制御する手法。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">プロンプトチェーニング</span>
+      <span class="glossary-en">Prompt Chaining</span>
+      <p class="glossary-def">複雑なタスクを複数のAPIコールに分割し、各ステップの出力を次の入力にする設計パターン。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">構造化出力</span>
+      <span class="glossary-en">Structured Output</span>
+      <p class="glossary-def">Claudeの出力をJSON等の決まったフォーマットに制御する技術。tool_useやJSONスキーマを活用する。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">検証再試行ループ</span>
+      <span class="glossary-en">Validation-Retry Loop</span>
+      <p class="glossary-def">Claudeの出力を検証し、基準を満たさなければ再生成させるパターン。品質保証の基本手法。</p>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">グラウンディング</span>
+      <span class="glossary-en">Grounding</span>
+      <p class="glossary-def">Claudeに回答の根拠を元データから引用させ、事実に基づいた回答を促す手法。ハルシネーション防止に有効。</p>
+    </div>
+  </div>
+
+  <!-- Section 5: クイズ -->
+  <div id="m2-s5" class="card" style="display:none">
+    <h2>確認クイズ &#8212; Module 2</h2>
+    <p>5つの質問に答えて、理解度を確認しましょう。</p>
+
+    <div class="quiz-section">
+      <div class="quiz-question" id="m2-q1">
+        <div class="q-text">Q1. Anthropicが公式に推奨する、複雑なプロンプト内で指示とデータを明確に区別する方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',0,0)">Markdown見出し（# や ##）で区切る</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',0,1)">XMLタグ（例: &lt;instructions&gt;, &lt;context&gt;）で構造化する</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',0,2)">空行で段落を分ける</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',0,3)">JSONフォーマットでプロンプト全体を記述する</div>
+        <div class="quiz-explanation" id="m2-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m2-q2">
+        <div class="q-text">Q2. Few-shotプロンプティングで例を作成する際に重視すべき2つの要素は？</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',1,0)">簡潔さ（Brevity）と形式美（Aesthetics）</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',1,1)">関連性（Relevance）と多様性（Diversity）</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',1,2)">長さ（Length）と正確さ（Accuracy）</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',1,3)">独創性（Originality）と複雑さ（Complexity）</div>
+        <div class="quiz-explanation" id="m2-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m2-q3">
+        <div class="q-text">Q3. 20,000トークンを超える長文ドキュメントをClaudeに処理させる場合、Anthropicが推奨するプロンプトの配置順序はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',2,0)">指示 → データ → 質問</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',2,1)">質問 → データ → 指示</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',2,2)">データ → 指示・質問</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',2,3)">配置順序は品質に影響しない</div>
+        <div class="quiz-explanation" id="m2-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m2-q4">
+        <div class="q-text">Q4. カスタマーサポートシステムで、Claudeの回答を「商品案内」「返品対応」「技術サポート」「その他」の4カテゴリに確実に分類させたい場合、最も適切なアプローチは？</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',3,0)">プロンプトに「必ず4カテゴリのいずれかで分類してください」と書く</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',3,1)">Chain-of-Thoughtで段階的に分類理由を考えさせる</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',3,2)">tool_useでenum制約のあるツールを定義し、構造化出力で分類させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',3,3)">Few-shotで各カテゴリの分類例を10個ずつ提示する</div>
+        <div class="quiz-explanation" id="m2-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m2-q5">
+        <div class="q-text">Q5. 法律文書の要約タスクで、Claudeが原文にない情報を生成してしまう（ハルシネーション）リスクを最小化するために最も有効な手法は？</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',4,0)">temperatureを0に設定する</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',4,1)">Few-shotで正確な要約の例を複数提示する</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',4,2)">まず関連箇所を引用（Quote）させてから、引用に基づいて要約させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m2',4,3)">システムプロンプトに「嘘をつくな」と書く</div>
+        <div class="quiz-explanation" id="m2-q5-exp"></div>
+      </div>
+
+      <button class="btn btn-accent" onclick="submitQuiz('m2')" id="m2-submit-btn">回答を確定する</button>
+      <button class="btn btn-outline" onclick="retryQuiz('m2')" id="m2-retry-btn" style="display:none">もう一度挑戦</button>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="btn-group" style="margin-top:2rem; justify-content: space-between;">
+    <button class="btn btn-outline" onclick="showPage('m1')">&#8592; Module 1へ</button>
+    <button class="btn btn-primary" onclick="showPage('m3')">次のモジュールへ &#8594;</button>
+  </div>
+</div>
+
+<div id="page-m3" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 3</span>
+    <h1>Module 3: システムプロンプト設計</h1>
+    <p class="subtitle">本番環境のためのプロンプト設計パターンを習得する</p>
+    <span class="domain-tag">ドメイン3: プロンプト工学 (20%)</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>システムプロンプト（System Prompt）の役割とユーザープロンプトとの違い</li>
+      <li>ペルソナ設定・制約条件・出力形式指定の設計パターン</li>
+      <li>XMLタグを使ったプロンプトの構造化技法</li>
+      <li>本番環境でのプロンプト管理とキャッシング</li>
+      <li>プロンプトインジェクション対策の基本</li>
+    </ul>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m3','s1',this)">システムプロンプトとは</button>
+    <button class="section-tab" onclick="showSection('m3','s2',this)">設計パターン</button>
+    <button class="section-tab" onclick="showSection('m3','s3',this)">構造化とXML</button>
+    <button class="section-tab" onclick="showSection('m3','s4',this)">運用と安全性</button>
+    <button class="section-tab" onclick="showSection('m3','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m3','s6',this)">クイズ</button>
+  </div>
+
+  <!-- Section 1: システムプロンプトとは -->
+  <div id="m3-s1" class="card">
+    <h2>システムプロンプトとは何か</h2>
+    <p>システムプロンプト（System Prompt）とは、AIに対して「あなたはどう振る舞うべきか」を伝える<strong>舞台裏の指示書</strong>です。レストランに例えると、お客さんが注文する料理が「ユーザープロンプト」、キッチンに貼ってある調理マニュアルや店のルールが「システムプロンプト」にあたります。</p>
+
+    <p>お客さん（ユーザー）には見えませんが、シェフ（Claude）の料理の仕方を根本から決める、非常に重要な存在です。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>システムプロンプト（System Prompt）：</strong>APIの <code>system</code> パラメータに指定する、会話全体に適用される指示。ロール定義、制約、振る舞いの設定を行い、エンドユーザーからは通常見えない。ユーザープロンプト（<code>messages</code>配列内の<code>role: "user"</code>）とは明確に区別される。</p>
+    </div>
+
+    <h3>システムプロンプト vs ユーザープロンプト</h3>
+    <p>この2つは似ているようで、役割が大きく異なります。</p>
+    <table class="compare-table">
+      <tr><th>観点</th><th>システムプロンプト</th><th>ユーザープロンプト</th></tr>
+      <tr><td><strong>APIでの指定方法</strong></td><td><code>system</code> パラメータ</td><td><code>messages</code> 配列内の <code>role: "user"</code></td></tr>
+      <tr><td><strong>適用範囲</strong></td><td>会話全体にグローバル適用</td><td>個別ターン（1回のやりとり）</td></tr>
+      <tr><td><strong>目的</strong></td><td>ロール定義、制約、振る舞い設定</td><td>具体的な質問やタスク指示</td></tr>
+      <tr><td><strong>エンドユーザーからの可視性</strong></td><td>通常は隠蔽</td><td>ユーザーが直接入力</td></tr>
+      <tr><td><strong>変更頻度</strong></td><td>アプリケーション単位で固定</td><td>リクエストごとに変動</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「システムプロンプトはAPIのどこで指定するか」が問われることがあります。答えは<code>system</code>パラメータであり、<code>messages</code>配列の中ではありません。claude.aiのWebインターフェースで使われるシステムプロンプトは、APIユーザーには適用されないことも覚えておきましょう。</p>
+    </div>
+
+    <h3>なぜシステムプロンプトが重要なのか</h3>
+    <p>システムプロンプトは、Claudeの振る舞いを<strong>根本から制御する最も強力な手段</strong>です。同じClaudeモデルでも、システムプロンプトを変えるだけで、丁寧なカスタマーサポート担当にも、厳格なコードレビュアーにもなります。</p>
+    <p>本番環境のアプリケーションでは、システムプロンプトの設計品質が<strong>ユーザー体験と安全性の両方</strong>を左右します。「とりあえず動く」プロンプトではなく、意図的に設計されたプロンプトが求められるのです。</p>
+  </div>
+
+  <!-- Section 2: 設計パターン -->
+  <div id="m3-s2" class="card" style="display:none">
+    <h2>システムプロンプトの設計パターン</h2>
+    <p>効果的なシステムプロンプトには、いくつかの定番パターンがあります。これらを組み合わせることで、Claudeの振る舞いを精密にコントロールできます。</p>
+
+    <h3>パターン1: ペルソナ/ロール設定（Role Assignment）</h3>
+    <p>Claudeに「あなたは〇〇です」と役割を与えるパターンです。たった1行でも、応答のトーンや専門性が大きく変わります。</p>
+
+    <div class="concept-box">
+      <div class="label">設計例</div>
+      <p><code>"You are a senior financial analyst specializing in ESG reporting. Respond in professional but accessible language."</code></p>
+      <p style="margin-top:.5rem;">ポイント：役割名だけでなく、<strong>専門分野</strong>と<strong>コミュニケーションスタイル</strong>も指定すると効果的です。</p>
+    </div>
+
+    <h3>パターン2: 制約条件の設定（Constraints）</h3>
+    <p>「やってはいけないこと」を伝えるときは、<strong>禁止ではなく推奨の形</strong>で書くのがAnthropicの推奨です。</p>
+    <table class="compare-table">
+      <tr><th>アプローチ</th><th>例</th><th>効果</th></tr>
+      <tr><td><strong>非推奨（禁止形）</strong></td><td>"Do not use markdown in your response"</td><td>何をすべきか不明確</td></tr>
+      <tr><td><strong>推奨（指示形）</strong></td><td>"Your response should be composed of smoothly flowing prose paragraphs."</td><td>望む行動が明確</td></tr>
+      <tr><td><strong>非推奨（理由なし）</strong></td><td>"NEVER use ellipses"</td><td>なぜか分からず一般化できない</td></tr>
+      <tr><td><strong>推奨（理由あり）</strong></td><td>"Your response will be read aloud by a text-to-speech engine, so never use ellipses since the TTS engine cannot pronounce them."</td><td>理由があるため応用が効く</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">Claude 4.5/4.6はシステムプロンプトへの応答性が非常に高くなっています。以前の「CRITICAL: You MUST...」のような強い表現は不要で、むしろ過剰に従おうとして不自然な出力になることがあります。自然な指示文で十分です。</p>
+    </div>
+
+    <h3>パターン3: 出力形式の指定（Output Format）</h3>
+    <p>Claudeの出力形式を制御するには複数の方法があります。</p>
+    <ul>
+      <li><strong>Structured Outputs：</strong>JSONスキーマを指定し、出力形式を厳密に強制する機能（Module 4で詳しく学びます）</li>
+      <li><strong>XMLタグでの出力指示：</strong>出力にタグを使って構造を示す</li>
+      <li><strong>システムプロンプトでの指示：</strong>「前置きなしで直接回答せよ」「箇条書きで回答せよ」など</li>
+    </ul>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Anthropicの推奨する「契約形式（Contract Format）」のシステムプロンプトは、以下の要素を含みます：(1) ロール（1行）、(2) 成功基準（箇条書き）、(3) 制約（箇条書き）、(4) 不確実性への対処ルール、(5) 出力形式の指定。</p>
+    </div>
+
+    <h3>パターン4: 行動制御（Behavior Control）</h3>
+    <p>Claudeに積極的に行動させるか、慎重に行動させるかを制御するパターンです。</p>
+    <table class="compare-table">
+      <tr><th>モード</th><th>指示例</th><th>適用場面</th></tr>
+      <tr><td><strong>積極的行動</strong></td><td>"提案ではなく実装せよ"</td><td>コード生成、自動化タスク</td></tr>
+      <tr><td><strong>慎重な行動</strong></td><td>"明示的な指示があるまで行動するな"</td><td>重要データの操作、確認が必要な場面</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 3: 構造化とXML -->
+  <div id="m3-s3" class="card" style="display:none">
+    <h2>XMLタグによるプロンプト構造化</h2>
+    <p>長いシステムプロンプトを整理するために、AnthropicはXMLタグの使用を推奨しています。これは本の「目次」のようなもので、Claudeが指示の各部分を正確に区別できるようになります。</p>
+
+    <h3>なぜXMLタグが有効なのか</h3>
+    <p>人間にとっての「見出し」や「箇条書き」と同じように、XMLタグはClaudeにとっての<strong>明確な区切り</strong>として機能します。特に以下の効果があります：</p>
+    <ul>
+      <li>指示と入力データを明確に分離できる</li>
+      <li>例（few-shot examples）と本番の指示を区別できる</li>
+      <li>長いプロンプトの見通しが良くなり、保守性が向上する</li>
+    </ul>
+
+    <div class="concept-box">
+      <div class="label">構造化の例</div>
+      <p>以下のようなタグが一般的に使われます：</p>
+      <p style="margin-top:.5rem;"><code>&lt;instructions&gt;</code> — 指示内容<br>
+      <code>&lt;context&gt;</code> — 背景情報・参照データ<br>
+      <code>&lt;input&gt;</code> — ユーザー入力<br>
+      <code>&lt;example&gt;</code> — 入出力の例<br>
+      <code>&lt;documents&gt;</code> — 参照文書</p>
+    </div>
+
+    <h3>Few-shot Prompting（少数例学習）</h3>
+    <p>Claudeに「こういう入力にはこう応答してほしい」という例を示す手法を<strong>Few-shot Prompting</strong>と呼びます。料理教室で「お手本の盛り付け」を見せるようなものです。</p>
+
+    <p>Anthropicは<strong>3〜5個の例</strong>が最適としています。例が多すぎると逆に柔軟性が失われることがあります。</p>
+
+    <div class="concept-box">
+      <div class="label">Few-shot設計のコツ</div>
+      <p><strong>関連性（Relevance）：</strong>実際のユースケースに近い例を選ぶ<br>
+      <strong>多様性（Diversity）：</strong>様々なパターンをカバーする<br>
+      <strong>構造化（Structure）：</strong><code>&lt;example&gt;</code>タグで入力と出力を明確に区分する</p>
+    </div>
+
+    <h3>長文データの配置ルール</h3>
+    <p>20,000トークン以上の長い参照データをプロンプトに含める場合、<strong>プロンプトの先頭</strong>に配置し、質問やクエリは<strong>末尾</strong>に置くのがベストプラクティスです。これにより、回答品質が最大30%向上するとAnthropicは報告しています。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">XMLタグの使い方はCCA-F試験で頻出テーマです。特に「指示とデータの分離」「例と本番指示の区別」が問われます。タグ名は自由に設定でき、標準仕様はありませんが、目的が明確になる名前を選ぶことが重要です。</p>
+    </div>
+
+    <h3>思考プロセスの制御（Extended Thinking）</h3>
+    <p>Claudeには「考える時間」を与える機能があります。複雑な推論が必要なタスクでは、<code>thinking</code>パラメータを設定して、Claudeに内部的な推論ステップを踏ませることができます。</p>
+    <table class="compare-table">
+      <tr><th>設定</th><th>説明</th><th>用途</th></tr>
+      <tr><td><strong>Adaptive Thinking</strong></td><td>Claude自身が思考の深さを判断</td><td>一般的なタスク</td></tr>
+      <tr><td><strong>Budget Tokens</strong></td><td>思考トークンの上限を設定</td><td>コスト制御が必要な場合</td></tr>
+      <tr><td><strong>Effort パラメータ</strong></td><td>max / high / medium / low</td><td>思考深度の簡易制御</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 4: 運用と安全性 -->
+  <div id="m3-s4" class="card" style="display:none">
+    <h2>本番環境でのプロンプト管理と安全性</h2>
+    <p>システムプロンプトは「書いて終わり」ではありません。本番環境では、管理・最適化・安全性の3つの観点が求められます。</p>
+
+    <h3>プロンプトテンプレートと変数</h3>
+    <p>本番環境では、プロンプトを<strong>固定部分</strong>（指示・制約）と<strong>可変部分</strong>（ユーザー入力・検索結果）に分離します。可変部分は<code>{{変数名}}</code>のプレースホルダーで表現します。</p>
+
+    <div class="concept-box">
+      <div class="label">テンプレートのメリット</div>
+      <p><strong>一貫性：</strong>全リクエストで同じ指示が適用される<br>
+      <strong>テスト容易性：</strong>変数を変えるだけで様々なケースをテスト可能<br>
+      <strong>バージョン管理：</strong>テンプレート単位で変更履歴を追跡できる<br>
+      <strong>スケーラビリティ：</strong>大量リクエストでも指示を統一できる</p>
+    </div>
+
+    <h3>プロンプトキャッシング（Prompt Caching）</h3>
+    <p>システムプロンプトのように毎回同じ内容を送る部分は、<strong>キャッシュ（一時保存）</strong>することでコストとレイテンシ（応答時間）を大幅に削減できます。</p>
+    <table class="compare-table">
+      <tr><th>指標</th><th>効果</th></tr>
+      <tr><td><strong>レイテンシ削減</strong></td><td>最大80%短縮</td></tr>
+      <tr><td><strong>コスト削減</strong></td><td>最大90%削減</td></tr>
+      <tr><td><strong>デフォルトキャッシュ寿命</strong></td><td>5分間（追加コストで1時間に延長可能）</td></tr>
+    </table>
+    <p>キャッシュの対象コンテンツは、<strong>プロンプトの先頭</strong>に配置するのがベストプラクティスです。</p>
+
+    <h3>プロンプトインジェクション対策</h3>
+    <p>プロンプトインジェクション（Prompt Injection）とは、悪意のあるユーザーが入力を通じてシステムプロンプトの指示を上書きしようとする攻撃です。たとえるなら、レストランのお客さんが「今日から営業時間を変更する」と言い出すようなものです。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">プロンプトインジェクション対策は、CCA-F試験で出題可能性が高いテーマです。単一の対策ではなく、複数の防御層を組み合わせる<strong>多層防御（Defense in Depth）</strong>の考え方が重要です。</p>
+    </div>
+
+    <p>主な対策手法は以下の通りです：</p>
+    <table class="compare-table">
+      <tr><th>対策</th><th>説明</th></tr>
+      <tr><td><strong>Harmlessness Screen</strong></td><td>軽量モデル（Haiku等）でユーザー入力を事前スクリーニング</td></tr>
+      <tr><td><strong>Input Validation</strong></td><td>既知の攻撃パターンをフィルタリング</td></tr>
+      <tr><td><strong>プロンプト設計</strong></td><td>システムプロンプト内で倫理的・法的境界を明示</td></tr>
+      <tr><td><strong>Chain Safeguards</strong></td><td>複数の防御層を重ねる多層防御</td></tr>
+      <tr><td><strong>出力モニタリング</strong></td><td>AIの出力を定期的に分析・監視</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">試験では「ビジネスルールの強制をプロンプト指示だけに頼るべきか？」という問いが出ることがあります。正解は「No」です。重要なビジネスルールは<strong>プログラム側の検証（Programmatic Hooks / Guardrails）</strong>でも担保すべきです。プロンプトだけでは確実な保証にはなりません。</p>
+    </div>
+
+    <h3>品質保証: Multi-pass Review</h3>
+    <p>AIの出力品質を向上させる手法として、<strong>Multi-pass Review（多段階レビュー）</strong>があります。これは同じClaudeモデルでも、<strong>独立した別セッション</strong>でレビューさせる方法です。</p>
+    <p>重要なのは、同一の会話セッション内でのセルフレビューではなく、<strong>独立したレビューインスタンス</strong>を使うことです。同じ会話内では自分の出力に引っ張られやすく、客観的なレビューになりにくいためです。</p>
+  </div>
+
+  <!-- Section 5: 用語集 -->
+  <div id="m3-s5" class="card" style="display:none">
+    <h2>Module 3 用語集</h2>
+    <p>このモジュールで登場した重要用語をまとめました。試験は英語のため、英語表記も確認しておきましょう。</p>
+
+    <div class="glossary-item">
+      <div class="glossary-term">システムプロンプト</div>
+      <div class="glossary-en">System Prompt</div>
+      <div class="glossary-def">APIの<code>system</code>パラメータに指定する、会話全体に適用されるグローバルな指示。ロール定義や制約を設定し、エンドユーザーからは通常見えない。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ペルソナ設定</div>
+      <div class="glossary-en">Role Assignment</div>
+      <div class="glossary-def">システムプロンプトでClaudeに特定の役割や専門性を与えること。応答のトーンや内容の専門性が変わる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">少数例学習</div>
+      <div class="glossary-en">Few-shot Prompting</div>
+      <div class="glossary-def">期待する入出力の例を3〜5個示し、Claudeに応答パターンを学習させる手法。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">プロンプトテンプレート</div>
+      <div class="glossary-en">Prompt Template</div>
+      <div class="glossary-def">固定の指示部分と可変のプレースホルダー（<code>{{変数名}}</code>）を組み合わせた再利用可能なプロンプト構造。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">プロンプトキャッシング</div>
+      <div class="glossary-en">Prompt Caching</div>
+      <div class="glossary-def">繰り返し送信されるプロンプト部分をサーバー側で一時保存し、コストとレイテンシを削減する仕組み。デフォルト5分間有効。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">プロンプトインジェクション</div>
+      <div class="glossary-en">Prompt Injection</div>
+      <div class="glossary-def">悪意あるユーザー入力を通じてシステムプロンプトの指示を上書き・無効化しようとする攻撃手法。多層防御で対策する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">多層防御</div>
+      <div class="glossary-en">Defense in Depth</div>
+      <div class="glossary-def">プロンプト設計・入力検証・出力モニタリングなど、複数の防御層を重ねるセキュリティ手法。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">多段階レビュー</div>
+      <div class="glossary-en">Multi-pass Review</div>
+      <div class="glossary-def">AIの出力を独立した別のセッションで再評価させる品質保証手法。同一セッション内のセルフレビューより客観性が高い。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">拡張思考</div>
+      <div class="glossary-en">Extended Thinking</div>
+      <div class="glossary-def">Claudeに内部的な推論ステップを踏ませる機能。<code>thinking</code>パラメータや<code>effort</code>パラメータで制御する。</div>
+    </div>
+  </div>
+
+  <!-- Section 6: Quiz -->
+  <div id="m3-s6" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 3 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
+
+      <div class="quiz-question" id="m3-q1">
+        <div class="q-text">Q1. Claude APIでシステムプロンプトを指定する正しい方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',0,0)">messages配列にrole: "system"で追加する</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',0,1)">独立したsystemパラメータに指定する</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',0,2)">最初のuserメッセージに含める</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',0,3)">configファイルで事前設定する</div>
+        <div class="quiz-explanation" id="m3-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m3-q2">
+        <div class="q-text">Q2. Anthropicが推奨するシステムプロンプトでの制約条件の書き方はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',1,0)">大文字で「NEVER」「MUST NOT」を多用する</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',1,1)">制約の理由は省略し、ルールだけを簡潔に書く</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',1,2)">禁止形ではなく推奨形で書き、理由も添える</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',1,3)">制約はユーザープロンプト側に書く方が効果的</div>
+        <div class="quiz-explanation" id="m3-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m3-q3">
+        <div class="q-text">Q3. 重要なビジネスルール（例：医療アドバイスの禁止）を確実に守らせるためのベストプラクティスはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',2,0)">システムプロンプトに強い口調で書けば十分</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',2,1)">ユーザープロンプトで毎回リマインドする</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',2,2)">プロンプト設計とプログラム側の検証（Guardrails）を組み合わせる</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',2,3)">Few-shot examplesで正しい拒否例を示す</div>
+        <div class="quiz-explanation" id="m3-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m3-q4">
+        <div class="q-text">Q4. プロンプトキャッシングについて正しい説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',3,0)">ユーザーの入力をキャッシュして応答速度を上げる機能</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',3,1)">Claudeの過去の応答を記憶させる機能</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',3,2)">繰り返し送信するプロンプト部分をサーバー側で一時保存し、コストとレイテンシを削減する機能</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',3,3)">プロンプトの最適化案を自動生成する機能</div>
+        <div class="quiz-explanation" id="m3-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m3-q5">
+        <div class="q-text">Q5. AIの出力品質を検証するためのMulti-pass Reviewについて、正しい方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',4,0)">同じ会話セッション内で「自分の回答を見直して」と指示する</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',4,1)">独立した別のセッション（レビューインスタンス）で出力を評価する</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',4,2)">ユーザーが手動で全出力を確認する</div>
+        <div class="quiz-option" onclick="selectAnswer('m3',4,3)">出力の文字数が規定範囲内であることだけ確認する</div>
+        <div class="quiz-explanation" id="m3-q5-exp"></div>
+      </div>
+
+      <div id="m3-quiz-result" class="quiz-result" style="display:none"></div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="submitQuiz('m3')" id="m3-submit-btn">回答を確定する</button>
+        <button class="btn btn-outline" onclick="retryQuiz('m3')" id="m3-retry-btn" style="display:none">もう一度挑戦</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="btn-group" style="margin-top:2rem; justify-content: space-between;">
+    <button class="btn btn-outline" onclick="showPage('m2')">&#8592; Module 2へ</button>
+    <button class="btn btn-primary" onclick="showPage('m4')">次のモジュールへ &#8594;</button>
+  </div>
+</div>
+
+<div id="page-m4" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">Week 4</span>
+    <h1>Module 4: 構造化出力とJSON</h1>
+    <p class="subtitle">AIの出力を「決まった形」で返させ、プログラムで確実に処理する</p>
+    <span class="domain-tag">ドメイン3: プロンプト工学と構造化出力 (20%)</span>
+  </div>
+
+  <div class="objectives">
+    <h3>このモジュールで学ぶこと</h3>
+    <ul>
+      <li>構造化出力（Structured Output）とは何か、なぜ必要なのかを理解する</li>
+      <li>JSON Outputs と Strict Tool Use の2つのアプローチの使い分けを習得する</li>
+      <li>JSON Schemaによるスキーマ定義の基本を理解する</li>
+      <li>構造化出力の信頼性を高めるベストプラクティスを知る</li>
+      <li>データ抽出・分類など、実務での活用パターンを学ぶ</li>
+    </ul>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('m4','s1',this)">構造化出力とは</button>
+    <button class="section-tab" onclick="showSection('m4','s2',this)">2つのアプローチ</button>
+    <button class="section-tab" onclick="showSection('m4','s3',this)">スキーマ設計</button>
+    <button class="section-tab" onclick="showSection('m4','s4',this)">実践パターン</button>
+    <button class="section-tab" onclick="showSection('m4','s5',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('m4','s6',this)">クイズ</button>
+  </div>
+
+  <!-- Section 1: 構造化出力とは -->
+  <div id="m4-s1" class="card">
+    <h2>構造化出力（Structured Output）とは</h2>
+    <p>AIに質問すると、通常は自由な文章で回答が返ってきます。しかし、その回答をプログラムで自動処理したい場合、「自由な文章」では困ります。たとえば、顧客メールから「名前」「問い合わせ内容」「緊急度」を抜き出したいとき、AIが毎回違う書き方で返してきたら、プログラムが正しく読み取れません。</p>
+    <p>そこで登場するのが<strong>構造化出力（Structured Output）</strong>です。AIの回答を<strong>JSON</strong>などの決まった形式で返させることで、プログラムが確実にデータを読み取れるようにします。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>JSON（JavaScript Object Notation / ジェイソン）：</strong>データを「キー」と「値」のペアで整理する書き方です。たとえば <code>{"name": "田中", "age": 30}</code> のように書きます。人間にも読みやすく、プログラムにも処理しやすい「共通言語」のようなものです。</p>
+    </div>
+
+    <h3>なぜ構造化出力が必要なのか</h3>
+    <p>AIの回答をプログラムに渡す場面を想像してみてください。たとえば、AIが商品レビューの感情分析をして、その結果をデータベースに保存したい場合です。</p>
+
+    <table class="compare-table">
+      <tr><th>出力方式</th><th>AIの回答例</th><th>プログラム処理</th></tr>
+      <tr>
+        <td><strong>自由文（非構造化）</strong></td>
+        <td>「このレビューはポジティブな意見です。星4つ相当でしょう。」</td>
+        <td>困難 &mdash; 「ポジティブ」の位置が毎回変わる</td>
+      </tr>
+      <tr>
+        <td><strong>構造化出力（JSON）</strong></td>
+        <td><code>{"sentiment": "positive", "rating": 4}</code></td>
+        <td>容易 &mdash; 常に同じキーでデータを取得できる</td>
+      </tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">試験では「どんな場面で構造化出力を使うべきか」が問われます。<strong>プログラムが後続処理するすべての場面</strong>で構造化出力が必要と考えてください。人間が読むだけの回答には不要です。</p>
+    </div>
+
+    <h3>Claudeにおける構造化出力の進化</h3>
+    <p>かつては、AIに「JSONで返してください」とプロンプトでお願いする方法しかありませんでした。しかし、AIが時々フォーマットを無視してしまう問題がありました。</p>
+    <p>現在のClaudeでは、<strong>制約付きデコーディング（Constrained Decoding）</strong>という技術により、スキーマ（設計図）通りのJSONが<strong>100%保証</strong>されます。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>制約付きデコーディング（Constrained Decoding）：</strong>AIの出力を「レールの上を走る列車」のように制限する技術です。列車が脱線（スキーマ違反）することが物理的に不可能になるため、必ず正しい形式のJSONが出力されます。これにより、出力形式のリトライが基本的に不要になりました。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: 2つのアプローチ -->
+  <div id="m4-s2" class="card" style="display:none">
+    <h2>構造化出力を得る2つの方法</h2>
+    <p>Claude APIで構造化出力を得るには、大きく2つのアプローチがあります。それぞれ「どこに出力されるか」「どんな場面に向いているか」が異なります。</p>
+
+    <h3>アプローチ1: JSON Outputs（output_config方式）</h3>
+    <p>Claudeの<strong>応答そのもの</strong>をJSON形式で返させる方式です。「記入式のフォーマット用紙を渡して、その通りに回答させる」イメージです。</p>
+    <p>API呼び出し時に <code>output_config.format</code> パラメータで <code>json_schema</code> を指定し、どんな形式のJSONが欲しいかを定義します。Claudeの応答テキスト（<code>response.content[0].text</code>）にJSONが入ります。</p>
+
+    <div class="concept-box">
+      <div class="label">使用例</div>
+      <p>請求書の画像からデータを抽出する場合：<code>output_config</code> に「会社名」「金額」「日付」のスキーマを指定すると、必ずその3項目が含まれたJSONが返ってきます。</p>
+    </div>
+
+    <h3>アプローチ2: Strict Tool Use（strict: true 方式）</h3>
+    <p>ツール定義（Tool Definition）に <code>strict: true</code> を追加し、ツール呼び出しのパラメータがスキーマ通りであることを保証する方式です。「自動販売機のコイン投入口」のように、決まった形式のデータしか出力されません。</p>
+    <p>応答は <code>tool_use</code> コンテンツブロックの <code>input</code> フィールドに入ります。</p>
+
+    <h3>どちらを使うべきか（試験頻出）</h3>
+    <table class="compare-table">
+      <tr><th>観点</th><th>JSON Outputs</th><th>Strict Tool Use</th></tr>
+      <tr><td><strong>出力場所</strong></td><td>応答テキスト（text）</td><td>ツール呼び出し（tool_use）の input</td></tr>
+      <tr><td><strong>適した場面</strong></td><td>データ抽出、分類、レポート生成</td><td>エージェントがツールを呼ぶ場面</td></tr>
+      <tr><td><strong>stop_reason</strong></td><td>end_turn</td><td>tool_use</td></tr>
+      <tr><td><strong>同時使用</strong></td><td colspan="2" style="text-align:center">両方を同時に使用可能</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;"><strong>使い分けの判断基準</strong>を押さえましょう。「AIの回答をそのまま構造化データとして使いたい」ならJSON Outputs、「AIがツール（API・データベース等）を呼び出す際のパラメータを保証したい」ならStrict Tool Useです。試験のシナリオ6「構造化データ抽出」ではJSON Outputsが中心です。</p>
+    </div>
+
+    <h3>Prefill技法（歴史的知識）</h3>
+    <p>かつてはAssistantメッセージに <code>{</code> を先頭に入れることで、Claudeの出力をJSON形式に強制する「Prefill（プレフィル）」という技法が使われていました。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">Prefillは<strong>最新モデル（Claude Opus 4.6/Sonnet 4.6/Sonnet 4.5）では非推奨（deprecated）</strong>です。現在はStructured Outputs（output_config方式）が正式な方法です。ただし、試験ではPrefillの存在を知っているか問われる可能性があります。</p>
+    </div>
+  </div>
+
+  <!-- Section 3: スキーマ設計 -->
+  <div id="m4-s3" class="card" style="display:none">
+    <h2>JSON Schemaによるスキーマ設計</h2>
+    <p>構造化出力を使うには、「どんな形のJSONが欲しいか」を定義する<strong>JSON Schema（設計図）</strong>が必要です。これは「記入用紙のフォーマット設計図」のようなものです。</p>
+
+    <h3>基本的なスキーマの構造</h3>
+    <p>JSON Schemaでは、「この項目はこんなデータ型で、必須かどうか」を定義します。</p>
+
+    <div class="concept-box">
+      <div class="label">スキーマの例</div>
+      <p>顧客情報を抽出するスキーマ：</p>
+      <p><code>type: "object"</code> &rarr; 全体はオブジェクト（データのまとまり）</p>
+      <p><code>properties</code> &rarr; 含まれる項目の定義（name: 文字列、age: 整数、is_vip: 真偽値）</p>
+      <p><code>required</code> &rarr; 必須項目のリスト</p>
+      <p><code>additionalProperties: false</code> &rarr; 定義外の項目を禁止</p>
+    </div>
+
+    <h3>使用できるデータ型</h3>
+    <table class="compare-table">
+      <tr><th>データ型</th><th>説明</th><th>例</th></tr>
+      <tr><td><code>string</code></td><td>文字列</td><td>"田中太郎"</td></tr>
+      <tr><td><code>number</code></td><td>数値（小数含む）</td><td>3.14</td></tr>
+      <tr><td><code>integer</code></td><td>整数のみ</td><td>42</td></tr>
+      <tr><td><code>boolean</code></td><td>真偽値</td><td>true / false</td></tr>
+      <tr><td><code>array</code></td><td>リスト（配列）</td><td>["A", "B", "C"]</td></tr>
+      <tr><td><code>object</code></td><td>オブジェクト（入れ子構造）</td><td>{"key": "value"}</td></tr>
+      <tr><td><code>enum</code></td><td>選択肢の中から1つ</td><td>"positive" | "negative" | "neutral"</td></tr>
+    </table>
+
+    <h3>サポートされない制約（試験注意）</h3>
+    <p>JSON Schemaの仕様にはあるが、Claude APIの構造化出力では<strong>サポートされない制約</strong>があります。これは試験でよく問われるポイントです。</p>
+
+    <table class="compare-table">
+      <tr><th>制約</th><th>サポート</th><th>代替手段</th></tr>
+      <tr><td><code>minimum</code> / <code>maximum</code>（数値範囲）</td><td>非サポート</td><td>descriptionに「18以上」と記述</td></tr>
+      <tr><td><code>minLength</code> / <code>maxLength</code>（文字数制限）</td><td>非サポート</td><td>descriptionに「100文字以内」と記述</td></tr>
+      <tr><td><code>pattern</code>（正規表現）</td><td>非サポート</td><td>descriptionに形式を記述</td></tr>
+      <tr><td><code>anyOf</code> / <code>oneOf</code> / <code>allOf</code></td><td>非サポート</td><td>シンプルなスキーマに分割</td></tr>
+      <tr><td><code>$ref</code>（参照）</td><td>非サポート</td><td>定義を直接展開する</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">サポートされない制約を使いたい場合は、<code>description</code> フィールドに自然言語で記述します。これは「用紙の備考欄に注意書きを書く」ようなものです。制約はスキーマレベルでは強制されませんが、Claudeはdescriptionの指示に従おうとします。</p>
+    </div>
+
+    <h3>additionalProperties: false の重要性</h3>
+    <p>スキーマ定義では、<strong><code>additionalProperties: false</code> を常に設定</strong>することがベストプラクティスです。これは「余白への書き込み禁止」にあたります。設定しないと、定義していないフィールドが予期せず出力に含まれる可能性があります。</p>
+
+    <h3>SDK連携：Pydantic と Zod</h3>
+    <p>実務では、JSON Schemaを手書きする代わりに、プログラミング言語のライブラリを使ってスキーマを自動生成できます。</p>
+
+    <table class="compare-table">
+      <tr><th>言語</th><th>ライブラリ</th><th>特徴</th></tr>
+      <tr><td>Python</td><td><strong>Pydantic（パイダンティック）</strong></td><td>Pythonクラスからスキーマを自動生成。<code>messages.parse()</code> メソッドで直接利用可能</td></tr>
+      <tr><td>TypeScript</td><td><strong>Zod（ゾッド）</strong></td><td><code>zodOutputFormat()</code> ヘルパーでスキーマを生成</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">試験では「PydanticやZodの制約（例：<code>Field(ge=1)</code> の最小値指定）はどう扱われるか」が問われることがあります。答えは「SDKが自動的にdescriptionに変換し、レスポンス検証時に元の制約でバリデーションする」です。</p>
+    </div>
+  </div>
+
+  <!-- Section 4: 実践パターン -->
+  <div id="m4-s4" class="card" style="display:none">
+    <h2>実践的な活用パターン</h2>
+    <p>構造化出力は、さまざまなビジネスシーンで活用されています。CCA-F試験のシナリオにも直結するパターンを見ていきましょう。</p>
+
+    <h3>パターン1: データ抽出（Extraction）</h3>
+    <p>非構造化テキスト（自由な文章）から必要な情報を取り出すパターンです。試験のシナリオ6「構造化データ抽出」に対応します。</p>
+    <div class="concept-box">
+      <div class="label">活用例</div>
+      <p>請求書・履歴書・契約書などのドキュメントから、「会社名」「金額」「日付」などを抽出してデータベースに保存する。JSON Outputsで出力スキーマを定義すれば、毎回同じ形式でデータが返ってくる。</p>
+    </div>
+
+    <h3>パターン2: 分類（Classification）</h3>
+    <p>テキストをカテゴリに分類するパターンです。<code>enum</code> を使って選択肢を限定します。</p>
+    <div class="concept-box">
+      <div class="label">活用例</div>
+      <p>カスタマーサポートの問い合わせメールを「技術的問題」「請求関連」「機能リクエスト」「その他」に自動分類する。シナリオ1「カスタマーサポート」で頻出のパターン。</p>
+    </div>
+
+    <h3>パターン3: エンティティ抽出（Entity Extraction）</h3>
+    <p>テキストから人名・地名・日付・金額などの「エンティティ（実体）」を識別して取り出すパターンです。</p>
+
+    <h3>パターン4: エージェントのツール呼び出し</h3>
+    <p>AIエージェントが外部ツール（API・データベース等）を呼び出す際、パラメータの形式を保証するパターンです。Strict Tool Useが適しています。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">シナリオごとに「どの構造化出力パターンが適切か」を判断する力が問われます。データ抽出・分類 &rarr; JSON Outputs、エージェントのツール呼び出し &rarr; Strict Tool Use と覚えましょう。</p>
+    </div>
+
+    <h3>信頼性を高めるベストプラクティス</h3>
+    <table class="compare-table">
+      <tr><th>プラクティス</th><th>説明</th></tr>
+      <tr><td><strong>スキーマはシンプルに</strong></td><td>深いネストを避け、段階的に複雑化する。複雑すぎるスキーマはエラーの原因</td></tr>
+      <tr><td><strong>additionalProperties: false</strong></td><td>常に設定し、予期しないフィールドを防ぐ</td></tr>
+      <tr><td><strong>descriptionで制約を説明</strong></td><td>JSON Schemaで表現できない制約は自然言語で記述</td></tr>
+      <tr><td><strong>optionalフィールドの活用</strong></td><td>情報が不足する可能性がある項目はrequiredから外す</td></tr>
+      <tr><td><strong>明確なプロンプト</strong></td><td>曖昧な指示はスキーマ準拠を困難にする。具体的に指示する</td></tr>
+    </table>
+
+    <h3>検証-再試行ループ（Validation-Retry Loop）</h3>
+    <p>構造化出力の品質をさらに高めるために、<strong>マルチパス検証アーキテクチャ</strong>が推奨されます。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>検証-再試行ループ：</strong>1つのAIインスタンスが出力を生成し、<strong>別の独立したAIインスタンス</strong>がその出力を検証します。同一セッション内での自己レビューではなく、「ダブルチェック体制」のように別の視点から確認することで、信頼性が高まります。</p>
+    </div>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;"><code>max_tokens</code>（最大トークン数）に達した場合、JSONが途中で切れてしまうことがあります。十分な<code>max_tokens</code>を設定するか、出力が完全かどうかを確認する仕組みを入れましょう。<code>stop_reason</code> が <code>max_tokens</code> の場合は出力が不完全です。</p>
+    </div>
+  </div>
+
+  <!-- Section 5: 用語集 -->
+  <div id="m4-s5" class="card" style="display:none">
+    <h2>Module 4 用語集</h2>
+    <p>構造化出力に関する重要用語をまとめました。試験は英語のため、英語表記も覚えておきましょう。</p>
+
+    <div class="glossary-item">
+      <div class="glossary-term">構造化出力</div>
+      <div class="glossary-en">Structured Output</div>
+      <div class="glossary-def">AIの出力をJSONなどの決まった形式で返すこと。プログラムが結果を確実に処理するために不可欠な仕組み。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">JSON</div>
+      <div class="glossary-en">JavaScript Object Notation</div>
+      <div class="glossary-def">データを「キーと値のペア」で表現する軽量なデータ形式。人間にもプログラムにも読みやすい「共通言語」。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">JSON Schema</div>
+      <div class="glossary-en">JSON Schema</div>
+      <div class="glossary-def">JSONデータの「設計図」。どんな項目が必要で、各項目がどんなデータ型かを定義する仕様。記入用紙のフォーマット設計図にあたる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">制約付きデコーディング</div>
+      <div class="glossary-en">Constrained Decoding</div>
+      <div class="glossary-def">AIの出力をスキーマ通りに制限する技術。「レールの上を走る列車」のように、スキーマ違反が物理的に不可能になる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">スキーマ</div>
+      <div class="glossary-en">Schema</div>
+      <div class="glossary-def">データの構造を定義する設計図。「どんな項目があり、各項目はどんな型か」を規定する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Prefill（プレフィル）</div>
+      <div class="glossary-en">Prefill</div>
+      <div class="glossary-def">Assistantメッセージに出力の冒頭部分を先に入れておく技法。最新モデルでは非推奨（deprecated）となり、Structured Outputsが正式な代替手段。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Pydantic（パイダンティック）</div>
+      <div class="glossary-en">Pydantic</div>
+      <div class="glossary-def">Pythonのデータ検証ライブラリ。クラス定義からJSON Schemaを自動生成でき、Claude SDKと直接連携できる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">バリデーション</div>
+      <div class="glossary-en">Validation</div>
+      <div class="glossary-def">データが正しい形式・制約を満たしているかを検証すること。構造化出力では、スキーマに沿っているかの確認を指す。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">stop_reason</div>
+      <div class="glossary-en">Stop Reason</div>
+      <div class="glossary-def">APIレスポンスの停止理由。end_turn（正常完了）、tool_use（ツール呼び出し）、max_tokens（トークン上限到達）などがある。</div>
+    </div>
+  </div>
+
+  <!-- Section 6: Quiz -->
+  <div id="m4-s6" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>Module 4 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
+
+      <div class="quiz-question" id="m4-q1">
+        <div class="q-text">Q1. あなたはカスタマーサポートシステムを設計しています。顧客からのメールを「技術的問題」「請求関連」「機能リクエスト」に自動分類し、その結果をデータベースに保存したいと考えています。最も適切な構造化出力のアプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',0,0)">Prefillテクニックを使い、Assistantメッセージに { を入れてJSON出力を強制する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',0,1)">JSON Outputs（output_config）でenumを使ったスキーマを定義する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',0,2)">Strict Tool Useでツール定義に分類用のスキーマを設定する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',0,3)">プロンプトで「必ずJSONで返してください」と指示する</div>
+        <div class="quiz-explanation" id="m4-q1-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m4-q2">
+        <div class="q-text">Q2. JSON Schemaでユーザーの年齢を「18歳以上」に制限したい場合、Claude APIの構造化出力ではどのように実現しますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',1,0)">minimum: 18 をスキーマに追加する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',1,1)">pattern: "[1-9][0-9]+" をスキーマに追加する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',1,2)">descriptionフィールドに「18歳以上の値を入力」と記述する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',1,3)">anyOf を使って18以上の値のみ許可する</div>
+        <div class="quiz-explanation" id="m4-q2-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m4-q3">
+        <div class="q-text">Q3. AIエージェントが外部APIを呼び出す際のパラメータ形式を保証したい場合、最も適切なアプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',2,0)">JSON Outputs（output_config.format）でスキーマを定義する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',2,1)">Strict Tool Use（strict: true）でツール定義のスキーマを保証する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',2,2)">Prefillテクニックでパラメータの先頭部分を固定する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',2,3)">システムプロンプトで出力形式を厳密に指定する</div>
+        <div class="quiz-explanation" id="m4-q3-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m4-q4">
+        <div class="q-text">Q4. 構造化出力のスキーマ定義で additionalProperties: false を設定する理由として最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',3,0)">APIの応答速度を向上させるため</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',3,1)">定義していないフィールドが予期せず出力に含まれることを防ぐため</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',3,2)">JSON Schemaの必須仕様であり、設定しないとエラーになるため</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',3,3)">Pydanticとの連携に必要であるため</div>
+        <div class="quiz-explanation" id="m4-q4-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m4-q5">
+        <div class="q-text">Q5. 構造化出力の信頼性を高めるために推奨される「検証-再試行ループ」のアーキテクチャとして正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',4,0)">同一セッション内でClaudeに「この出力は正しいですか？」と自己レビューさせる</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',4,1)">出力を生成したインスタンスとは別の独立したインスタンスで検証する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',4,2)">出力をそのまま信頼し、エラーが発生した場合のみ再試行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',4,3)">max_tokensを最大値に設定して出力の完全性を保証する</div>
+        <div class="quiz-explanation" id="m4-q5-exp"></div>
+      </div>
+
+      <button class="btn btn-accent" onclick="submitQuiz('m4')" id="m4-submit-btn">回答を確定する</button>
+      <button class="btn btn-outline" onclick="retryQuiz('m4')" id="m4-retry-btn" style="display:none">もう一度挑戦</button>
+      <div id="m4-quiz-result" class="quiz-result" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="btn-group" style="margin-top:2rem; justify-content: space-between;">
+    <button class="btn btn-outline" onclick="showPage('m3')">&#8592; Module 3へ</button>
+    <button class="btn btn-primary" onclick="showPage('m5')">次のモジュールへ &#8594;</button>
+  </div>
+</div>
 
 <div id="page-m5" style="display:none"><div class="module-header"><span class="week-badge">Week 5</span><h1>Module 5: ツール設計の基礎</h1><p class="subtitle">Claudeに外部機能を与える仕組みを理解する</p><span class="domain-tag">ドメイン4: ツール & MCP (18%)</span></div><div class="card"><h2>コンテンツ準備中</h2></div><div class="btn-group"><button class="btn btn-outline" onclick="showPage('m4')">&#8592; 前へ</button><button class="btn btn-primary" onclick="showPage('m6')">次へ &#8594;</button></div></div>
 
@@ -1027,6 +2059,36 @@ const QUIZ_DATA = {
       'Claude Code CLIは開発者が対話的に使う開発支援ツール、Agent SDKはCI/CDパイプラインやプロダクション環境での自動化に組み込むためのライブラリです。「人間が使う」か「プログラムが使う」かの違いがポイントです。',
       '数千件の分類という大量処理には、最もコストが低いClaude Haikuと、50%割引のBatches APIの組み合わせが最適です。Opusは高性能ですが単純な分類タスクにはオーバースペックで、コスト効率が悪くなります。',
       'CLAUDE.mdはプロジェクト固有のルール・規約・コーディング方針をClaude Codeに伝えるための設定ファイルです。APIキーの保存やログ記録には使いません。'
+    ]
+  },
+  m2: {
+    answers: [1, 1, 2, 2, 2],
+    explanations: [
+      'Anthropicは複雑なプロンプトでXMLタグを使って構造化することを公式に推奨しています。<instructions>, <context>, <example>等のタグで指示、背景情報、例を明確に分離することで、Claudeの誤解釈を防ぎます。これはClaude固有のベストプラクティスです。',
+      'Few-shotプロンプティングの例を選ぶ際に最も重要な要素は、関連性（Relevance: 実際のユースケースに近い例）と多様性（Diversity: エッジケースをカバーし、偏ったパターン学習を防ぐ）です。Anthropic公式ドキュメントで明示されています。',
+      '長文コンテキストでは、データ（ドキュメント）をプロンプトの上部に配置し、指示や質問を下部に配置することが推奨されています。Anthropicのテストでは、この配置で最大30%の品質向上が確認されています。',
+      '分類タスクでカテゴリを確実に制限するには、tool_use機能でenum制約のあるツールを定義し、構造化出力を使うのが最も信頼性が高い方法です。プロンプトだけの指示では、稀にカテゴリ外の出力が発生する可能性があります。',
+      'ハルシネーション防止に最も効果的なのは、グラウンディング（Grounding）です。まずClaudeに原文から関連箇所を引用（Quote）させ、その引用に基づいて回答させることで、事実に基づかない情報の生成を大幅に抑制できます。'
+    ]
+  },
+  m3: {
+    answers: [1, 2, 2, 2, 1],
+    explanations: [
+      'Claude APIではシステムプロンプトは独立したsystemパラメータに指定します。messages配列内のrole: "user"やrole: "assistant"とは別のパラメータです。これはAPIの基本設計として理解しておく必要があります。',
+      'Anthropicは制約条件を「禁止形」ではなく「推奨形（何をすべきか）」で書くことを推奨しています。さらに、制約の理由を添えることでClaudeが文脈を理解し、類似の状況でも適切に一般化できるようになります。',
+      '重要なビジネスルールの遵守は、システムプロンプトだけでは確実に保証できません。プロンプト設計に加えて、プログラム側のGuardrails（検証ロジック）を組み合わせる多層防御アプローチがベストプラクティスです。',
+      'プロンプトキャッシングは、システムプロンプトなど繰り返し送信される安定したコンテンツをサーバー側で一時保存する機能です。レイテンシ最大80%削減、コスト最大90%削減が見込めます。デフォルトのキャッシュ寿命は5分間です。',
+      'Multi-pass Reviewでは、独立した別のセッション（レビューインスタンス）を使って出力を評価します。同じ会話セッション内でのセルフレビューは、自分の出力に引っ張られやすく客観的なレビューになりにくいため、避けるべきです。'
+    ]
+  },
+  m4: {
+    answers: [1, 2, 1, 1, 1],
+    explanations: [
+      'データ分類のようにAIの応答そのものを構造化データとして使いたい場合は、JSON Outputs（output_config方式）が最適です。enumを使えば選択肢を限定でき、制約付きデコーディングにより100%スキーマ準拠が保証されます。Prefillは最新モデルでは非推奨です。',
+      'Claude APIの構造化出力では minimum や maximum などの数値制約はサポートされていません。代わりに、descriptionフィールドに自然言語で制約を記述します。pattern や anyOf も同様にサポートされていません。',
+      'エージェントがツール（外部API等）を呼び出す際のパラメータ形式を保証するには、Strict Tool Use（strict: true）が最適です。JSON Outputsは応答テキスト全体の構造化に適しており、ツール呼び出しのパラメータ保証には Strict Tool Use を使います。',
+      'additionalProperties: false を設定すると、スキーマで定義していないフィールドが出力に含まれることを防げます。これは「余白への書き込み禁止」にあたり、予期しないデータの混入を防ぐベストプラクティスです。必須仕様ではありませんが、常に設定することが推奨されます。',
+      '検証-再試行ループでは、出力を生成したインスタンスとは別の独立したインスタンスで検証することが推奨されます。同一セッション内での自己レビューでは、同じバイアスや誤りを引き継ぐ可能性があるため、「ダブルチェック体制」として別の視点から確認します。'
     ]
   }
 };
