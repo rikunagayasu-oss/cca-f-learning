@@ -1,0 +1,267 @@
+{
+  "domain": "D3",
+  "title": "Claude Codeの設定とワークフロー",
+  "description": "CLAUDE.md階層・Hooks・Permissions・CI/CD・Plan mode・Claude Code Securityに関するドメイン別問題集",
+  "questions": [
+    {
+      "id": "d3-01",
+      "topic": "CLAUDE.md階層",
+      "question": "あなたはチームのClaude Code運用を整備しています。プロジェクトルートのCLAUDE.mdに「テストは必ずJestで実行」と記載し、サブディレクトリ backend/ のCLAUDE.mdに「テストはpytestで実行」と記載しました。backendディレクトリでClaude Codeを実行した場合、どちらの指示が適用されますか？",
+      "choices": [
+        "プロジェクトルートのCLAUDE.mdが常に最優先される",
+        "backend/のCLAUDE.mdが優先される（後から読まれたものが上書き）",
+        "両方の指示が競合し、Claude Codeがユーザーに確認を求める",
+        "エラーが発生し、どちらのテストも実行されない"
+      ],
+      "answer": 1,
+      "explanation": "CLAUDE.mdは読み込み順序に従い「後から読まれたものが先のものを上書き（override）」します。読み込み順序はグローバル→リポジトリルート→ユーザーローカル→サブディレクトリの順で、より具体的（ディレクトリに近い）な設定が優先されます。"
+    },
+    {
+      "id": "d3-02",
+      "topic": "CLAUDE.md階層",
+      "question": "エンタープライズ環境でClaude Codeを導入しています。管理者が設定した企業ポリシー（Enterprise CLAUDE.md）、プロジェクトのCLAUDE.md、個人のグローバルCLAUDE.md（~/.claude/CLAUDE.md）が存在する場合、優先順位として正しいものはどれですか？",
+      "choices": [
+        "個人グローバル > プロジェクト > Enterprise（個人設定が最優先）",
+        "プロジェクト > Enterprise > 個人グローバル（PJ固有が最優先）",
+        "Enterprise > プロジェクト > 個人グローバル（企業ポリシーが最優先）",
+        "全て同じ優先度で、競合時はClaude Codeが自律的に判断する"
+      ],
+      "answer": 2,
+      "explanation": "Enterprise CLAUDE.mdは企業管理者が設定するポリシーであり、セキュリティや規制遵守の観点から常に最優先されます。個人やプロジェクトの設定でEnterprise設定を上書きすることはできません。これにより、企業のガバナンスが確実に適用されます。"
+    },
+    {
+      "id": "d3-03",
+      "topic": "CLAUDE.md階層",
+      "question": "Claude Codeで特定のファイルやディレクトリをコンテキストから除外するために使用するファイルはどれですか？",
+      "choices": [
+        "CLAUDE.mdに「以下のファイルを無視」と記載する",
+        ".claudeignoreファイルを作成する",
+        "settings.jsonのexcludeFilesオプションを設定する",
+        ".gitignoreに記載すれば自動的に除外される"
+      ],
+      "answer": 1,
+      "explanation": ".claudeignoreファイルは.gitignoreと同じ構文でClaude Codeに対してファイルやディレクトリの除外を指定します。機密ファイル（.envや認証情報）や大きなバイナリファイルをコンテキストから除外するのに使用します。.gitignoreとは独立した設定であり、別途作成が必要です。"
+    },
+    {
+      "id": "d3-04",
+      "topic": "CLAUDE.md階層",
+      "question": "あなたのチームでは、全メンバーに共通のコーディング規約と、個人ごとの好み（エディタ設定等）を分けて管理したいと考えています。最適な構成はどれですか？",
+      "choices": [
+        "全てプロジェクトルートのCLAUDE.mdに記載し、git管理する",
+        "共通規約はプロジェクトルートのCLAUDE.md（git管理）、個人設定はユーザーローカル（.claude/CLAUDE.md、git除外）に分ける",
+        "全てグローバルCLAUDE.md（~/.claude/CLAUDE.md）に記載する",
+        "共通規約はsettings.json、個人設定はCLAUDE.mdに記載する"
+      ],
+      "answer": 1,
+      "explanation": "プロジェクトルートのCLAUDE.mdはgit管理されチーム全員に共有されるため、共通ルールの記載に最適です。ユーザーローカルの.claude/CLAUDE.mdはgit追跡外であり、個人の好みや開発環境固有の設定を記載するのに適しています。settings.jsonは機械的設定（権限等）用で、自然言語の規約には向きません。"
+    },
+    {
+      "id": "d3-05",
+      "topic": "Hooks",
+      "question": "Claude Codeでファイル書き込み（Write）操作の前に、自動的にコードフォーマッターを実行したいと考えています。最適なHookタイプはどれですか？",
+      "choices": [
+        "PostToolUse — 書き込み完了後にフォーマッターを実行",
+        "PreToolUse — 書き込み実行前にフォーマッターを実行",
+        "Notification — 書き込み通知時にフォーマッターを実行",
+        "PreCommit — コミット前にフォーマッターを実行"
+      ],
+      "answer": 0,
+      "explanation": "ファイル書き込み後のフォーマットにはPostToolUseが最適です。PreToolUseは書き込み前に実行されるため、まだ書き込まれていないファイルをフォーマットすることはできません。PostToolUseなら書き込み完了後のファイルに対してフォーマッターを適用し、結果をClaudeにフィードバックできます。"
+    },
+    {
+      "id": "d3-06",
+      "topic": "Hooks",
+      "question": "セキュリティポリシーにより、Claude Codeが本番データベースへの接続コマンド（psql -h prod-db）を実行することを絶対に阻止する必要があります。最適なアプローチはどれですか？",
+      "choices": [
+        "CLAUDE.mdに「本番DBには接続しないでください」と記載する",
+        "PreToolUseフックでBashコマンドの内容を検査し、非ゼロ終了コードでブロックする",
+        "PostToolUseフックで実行後に検知してロールバックする",
+        "Notificationフックでチームに通知する"
+      ],
+      "answer": 1,
+      "explanation": "PreToolUseフックはツール実行前に呼び出され、非ゼロ終了コードを返すことでツール実行を確実にブロックします。CLAUDE.mdの指示はプロンプトベースであり100%の遵守は保証されません。PostToolUseでは実行後の検知となり手遅れです。決定論的にブロックするにはPreToolUseフックが最適です。"
+    },
+    {
+      "id": "d3-07",
+      "topic": "Hooks",
+      "question": "Claude CodeのHookがツール実行をブロックした場合、Claudeへのフィードバックはどのように伝えますか？",
+      "choices": [
+        "stdoutにフィードバックメッセージを出力する",
+        "stderrにフィードバックメッセージを出力し、非ゼロ終了コードで終了する",
+        "専用のフィードバックファイル（.claude/feedback.txt）に書き込む",
+        "環境変数CLAUDE_FEEDBACKに設定する"
+      ],
+      "answer": 1,
+      "explanation": "Hookがブロックする場合、stderrにフィードバックメッセージを出力し、非ゼロ終了コードで終了します。stderrの内容がClaudeへのフィードバックとして渡され、Claudeはその理由を理解して代替アプローチを検討します。stdoutはツール結果の変更（入出力の書き換え）に使用されるため、フィードバック用途にはstderrを使います。"
+    },
+    {
+      "id": "d3-08",
+      "topic": "Hooks",
+      "question": "Claude Codeがタスク完了時にSlack通知を自動送信する仕組みを構築したいと考えています。最適なHookタイプはどれですか？",
+      "choices": [
+        "PostToolUse — 最後のツール使用後に通知",
+        "PreToolUse — ツール実行前に通知",
+        "Notification — Claude Codeの通知イベント時にSlackへ送信",
+        "CLAUDE.mdに「完了時にSlack通知せよ」と記載する"
+      ],
+      "answer": 2,
+      "explanation": "NotificationフックはClaude Codeが通知を送信するイベント（タスク完了や待機状態への移行など）に対して発火します。このフックを使ってSlack APIを呼び出すことで、タスク完了時の自動通知を実現できます。PostToolUseは個別のツール使用ごとに発火するため、タスク完了の検知には適しません。"
+    },
+    {
+      "id": "d3-09",
+      "topic": "Permissions",
+      "question": "Claude Codeのpermissions設定で、allowリストに「Bash(npm test)」を追加し、同時にdenyリストにも「Bash(npm *)」を追加した場合、「npm test」コマンドの実行はどうなりますか？",
+      "choices": [
+        "allowリストに明示的に許可されているため、実行される",
+        "denyリストが常にallowリストより優先されるため、ブロックされる",
+        "より具体的なルール（npm test）が優先されるため、実行される",
+        "競合が検出され、ユーザーに確認を求める"
+      ],
+      "answer": 1,
+      "explanation": "Claude Codeの権限評価はdeny → ask → allowの順で行われます。denyリストは常に最優先であり、allowリストの設定で上書きすることはできません。「Bash(npm *)」がdenyに含まれている限り、全てのnpmコマンド（npm testを含む）がブロックされます。セキュリティの観点から、禁止事項が許可事項を上書きする設計です。"
+    },
+    {
+      "id": "d3-10",
+      "topic": "Permissions",
+      "question": "CI/CD環境でClaude Codeを完全自動実行するため、bypassPermissionsモードの使用を検討しています。このモードの使用条件として正しいものはどれですか？",
+      "choices": [
+        "管理者権限（sudo）があれば任意の環境で使用できる",
+        "コンテナなどの隔離された環境でのみ使用すべきである",
+        "CLAUDE.mdに明記すれば通常の開発環境でも使用できる",
+        "settings.jsonでenterprise: trueを設定すれば使用できる"
+      ],
+      "answer": 1,
+      "explanation": "bypassPermissions（CLIでは--dangerously-skip-permissions）は全ての権限チェックをスキップするため、コンテナなどの隔離された環境でのみ使用すべきです。フラグ名自体に「dangerously」が含まれている通り、通常の開発環境での使用は危険です。隔離環境でも.git、.claude、.vscode、.ideaへの書き込みは例外的に確認が入ります。"
+    },
+    {
+      "id": "d3-11",
+      "topic": "Permissions",
+      "question": "新しいチームメンバーが初めてClaude Codeを使う際、安全に始めるための権限設定として最も適切なものはどれですか？",
+      "choices": [
+        "bypassPermissionsを有効にして、スムーズに作業できるようにする",
+        "全てのツールをdenyリストに入れ、必要に応じて1つずつ許可する",
+        "デフォルトのask設定のまま使用し、信頼できる操作を徐々にallowリストに追加する",
+        "allowリストに全ツールを追加し、問題が起きたらdenyに追加する"
+      ],
+      "answer": 2,
+      "explanation": "デフォルトの権限モードでは、未設定のツールは実行前にユーザーに確認（ask）を求めます。最初はこの設定で使い始め、繰り返し使う安全な操作を徐々にallowリストに追加するのが最も安全なアプローチです。bypassPermissionsは隔離環境専用、全deny は作業効率が極端に低下、全allowは安全性が確保できません。"
+    },
+    {
+      "id": "d3-12",
+      "topic": "CI/CD",
+      "question": "GitHub ActionsでClaude Codeを使ったコードレビュー自動化を構築しています。PRが作成されるたびにClaude Codeがレビューコメントを投稿するようにしたい場合、最適な実行方法はどれですか？",
+      "choices": [
+        "claude --resume でセッションを再開し、PRの差分を渡す",
+        "claude --print (-p) でヘッドレス実行し、レビュー結果を標準出力で取得する",
+        "claude を対話モードで起動し、自動入力でPRの差分を渡す",
+        "Claude APIを直接呼び出し、Claude Codeは使用しない"
+      ],
+      "answer": 1,
+      "explanation": "--print（-p）フラグはヘッドレスモードでClaude Codeを起動し、対話的な入力を待たずに結果を返して終了します。CI/CDパイプラインやスクリプトからの自動実行に最適です。--resumeはセッション管理が必要で不安定、対話モードはCI/CDに不向き、Claude APIは直接呼んでもCLAUDE.mdの恩恵を受けられません。"
+    },
+    {
+      "id": "d3-13",
+      "topic": "CI/CD",
+      "question": "CI/CDパイプラインでClaude Codeのヘッドレス実行結果をJSON形式で取得したい場合、使用するオプションはどれですか？",
+      "choices": [
+        "--print --format json",
+        "--print --output-format json",
+        "--print --json",
+        "--print --structured-output"
+      ],
+      "answer": 1,
+      "explanation": "--output-formatオプションでClaude Codeの出力形式を指定できます。jsonを指定するとJSON形式で結果が返され、後続のパイプライン処理（パース・条件分岐等）が容易になります。CI/CDパイプラインでの自動処理に不可欠なオプションです。"
+    },
+    {
+      "id": "d3-14",
+      "topic": "CI/CD",
+      "question": "CI/CDでClaude Codeを実行する際、コストの暴走を防ぐために設定すべきオプションとして最も適切な組み合わせはどれですか？",
+      "choices": [
+        "--max-turns と --timeout",
+        "--max-turns と --max-budget-usd",
+        "--timeout と --rate-limit",
+        "--max-budget-usd と --dry-run"
+      ],
+      "answer": 1,
+      "explanation": "--max-turnsはエージェントのターン数（ツール実行回数）を制限し、無限ループを防ぎます。--max-budget-usdは金額の上限を設定し、予期しないコスト発生を防ぎます。この2つの組み合わせにより、ターン数とコストの両面からCI/CD実行を安全に制限できます。"
+    },
+    {
+      "id": "d3-15",
+      "topic": "Plan mode",
+      "question": "大規模なリファクタリングを行う前に、Claude Codeにまず計画を立てさせてから実行したいと考えています。最適なアプローチはどれですか？",
+      "choices": [
+        "CLAUDE.mdに「まず計画を立ててから実行せよ」と記載する",
+        "Plan modeを使って計画を確認・承認してから実行モードに切り替える",
+        "--dry-runフラグで計画を確認し、その後通常実行する",
+        "最初のプロンプトに「計画のみ出力し、実行しないこと」と指示する"
+      ],
+      "answer": 1,
+      "explanation": "Plan modeはClaude Codeに「計画のみ行い、ファイル変更を行わない」モードで動作させます。計画内容を確認し、ユーザーが承認した後に実行モードに切り替えることで、大規模変更の安全性を確保できます。CLAUDE.mdやプロンプトだけの指示では100%の遵守は保証されません。"
+    },
+    {
+      "id": "d3-16",
+      "topic": "Plan mode",
+      "question": "Plan modeの使用が特に適切な場面はどれですか？",
+      "choices": [
+        "単一ファイルのバグ修正",
+        "複数モジュールにまたがるアーキテクチャ変更",
+        "ドキュメントのタイポ修正",
+        "既存テストの実行"
+      ],
+      "answer": 1,
+      "explanation": "Plan modeは変更の影響範囲が大きく、事前に計画を確認したい場面で有効です。複数モジュールにまたがるアーキテクチャ変更では、どのファイルをどう変更するかの全体像を把握してから実行に移ることが重要です。単一ファイルの修正やタイポ修正のような小規模変更にPlan modeを使うのはオーバーヘッドが大きく不適切です。"
+    },
+    {
+      "id": "d3-17",
+      "topic": "Plan mode",
+      "question": "Claude CodeのPlan modeとCI/CDの--printモードを組み合わせて使う場合の注意点として正しいものはどれですか？",
+      "choices": [
+        "Plan modeは--printモードでは使用できない",
+        "--printモードではPlan modeの承認ステップが自動スキップされる",
+        "--printモードでPlan modeを使うと、計画のみが出力され実行されない",
+        "Plan modeと--printモードは同時に使用するとエラーになる"
+      ],
+      "answer": 2,
+      "explanation": "--print（ヘッドレス）モードでは対話的な承認ができないため、Plan modeを組み合わせると計画のみが出力され、実際のファイル変更は行われません。CI/CDで計画確認のみを行いたい場合に有用ですが、実行まで完了したい場合はPlan modeなしの--printを使用します。"
+    },
+    {
+      "id": "d3-18",
+      "topic": "Claude Code Security",
+      "question": "Claude Codeがユーザーのコードを読み取る際のデータ取り扱いとして正しいものはどれですか？",
+      "choices": [
+        "読み取ったコードは全てAnthropicのサーバーに永続的に保存される",
+        "読み取ったコードはAPIリクエストとして送信されるが、モデル訓練には使用されない（Commercial利用規約に基づく）",
+        "全てのコードはローカルで処理され、外部に送信されることはない",
+        "コードの送信はオプトイン方式で、ユーザーが明示的に許可した場合のみ送信される"
+      ],
+      "answer": 1,
+      "explanation": "Claude CodeはAPI経由でAnthropicのサーバーにコードを送信しますが、Commercial利用規約（API）の下では、送信されたデータはモデルの訓練には使用されません。ただし、完全にローカルで処理されるわけではなく、APIリクエストとしてコンテキストが送信される点を理解しておく必要があります。"
+    },
+    {
+      "id": "d3-19",
+      "topic": "Claude Code Security",
+      "question": "Claude Codeのセキュリティアーキテクチャにおいて、プロンプトインジェクション攻撃から保護するための設計として最も重要なものはどれですか？",
+      "choices": [
+        "全てのユーザー入力をサニタイズしてからClaudeに渡す",
+        "信頼境界（Trust Boundary）を設定し、外部コンテンツの権限を制限する多層防御",
+        "入力文字数を制限してインジェクションペイロードを排除する",
+        "AIモデル自体にインジェクション検知機能が組み込まれているため追加対策は不要"
+      ],
+      "answer": 1,
+      "explanation": "Claude Codeのセキュリティは信頼境界と多層防御に基づいています。外部から読み込まれるコンテンツ（Webページ、ファイル等）は信頼されないソースとして扱い、権限モデル（deny/ask/allow）、Hooks、sandbox等の複数の防御層を重ねます。単一のサニタイズや文字数制限では不十分であり、多層防御が重要です。"
+    },
+    {
+      "id": "d3-20",
+      "topic": "Claude Code Security",
+      "question": "開発チームがClaude Codeを安全に運用するために、sandbox環境で実行する主な目的はどれですか？",
+      "choices": [
+        "パフォーマンスの向上（リソース分離による高速化）",
+        "ファイルシステムやネットワークへのアクセスを制限し、意図しない操作を防止する",
+        "複数ユーザーが同時に同じプロジェクトで作業できるようにする",
+        "APIコストを削減するためにリクエストをバッチ処理する"
+      ],
+      "answer": 1,
+      "explanation": "sandbox環境はClaude Codeの操作範囲を制限し、意図しないファイルシステムの変更やネットワークアクセスを防止します。特にbypassPermissionsモードを使用する場合、コンテナなどの隔離環境（sandbox）で実行することが必須とされています。これは最小権限の原則に基づくセキュリティ設計です。"
+    }
+  ]
+}
