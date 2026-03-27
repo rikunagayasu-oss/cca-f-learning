@@ -128,7 +128,7 @@
 
   <div class="tip-box">
     <div class="label">試験のポイント</div>
-    <p style="margin-top:.25rem;">Batches APIの最大の特徴は<strong>「50%割引」</strong>と<strong>「非同期処理」</strong>です。試験では「大量処理でコストを最小化するには？」という問いに対して、Batches API + 適切なモデル選定（Haikuなど）の組み合わせが正解になることが多いです。</p>
+    <p style="margin-top:.25rem;">Batches APIの最大の特徴は<strong>「50%割引」</strong>と<strong>「非同期処理」</strong>です。試験では「大量処理でコストを最小化するには？」という問いに対して、Batches API + 適切なモデル選定（Haiku 4.5など）の組み合わせが正解になることが多いです。</p>
   </div>
 
   <h3>料金体系</h3>
@@ -204,12 +204,24 @@
   <h3>コスト最適化の実践パターン</h3>
   <p>Batches APIを最大限活用するための戦略を紹介します。</p>
 
+  <div class="concept-box">
+    <div class="label">Claudeモデルの主要スペック（2026年3月時点）</div>
+    <table class="compare-table">
+      <tr><th>モデル</th><th>コンテキストウィンドウ</th><th>Max Output（最大出力）</th><th>備考</th></tr>
+      <tr><td><strong>Claude Opus 4.6</strong></td><td>1,000,000トークン（1M）</td><td>128,000トークン（128k）</td><td>最高性能モデル</td></tr>
+      <tr><td><strong>Claude Sonnet 4.6</strong></td><td>1,000,000トークン（1M）</td><td>64,000トークン（64k）</td><td>性能とコストのバランス</td></tr>
+      <tr><td><strong>Claude Haiku 4.5</strong></td><td>200,000トークン（200k）</td><td>64,000トークン（64k）</td><td>最速・最安モデル</td></tr>
+      <tr><td><s>Claude Haiku 3</s></td><td>200,000トークン</td><td>4,096トークン</td><td>⚠ 2026年4月19日廃止予定（deprecated）</td></tr>
+    </table>
+  </div>
+
+
   <table class="compare-table">
     <tr><th>戦略</th><th>説明</th><th>コスト削減効果</th></tr>
     <tr>
       <td><strong>モデル選定の最適化</strong></td>
-      <td>単純な分類タスクにはClaude Haiku（最安モデル）を使い、Batches APIと組み合わせる</td>
-      <td>Haiku + Batch = 最安構成</td>
+      <td>単純な分類タスクにはClaude Haiku 4.5（最安モデル）を使い、Batches APIと組み合わせる。※Claude Haiku 3は2026年4月19日に廃止予定（deprecated）</td>
+      <td>Haiku 4.5 + Batch = 最安構成</td>
     </tr>
     <tr>
       <td><strong>プロンプトキャッシュとの併用</strong></td>
