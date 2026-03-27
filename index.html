@@ -158,10 +158,14 @@
 
   /* Scenario cards */
   .scenario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
-  .scenario-card { border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+  .scenario-card { border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; background: var(--card); transition: box-shadow .15s; }
+  .scenario-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
   .scenario-card .scenario-num { font-size: .75rem; font-weight: 700; color: var(--accent); }
   .scenario-card h4 { font-size: .95rem; margin: .25rem 0 .5rem; }
-  .scenario-card p { font-size: .85rem; color: var(--text-light); }
+  .scenario-card p { font-size: .85rem; color: var(--text-light); margin-bottom: .5rem; }
+  .scenario-card .domain-tag { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: .7rem; font-weight: 600; padding: .15rem .5rem; border-radius: 999px; margin-right: .25rem; }
+  .scenario-card a { display: inline-block; margin-top: .5rem; color: var(--primary); font-weight: 600; font-size: .85rem; text-decoration: none; cursor: pointer; }
+  .scenario-card a:hover { text-decoration: underline; }
 
   /* Glossary */
   .glossary-item { margin-bottom: 1rem; }
@@ -180,6 +184,142 @@
 
   /* Print */
   @media print { .sidebar, .sidebar-toggle { display: none; } .main { margin-left: 0; } }
+
+
+  /* Flow diagram (m10) */
+  .flow-diagram { background: #F3F4F6; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; text-align: center; font-size: .9rem; line-height: 2; }
+  .flow-step { display: inline-block; background: var(--card); border: 2px solid var(--primary); border-radius: 8px; padding: .4rem .8rem; margin: .25rem; font-weight: 600; font-size: .85rem; }
+  .flow-arrow { color: var(--primary); font-weight: 700; margin: 0 .25rem; }
+
+  .quiz-explanation.correct-exp { background: var(--success-light); color: #065F46; }
+  .quiz-explanation.incorrect-exp { background: var(--danger-light); color: #991B1B; }
+
+  /* Cheatsheet page (scoped) */
+
+  /* チートシート専用スタイル */
+  .cheatsheet-page .sheet { max-width: 210mm; margin: 0 auto; padding: 12px; }
+  .cheatsheet-page .cs-header {
+    text-align: center;
+    padding: 8px 0;
+    border-bottom: 3px solid var(--primary);
+    margin-bottom: 10px;
+  }
+  .cheatsheet-page .cs-header h1 { font-size: 18px; color: var(--primary-dark); margin-bottom: 2px; }
+  .cheatsheet-page .cs-header .subtitle { font-size: 10px; color: var(--text-light); }
+  .cheatsheet-page .exam-overview {
+    display: flex; justify-content: center; gap: 16px; margin-top: 6px; font-size: 10px; font-weight: 600;
+  }
+  .cheatsheet-page .exam-overview span { background: var(--primary-light); padding: 2px 8px; border-radius: 4px; }
+
+  .cheatsheet-page .cs-domain {
+    border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; page-break-inside: avoid;
+  }
+  .cheatsheet-page .cs-domain-header {
+    padding: 4px 10px; border-radius: 5px 5px 0 0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-weight: 700; font-size: 12px; color: #FFFFFF;
+  }
+  .cheatsheet-page .cs-domain-header .weight { font-size: 14px; }
+  .cheatsheet-page .cs-domain-body { padding: 6px 10px; }
+  .cheatsheet-page .cs-domain-body h4 {
+    font-size: 10px; font-weight: 700; color: var(--text);
+    margin: 4px 0 2px; border-bottom: 1px dotted var(--border); padding-bottom: 1px;
+  }
+  .cheatsheet-page .cs-domain-body ul { margin: 0 0 2px 14px; font-size: 10px; }
+  .cheatsheet-page .cs-domain-body li { margin-bottom: 1px; }
+  .cheatsheet-page .cs-domain-body li strong { font-weight: 700; }
+
+  .cheatsheet-page .d1 .cs-domain-header { background: #7C3AED; }
+  .cheatsheet-page .d1 .cs-domain-body { background: #F5F3FF; }
+  .cheatsheet-page .d2 .cs-domain-header { background: #2563EB; }
+  .cheatsheet-page .d2 .cs-domain-body { background: #EFF6FF; }
+  .cheatsheet-page .d3 .cs-domain-header { background: #D97706; }
+  .cheatsheet-page .d3 .cs-domain-body { background: #FFFBEB; }
+  .cheatsheet-page .d4 .cs-domain-header { background: #059669; }
+  .cheatsheet-page .d4 .cs-domain-body { background: #ECFDF5; }
+  .cheatsheet-page .d5 .cs-domain-header { background: #DC2626; }
+  .cheatsheet-page .d5 .cs-domain-body { background: #FEF2F2; }
+
+  .cheatsheet-page .num-table {
+    width: 100%; border-collapse: collapse; font-size: 10px; margin: 4px 0;
+  }
+  .cheatsheet-page .num-table th {
+    background: #F3F4F6; padding: 2px 6px; text-align: left; font-weight: 700; border: 1px solid var(--border);
+  }
+  .cheatsheet-page .num-table td { padding: 2px 6px; border: 1px solid var(--border); }
+  .cheatsheet-page .num-table td:last-child { font-weight: 700; }
+
+  .cheatsheet-page .trap {
+    background: var(--danger-light); border-left: 3px solid var(--danger);
+    padding: 3px 8px; margin: 4px 0; font-size: 10px; border-radius: 0 4px 4px 0;
+  }
+
+  .cheatsheet-page .scenarios {
+    border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; page-break-inside: avoid;
+  }
+  .cheatsheet-page .scenarios-header {
+    background: #1F2937; color: #FFFFFF; padding: 4px 10px; border-radius: 5px 5px 0 0; font-weight: 700; font-size: 12px;
+  }
+  .cheatsheet-page .scenarios-body { padding: 6px 10px; }
+  .cheatsheet-page .scenario-item { display: flex; gap: 8px; margin-bottom: 3px; font-size: 10px; }
+  .cheatsheet-page .scenario-item .s-num { font-weight: 700; min-width: 20px; color: var(--primary-dark); }
+  .cheatsheet-page .scenario-item .s-name { font-weight: 700; min-width: 140px; }
+
+  .cheatsheet-page .tips {
+    border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; page-break-inside: avoid;
+  }
+  .cheatsheet-page .tips-header {
+    background: var(--success); color: #FFFFFF; padding: 4px 10px; border-radius: 5px 5px 0 0; font-weight: 700; font-size: 12px;
+  }
+  .cheatsheet-page .tips-body { padding: 6px 10px; }
+  .cheatsheet-page .tips-body ul { margin: 0 0 0 14px; font-size: 10px; }
+  .cheatsheet-page .tips-body li { margin-bottom: 2px; }
+
+  .cheatsheet-page .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cheatsheet-page .two-col > .cs-domain { margin-bottom: 0; }
+
+  @media print {
+    .cheatsheet-page { font-size: 9px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cheatsheet-page .sheet { padding: 6px; max-width: 100%; }
+    .cheatsheet-page .cs-domain, .cheatsheet-page .scenarios, .cheatsheet-page .tips { page-break-inside: avoid; }
+    .cheatsheet-page .cs-header { padding: 4px 0; margin-bottom: 6px; }
+    .cheatsheet-page .cs-domain-body ul { font-size: 9px; }
+    .cheatsheet-page .num-table { font-size: 9px; }
+    .cheatsheet-page .trap { font-size: 9px; }
+    .cheatsheet-page .scenario-item { font-size: 9px; }
+    .cheatsheet-page .tips-body ul { font-size: 9px; }
+    .cheatsheet-page .two-col { gap: 4px; }
+    @page { margin: 8mm; size: A4; }
+  }
+
+
+  /* Glossary page (scoped) */
+
+  /* 用語集ナビゲーション */
+  .glossary-page .section-nav { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .glossary-page .section-tab { padding: .4rem 1rem; border-radius: 999px; border: 2px solid var(--border); background: white; cursor: pointer; font-size: .85rem; font-weight: 500; transition: all .15s; text-decoration: none; color: var(--text); }
+  .glossary-page .section-tab:hover { border-color: var(--primary); }
+  .glossary-page .section-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* アルファベット索引 */
+  .glossary-page .alpha-index { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
+  .glossary-page .alpha-index a { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 6px; border: 1px solid var(--border); background: white; color: var(--accent); font-weight: 600; font-size: .85rem; text-decoration: none; transition: all .15s; }
+  .glossary-page .alpha-index a:hover { background: var(--accent-light); border-color: var(--accent); }
+  .glossary-page .alpha-index a.disabled { color: var(--border); pointer-events: none; }
+
+  /* ドメインヘッダー（用語集内） */
+  .glossary-page .glossary-domain-header { background: var(--accent-light); color: var(--accent); padding: .75rem 1.25rem; border-radius: 8px; margin: 1.5rem 0 1rem; font-weight: 700; font-size: 1rem; }
+
+  /* 頻出度 */
+  .glossary-page .freq-high { color: var(--danger); font-weight: 700; }
+  .glossary-page .freq-mid { color: var(--primary); font-weight: 600; }
+  .glossary-page .freq-low { color: var(--text-light); }
+
+  @media print {
+    .glossary-page .section-nav, .glossary-page .alpha-index { display: none; }
+    .glossary-page .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  }
+
 </style>
 </head>
 <body>
@@ -338,10 +478,10 @@
         <span class="module-label">M12: 総復習と模擬試験</span>
         <span class="module-pct" id="pct-m12"></span>
       </div>
-      <div class="nav-item" onclick="window.open('scenario-guide.html','_blank')" id="nav-scenario" style="border-top:1px solid #374151;margin-top:.5rem;padding-top:.75rem;">
+      <div class="nav-item" onclick="showPage('scenario-guide')" id="nav-scenario-guide" style="border-top:1px solid #374151;margin-top:.5rem;padding-top:.75rem;">
         <span class="status-dot" style="background:#7C3AED;"></span>
         <span class="module-label">シナリオ別対策ガイド</span>
-        <span class="module-pct" style="font-size:.7rem;">外部</span>
+        <span class="module-pct" id="pct-scenario-guide"></span>
       </div>
     </div>
   </div>
@@ -350,15 +490,15 @@
       <span class="module-label">弱点克服ドリル</span>
       <span class="module-pct" id="pct-drill"></span>
     </div>
-    <div class="nav-item" onclick="window.open('glossary-english.html','_blank')" id="nav-glossary-en">
+    <div class="nav-item" onclick="showPage('glossary')" id="nav-glossary">
       <span class="status-dot" style="background:#2563EB;"></span>
       <span class="module-label">英語用語集</span>
-      <span class="module-pct" style="font-size:.7rem;">外部</span>
+      <span class="module-pct" id="pct-glossary"></span>
     </div>
-    <div class="nav-item" onclick="window.open('cheatsheet.html','_blank')" id="nav-cheatsheet">
+    <div class="nav-item" onclick="showPage('cheatsheet')" id="nav-cheatsheet">
       <span class="status-dot" style="background:#059669;"></span>
       <span class="module-label">直前チートシート</span>
-      <span class="module-pct" style="font-size:.7rem;">外部</span>
+      <span class="module-pct" id="pct-cheatsheet"></span>
     </div>
 
   <div class="sidebar-progress">
@@ -676,6 +816,7 @@
 
   <!-- Section 6: Quiz -->
   <div id="m0-s6" class="card">
+  <h2 id="m0-s6-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 0 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -993,6 +1134,7 @@
 
   <!-- Section 5: Quiz -->
   <div id="m1-s5" class="card">
+  <h2 id="m1-s5-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 1 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -1690,6 +1832,7 @@
 
   <!-- Section 6: Quiz -->
   <div id="m3-s6" class="card">
+  <h2 id="m3-s6-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 3 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -2294,6 +2437,7 @@
 
   <!-- Section 6: Quiz -->
   <div id="m4-s6" class="card">
+  <h2 id="m4-s6-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 4 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -3452,6 +3596,7 @@ tool_choice: {"type": "auto"}</pre>
 
   <!-- Section 11: クイズ -->
   <div id="m5-s11" class="card">
+  <h2 id="m5-s11-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 5 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -4847,6 +4992,7 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <div id="m7-s6" class="card">
+  <h2 id="m7-s6-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 7 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。</p>
@@ -5268,6 +5414,7 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <div id="m8-s6" class="card">
+  <h2 id="m8-s6-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 8 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。</p>
@@ -5819,6 +5966,7 @@ tool_choice: {"type": "auto"}</pre>
 
   <!-- Section 6: クイズ -->
   <div id="m9-s6" class="card">
+  <h2 id="m9-s6-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 9 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -8031,6 +8179,7 @@ tool_choice: {"type": "auto"}</pre>
 
   <!-- Section 6: Quiz -->
   <div id="m11-s6" class="card">
+  <h2 id="m11-s6-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>Module 11 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -8658,6 +8807,7 @@ tool_choice: {"type": "auto"}</pre>
 
   <!-- Section 3: 模擬試験 -->
   <div id="m12-s3" class="card">
+  <h2 id="m12-s3-heading">確認クイズ</h2>
     <div class="quiz-section">
       <h3>CCA-F ミニ模試（15問）</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">全5ドメインから配点比率に応じて出題する基本確認テストです。目標：11問以上正解（73%以上）で合格圏内です。本格的な模試は「本番形式模試」タブをご利用ください。</p>
@@ -8910,6 +9060,1218 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 </div>
 
+
+
+<!-- ==================== SCENARIO PAGES ==================== -->
+<!-- 統合用断片: シナリオ別対策ガイド + シナリオ1〜6                -->
+<!-- 元ファイル: scenario-guide.html, scenario-1〜6.html (計7件)    -->
+<!-- サイドバー推奨配置: 「試験対策」カテゴリに追加                 -->
+<!--   - シナリオ別対策ガイド → showPage('scenario-guide')          -->
+<!--   - 各シナリオは対策ガイドのカード内リンクから遷移              -->
+<!-- ============================================================ -->
+
+<!-- 固有CSS: scenario-guide.html 由来 -->
+<!-- ==================== -->
+<!-- シナリオ別対策ガイド  -->
+<!-- ==================== -->
+<div id="page-scenario-guide" class="page" style="display:none">
+
+<div class="module-header">
+  <span class="week-badge">試験対策</span>
+  <h1>シナリオ別対策ガイド</h1>
+  <p class="subtitle">CCA-F試験の6つのシナリオを攻略するための対策集</p>
+  <span class="domain-tag">全ドメイン対応</span>
+</div>
+
+<div class="objectives">
+  <h3>このガイドの目的</h3>
+  <ul>
+    <li>CCA-F試験のシナリオベース出題形式を理解する</li>
+    <li>6つのシナリオそれぞれの出題傾向と対策ポイントを把握する</li>
+    <li>各シナリオに関連するドメイン知識を整理する</li>
+    <li>練習問題を通じてシナリオ問題への対応力を高める</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>CCA-F試験のシナリオ出題形式</h2>
+  <p>CCA-F試験では、<strong>全6シナリオのうちランダムに4つが出題</strong>されます。各シナリオは実際のビジネス場面を想定した一連のストーリーで構成され、その中で複数の問題が出されます。</p>
+
+  <div class="concept-box">
+    <div class="label">試験のポイント</div>
+    <p>どの4シナリオが選ばれるかは受験時までわかりません。そのため、<strong>6つすべてのシナリオに対して準備しておく</strong>ことが合格への鍵です。各シナリオは複数のドメインにまたがるため、横断的な知識が求められます。</p>
+  </div>
+
+  <table class="compare-table">
+    <tr><th>項目</th><th>内容</th></tr>
+    <tr><td>出題形式</td><td>シナリオベースの4択問題</td></tr>
+    <tr><td>全シナリオ数</td><td>6シナリオ</td></tr>
+    <tr><td>出題シナリオ数</td><td>ランダムに4シナリオ</td></tr>
+    <tr><td>総問題数</td><td>60問 / 120分</td></tr>
+    <tr><td>合格ライン</td><td>720 / 1000点</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <div class="label">学習のヒント</div>
+    <p>シナリオ問題では、単独の知識よりも<strong>「状況に応じてどの技術を選ぶか」</strong>という判断力が問われます。各シナリオの業務背景を理解した上で、適切な技術選択ができるように準備しましょう。</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>6つのシナリオ一覧</h2>
+  <p>以下の6シナリオについて、それぞれの対策ページで詳しく解説しています。</p>
+
+  <div class="scenario-grid">
+    <div class="scenario-card">
+      <span class="scenario-num">SCENARIO 1</span>
+      <h4>社内チャットボット導入</h4>
+      <p>社内向けAIチャットボットの設計から運用まで。エージェント設計とツール連携がカギ。</p>
+      <span class="domain-tag">D1 エージェント設計</span>
+      <span class="domain-tag">D4 ツール&MCP</span>
+      <br><a onclick="showPage('scenario-1')">対策ページを見る &rarr;</a>
+    </div>
+
+    <div class="scenario-card">
+      <span class="scenario-num">SCENARIO 2</span>
+      <h4>コード自動レビューシステム構築</h4>
+      <p>CI/CDパイプラインにAIレビューを組み込む。Claude Codeの活用がポイント。</p>
+      <span class="domain-tag">D3 Claude Code</span>
+      <span class="domain-tag">D1 エージェント設計</span>
+      <br><a onclick="showPage('scenario-2')">対策ページを見る &rarr;</a>
+    </div>
+
+    <div class="scenario-card">
+      <span class="scenario-num">SCENARIO 3</span>
+      <h4>カスタマーサポート自動化</h4>
+      <p>AIエージェントによる顧客対応の自動化。ツール設計とガードレールが重要。</p>
+      <span class="domain-tag">D2 ツール設計</span>
+      <span class="domain-tag">D5 コンテキスト管理</span>
+      <br><a onclick="showPage('scenario-3')">対策ページを見る &rarr;</a>
+    </div>
+
+    <div class="scenario-card">
+      <span class="scenario-num">SCENARIO 4</span>
+      <h4>マルチエージェント文書処理</h4>
+      <p>複数のAIエージェントが協調して文書を処理するシステム。アーキテクチャ設計力が試される。</p>
+      <span class="domain-tag">D1 エージェント設計</span>
+      <span class="domain-tag">D2 ツール設計</span>
+      <br><a onclick="showPage('scenario-4')">対策ページを見る &rarr;</a>
+    </div>
+
+    <div class="scenario-card">
+      <span class="scenario-num">SCENARIO 5</span>
+      <h4>API統合データパイプライン</h4>
+      <p>外部APIと連携した大規模データ処理。レート制限対策とエラー処理がカギ。</p>
+      <span class="domain-tag">D2 ツール設計</span>
+      <span class="domain-tag">D5 コンテキスト管理</span>
+      <br><a onclick="showPage('scenario-5')">対策ページを見る &rarr;</a>
+    </div>
+
+    <div class="scenario-card">
+      <span class="scenario-num">SCENARIO 6</span>
+      <h4>エンタープライズAIガバナンス</h4>
+      <p>組織全体でのAI活用ルール整備。プライバシーとセキュリティが中心。</p>
+      <span class="domain-tag">D5 コンテキスト管理</span>
+      <span class="domain-tag">D3 Claude Code</span>
+      <br><a onclick="showPage('scenario-6')">対策ページを見る &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>シナリオとドメインの対応関係</h2>
+  <p>各シナリオがどのドメインに関連するかを把握しておくと、効率的に学習を進められます。</p>
+
+  <table class="compare-table">
+    <tr>
+      <th>シナリオ</th>
+      <th>主要ドメイン</th>
+      <th>配点目安</th>
+    </tr>
+    <tr>
+      <td>1. 社内チャットボット導入</td>
+      <td>D1 エージェント設計 + D4 ツール&MCP</td>
+      <td>27% + 18%</td>
+    </tr>
+    <tr>
+      <td>2. コード自動レビュー</td>
+      <td>D3 Claude Code + D1 エージェント設計</td>
+      <td>20% + 27%</td>
+    </tr>
+    <tr>
+      <td>3. カスタマーサポート自動化</td>
+      <td>D2 ツール設計 + D5 コンテキスト管理</td>
+      <td>18% + 15%</td>
+    </tr>
+    <tr>
+      <td>4. マルチエージェント文書処理</td>
+      <td>D1 エージェント設計 + D2 ツール設計</td>
+      <td>27% + 18%</td>
+    </tr>
+    <tr>
+      <td>5. API統合データパイプライン</td>
+      <td>D2 ツール設計 + D5 コンテキスト管理</td>
+      <td>18% + 15%</td>
+    </tr>
+    <tr>
+      <td>6. エンタープライズAIガバナンス</td>
+      <td>D5 コンテキスト管理 + D3 Claude Code</td>
+      <td>15% + 20%</td>
+    </tr>
+  </table>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p>シナリオは「主要ドメイン」だけでなく、他のドメインの知識も横断的に問われることがあります。ドメイン単体の学習だけでなく、複数ドメインを組み合わせた応用力を養いましょう。</p>
+  </div>
+</div>
+
+</div><!-- /page-scenario-guide -->
+
+
+<!-- ==================== -->
+<!-- シナリオ1             -->
+<!-- ==================== -->
+<div id="page-scenario-1" class="page" style="display:none">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 1</span>
+  <h1>社内チャットボット導入</h1>
+  <p class="subtitle">エージェント設計とツール連携で実現する社内AI活用</p>
+  <span class="domain-tag">D1 エージェント設計 (27%)</span>
+  <span class="domain-tag">D4 ツール&MCP (18%)</span>
+</div>
+
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p>このシナリオでは、<strong>社内向けのAIチャットボットを導入するプロジェクト</strong>が舞台です。たとえば、社内の就業規則や福利厚生に関する問い合わせに自動で回答するシステムを構築する場面を想像してください。</p>
+  <p>具体的には、以下のような業務場面が設定されます。</p>
+  <ul>
+    <li>社内ナレッジベース（社内Wiki、規程集など）を参照して回答するチャットボットの設計</li>
+    <li>人事部門や総務部門の問い合わせ対応を効率化する仕組みづくり</li>
+    <li>機密情報を含む質問への対応ルール整備</li>
+    <li>チャットボットの回答品質を維持・改善する運用体制</li>
+  </ul>
+
+  <div class="concept-box">
+    <div class="label">シナリオの背景</div>
+    <p>社内チャットボットは、AIエージェントの最も典型的なユースケースの一つです。「知識の検索」「回答の生成」「人間への引き継ぎ」という3つの機能を組み合わせたシステム設計が求められます。</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>関連ドメインと出題傾向</h2>
+  <h3>D1: エージェント型アーキテクチャとオーケストレーション（Agent Architecture）</h3>
+  <p>試験配点の<strong>27%</strong>を占める最大のドメインです。このシナリオでは、チャットボットをどのようなアーキテクチャで設計するかが問われます。</p>
+  <ul>
+    <li>エージェントループ（Agentic Loop）の設計 ― 質問受付から回答生成までの処理フロー</li>
+    <li>ワークフロー vs エージェント ― 固定フローか、AIが判断するかの選択</li>
+    <li>HITL（Human-in-the-Loop）― 人間の承認が必要なケースの設計</li>
+    <li>フォールバック戦略 ― AIが回答できない場合の人間への引き継ぎ</li>
+  </ul>
+  <h3>D4: ツール設計とMCP統合（Tool Design & MCP）</h3>
+  <p>試験配点の<strong>18%</strong>を占めるドメインです。チャットボットが社内システムと連携するためのツール設計が中心です。</p>
+  <ul>
+    <li>ツール定義の設計 ― 社内検索ツール、FAQ検索ツールなどの設計方法</li>
+    <li>MCP（Model Context Protocol）統合 ― 社内データベースやドキュメント管理システムとの接続</li>
+    <li>ツール分配（Tool Distribution）― 状況に応じて適切なツールセットを渡す</li>
+    <li>エラーハンドリング ― ツール実行失敗時の対応設計</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>重要概念リスト</h2>
+  <table class="compare-table">
+    <tr><th>概念</th><th>英語名</th><th>ポイント</th></tr>
+    <tr><td>エージェントループ</td><td>Agentic Loop</td><td>LLMがツールを呼び→結果を受け→次の判断をする繰り返し。チャットボットの中核</td></tr>
+    <tr><td>HITL</td><td>Human-in-the-Loop</td><td>重要な判断や機密情報へのアクセス時に人間の承認を挟む仕組み</td></tr>
+    <tr><td>ガードレール</td><td>Guardrails</td><td>AIの回答が不適切にならないよう制限をかける仕組み。入力・出力の両方に設定</td></tr>
+    <tr><td>ツール定義</td><td>Tool Definition</td><td>AIが使えるツールの名前・説明・パラメータをJSON形式で定義すること</td></tr>
+    <tr><td>MCP</td><td>Model Context Protocol</td><td>AIと外部データソースを標準的に接続するプロトコル。「USBのような共通の差し込み口」</td></tr>
+    <tr><td>プロンプトキャッシング</td><td>Prompt Caching</td><td>同じシステムプロンプトを繰り返し使う場合にコスト・速度を最適化する機能</td></tr>
+    <tr><td>承認フロー</td><td>Approval Flow</td><td>チャットボットが実行前に人間の承認を求める処理パターン</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>対策ポイント</h2>
+  <div class="tip-box">
+    <div class="label">対策1: ワークフローとエージェントの使い分けを理解する</div>
+    <p>「FAQ回答」のように手順が決まっている処理は<strong>ワークフロー（Workflow）</strong>が適切です。一方、「ユーザーの質問内容に応じて検索先を変える」ような柔軟な対応には<strong>エージェント（Agent）</strong>が向いています。試験では「この場面ではどちらを選ぶべきか」が問われます。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策2: HITLの導入判断基準を覚える</div>
+    <p>すべてのやり取りに人間の承認を入れると効率が悪くなります。<strong>「影響度が高い操作」「機密情報へのアクセス」「不可逆な処理」</strong>の3つの基準で、HITLを入れるべき箇所を判断できるようにしましょう。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策3: ツール定義のベストプラクティスを押さえる</div>
+    <p>ツールのdescriptionには<strong>「いつ使うか」と「いつ使わないか」</strong>の両方を書くことがポイントです。特に似た機能のツールが複数ある場合、使い分けの基準を明記するとAIの選択精度が上がります。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策4: エラー時のフォールバック設計を意識する</div>
+    <p>チャットボットが回答できない場合の対応策（人間への引き継ぎ、「わかりません」と正直に伝える、など）を設計しておくことが重要です。<strong>ハルシネーション（事実と異なる回答の生成）を防ぐ仕組み</strong>もセットで理解しましょう。</p>
+  </div>
+  <div class="warn-box">
+    <div class="label">よくある誤解</div>
+    <p>「AIは全自動で動かすべき」と考えがちですが、実務では<strong>適切な人間の介入が品質と信頼性を保つカギ</strong>です。試験でも「完全自動化」を選択肢に含む引っかけ問題があるので注意しましょう。</p>
+  </div>
+</div>
+
+<div class="quiz-section" id="quiz-s1">
+  <h3>練習問題</h3>
+  <div class="quiz-question" id="s1-q1">
+    <div class="q-text">Q1. 社内チャットボットで、就業規則の内容を回答させる機能を設計しています。チャットボットがナレッジベースから情報を検索し、回答を生成する処理を最も適切に設計するアプローチはどれですか？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q1', 0, 1)">A) すべてのナレッジベースの内容をシステムプロンプトに含めて、ツールを使わずに回答させる</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q1', 1, 1)">B) 検索ツールを定義してエージェントループで動作させ、質問に関連する情報を検索してから回答を生成させる</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q1', 2, 1)">C) ユーザーの質問をそのまま社内検索エンジンに転送し、検索結果をそのまま表示する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q1', 3, 1)">D) 想定される質問と回答のペアをすべて事前に用意し、完全一致で回答を返す</div>
+    <div class="quiz-explanation" id="exp-s1-q1">検索ツールを使ったエージェントループが最適です。ナレッジベースの全内容をプロンプトに含めるとコンテキストウィンドウ（Context Window）を圧迫し、コストも増大します。検索ツールで関連情報だけを取得し、それに基づいて自然言語で回答を生成するのがベストプラクティスです。</div>
+  </div>
+  <div class="quiz-question" id="s1-q2">
+    <div class="q-text">Q2. 社内チャットボットが「あなたの有給休暇残日数は15日です」と回答しました。しかし、この情報は人事システムの古いデータに基づいており、実際には12日でした。この問題を防ぐために最も効果的な対策はどれですか？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q2', 0, 3)">A) システムプロンプトに「正確な情報のみ回答すること」と指示を追加する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q2', 1, 3)">B) チャットボットの回答にすべて「※この情報は参考値です」と免責表示を付ける</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q2', 2, 3)">C) 個人データに関する質問には回答せず、人事部への問い合わせを案内する設計にする</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q2', 3, 3)">D) ツールが最新のリアルタイムデータを取得する設計にし、回答時にデータ取得日時も表示する</div>
+    <div class="quiz-explanation" id="exp-s1-q2">根本的な対策は、ツールが常に最新のデータを取得できる設計にすることです（D）。加えて、データ取得日時を明示することで、ユーザー自身が情報の鮮度を判断できます。プロンプトでの指示（A）だけではデータの鮮度問題は解決できません。免責表示（B）は信頼性を損ないます。完全に回答拒否（C）はユーザー体験を大きく低下させます。</div>
+  </div>
+  <div class="quiz-question" id="s1-q3">
+    <div class="q-text">Q3. 社内チャットボットに「社内検索ツール」と「FAQ検索ツール」の2つを持たせる設計にしました。しかし、AIがどちらのツールを使うべきか迷い、誤ったツールを選択することが頻発しています。最も効果的な改善策はどれですか？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q3', 0, 2)">A) 2つのツールを1つに統合して、内部で自動振り分けする設計に変更する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q3', 1, 2)">B) tool_choiceパラメータで常に社内検索ツールを強制的に指定する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q3', 2, 2)">C) 各ツールのdescriptionに「いつ使うか」「いつ使わないか」の使い分け基準を明記する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s1-q3', 3, 2)">D) プロンプトキャッシングを有効にして、ツール定義の処理速度を上げる</div>
+    <div class="quiz-explanation" id="exp-s1-q3">ツール選択精度の改善には、各ツールのdescriptionに使い分けの基準を明記するのが最も効果的です（C）。たとえば「社内検索ツール: 社内規程・マニュアルなど公式文書を検索する際に使用。よくある質問にはFAQ検索ツールを使うこと」のように記載します。ツール統合（A）は柔軟性が低下し、強制指定（B）は状況適応ができなくなります。キャッシング（D）は速度の問題であり、選択精度には関係しません。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a class="btn btn-outline" onclick="showPage('scenario-guide')">&larr; シナリオ一覧に戻る</a>
+  <a class="btn btn-primary" onclick="showPage('scenario-2')">シナリオ2: コード自動レビュー &rarr;</a>
+</div>
+
+</div><!-- /page-scenario-1 -->
+
+
+<!-- ==================== -->
+<!-- シナリオ2             -->
+<!-- ==================== -->
+<div id="page-scenario-2" class="page" style="display:none">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 2</span>
+  <h1>コード自動レビューシステム構築</h1>
+  <p class="subtitle">Claude Codeを活用したCI/CDパイプラインへのAIレビュー統合</p>
+  <span class="domain-tag">D3 Claude Code (20%)</span>
+  <span class="domain-tag">D1 エージェント設計 (27%)</span>
+</div>
+
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p>このシナリオでは、<strong>開発チームのコードレビュープロセスにAIを組み込むプロジェクト</strong>が舞台です。プルリクエストが作成されたときに、AIが自動的にコードをレビューし、改善点を指摘するシステムを構築します。</p>
+  <div class="concept-box">
+    <div class="label">シナリオの背景</div>
+    <p>コード自動レビューは、Claude Codeの<strong>ヘッドレスモード（--printフラグ）</strong>を活用する代表的なユースケースです。人間の対話なしにCIパイプラインからClaude Codeを呼び出し、レビュー結果を自動的に返す仕組みが問われます。</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>関連ドメインと出題傾向</h2>
+  <h3>D3: Claude Codeの設定とワークフロー</h3>
+  <p>試験配点の<strong>20%</strong>。ヘッドレスモード、CLAUDE.md、Hooks、権限制御、セキュリティアーキテクチャが問われます。</p>
+  <h3>D1: エージェント型アーキテクチャとオーケストレーション</h3>
+  <p>サブエージェント活用、コンテキスト隔離、暴走防止（--max-turns, --max-budget-usd）が問われます。</p>
+</div>
+
+<div class="card">
+  <h2>対策ポイント</h2>
+  <div class="tip-box">
+    <div class="label">対策1: Claude Codeの2つの使い方を区別する</div>
+    <p><strong>対話モード</strong>と<strong>ヘッドレスモード</strong>の違いを明確に。CI/CDにはヘッドレスモード（--printフラグ + ANTHROPIC_API_KEY）が必要です。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策2: Hooksの仕組みを理解する</div>
+    <p><strong>PreToolUse</strong>でブロックするには、stderrにメッセージ + 非ゼロ終了コード。stdoutはツール結果変更用です。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策3: 権限制御の評価順序を暗記する</div>
+    <p><strong>deny &rarr; ask &rarr; allow</strong>の順。denyが常に最優先。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策4: セキュリティの多層防御を意識する</div>
+    <p>bypassPermissionsは<strong>コンテナなど隔離環境でのみ</strong>使用。--max-turnsや--max-budget-usdとの組み合わせが推奨。</p>
+  </div>
+</div>
+
+<div class="quiz-section" id="quiz-s2">
+  <h3>練習問題</h3>
+  <div class="quiz-question" id="s2-q1">
+    <div class="q-text">Q1. GitHub ActionsのパイプラインにClaude Codeでコード自動レビュー機能を追加する場合、どのように起動すべきですか？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q1', 0, 0)">A) claude --print フラグで起動し、ANTHROPIC_API_KEYを環境変数に設定する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q1', 1, 0)">B) claude を対話モードで起動し、スクリプトでキー入力を自動化する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q1', 2, 0)">C) CLAUDE.mdにCI実行トリガーを定義し、Claude Codeに自動起動させる</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q1', 3, 0)">D) Claude APIのMessages APIを直接呼び出し、Claude Codeは使用しない</div>
+    <div class="quiz-explanation" id="exp-s2-q1">CI/CDでは--print（-p）フラグによるヘッドレスモードで起動します（A）。対話モードはCIに不向きで、CLAUDE.mdはトリガーではなく指示書です。</div>
+  </div>
+  <div class="quiz-question" id="s2-q2">
+    <div class="q-text">Q2. Claude Codeが意図せず本番データベースへの接続コマンドを実行するリスクへの最適な対策は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q2', 0, 2)">A) CLAUDE.mdに「本番データベースに接続しないこと」と記載する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q2', 1, 2)">B) --max-turns=1を設定して1回で強制終了させる</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q2', 2, 2)">C) permissions.denyで危険なコマンドをブロックし、隔離環境で実行する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q2', 3, 2)">D) 対話モードで実行し、各コマンド前に人間が確認する</div>
+    <div class="quiz-explanation" id="exp-s2-q2">permissions.denyでブロック + 隔離環境の多層防御が最適です（C）。CLAUDE.mdはプロンプトレベルの対策で確実ではありません。</div>
+  </div>
+  <div class="quiz-question" id="s2-q3">
+    <div class="q-text">Q3. PreToolUseフックで.envファイルへの書き込みをブロックする正しい方法は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q3', 0, 1)">A) stdoutに「BLOCKED」と出力し、終了コード0で終了する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q3', 1, 1)">B) stderrにフィードバックメッセージを出力し、非ゼロの終了コードで終了する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q3', 2, 1)">C) stdoutにJSON形式のエラーオブジェクトを出力し、終了コード1で終了する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s2-q3', 3, 1)">D) 環境変数CLAUDE_BLOCK=trueを設定し、終了コード0で終了する</div>
+    <div class="quiz-explanation" id="exp-s2-q3">stderrにフィードバック + 非ゼロ終了コードです（B）。stdoutはツール結果変更用に予約されています。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a class="btn btn-outline" onclick="showPage('scenario-1')">&larr; シナリオ1</a>
+  <a class="btn btn-outline" onclick="showPage('scenario-guide')">シナリオ一覧</a>
+  <a class="btn btn-primary" onclick="showPage('scenario-3')">シナリオ3 &rarr;</a>
+</div>
+
+</div><!-- /page-scenario-2 -->
+
+
+<!-- ==================== -->
+<!-- シナリオ3             -->
+<!-- ==================== -->
+<div id="page-scenario-3" class="page" style="display:none">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 3</span>
+  <h1>カスタマーサポート自動化</h1>
+  <p class="subtitle">AIエージェントによる顧客対応の効率化とガードレール設計</p>
+  <span class="domain-tag">D2 ツール設計 (18%)</span>
+  <span class="domain-tag">D5 コンテキスト管理 (15%)</span>
+</div>
+
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p><strong>カスタマーサポート部門にAIエージェントを導入</strong>。FAQ検索、注文確認、返品手続き案内を自動化するシステム。「多様なツールとの連携」と「長い会話の文脈管理」が求められます。</p>
+</div>
+
+<div class="card">
+  <h2>重要概念リスト</h2>
+  <table class="compare-table">
+    <tr><th>概念</th><th>英語名</th><th>ポイント</th></tr>
+    <tr><td>ツール分配</td><td>Tool Distribution</td><td>全ツール常時渡しは推論遅延。カテゴリ別に必要なものだけ渡す</td></tr>
+    <tr><td>構造化エラー</td><td>Structured Error Response</td><td>is_error: true + エラータイプ + isRetryableフラグ</td></tr>
+    <tr><td>ガードレール</td><td>Guardrails</td><td>入力・出力両方でチェック。プロンプト+プログラムの多層防御</td></tr>
+    <tr><td>グラウンディング</td><td>Grounding</td><td>回答根拠をデータソースから引用。ハルシネーション防止の最重要手法</td></tr>
+    <tr><td>プログレッシブ要約</td><td>Progressive Summarization</td><td>古い会話を要約してコンテキスト節約。重要情報は保持</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>対策ポイント</h2>
+  <div class="tip-box">
+    <div class="label">対策1: ツール設計の「記述」が品質を決める</div>
+    <p>descriptionに「いつ使うか」「いつ使わないか」「パラメータの制約」を明記。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策2: ガードレールは「多層防御」で設計する</div>
+    <p>プロンプト指示 + プログラムによる出力検証の組み合わせが推奨。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策3: コンテキストウィンドウの消費を意識する</div>
+    <p>プログレッシブ要約で古い会話を要約。顧客名・注文番号は要約後も保持。</p>
+  </div>
+  <div class="warn-box">
+    <div class="label">よくある誤解</div>
+    <p>ツールが多いほど便利ではない。<strong>推論オーバーロード</strong>でツール選択精度が低下。絞り込みが本質的対策。</p>
+  </div>
+</div>
+
+<div class="quiz-section" id="quiz-s3">
+  <h3>練習問題</h3>
+  <div class="quiz-question" id="s3-q1">
+    <div class="q-text">Q1. 「注文した商品がまだ届きません」という問い合わせへの最初のアクションとして最も適切なのは？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q1', 0, 2)">A) FAQ検索ツールで「配送遅延」に関するFAQを検索する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q1', 1, 2)">B) 在庫照会ツールで商品の在庫状況を確認する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q1', 2, 2)">C) 注文確認ツールで顧客の注文番号を使って配送状況を確認する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q1', 3, 2)">D) 返品処理ツールで返品手続きを開始する</div>
+    <div class="quiz-explanation" id="exp-s3-q1">まず注文確認ツールで具体的な配送状況を確認するのが最適です（C）。</div>
+  </div>
+  <div class="quiz-question" id="s3-q2">
+    <div class="q-text">Q2. 外部APIからレート制限エラーが返された場合のtool_resultのベストプラクティスは？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q2', 0, 1)">A) tool_resultを返さずにエラーを無視する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q2', 1, 1)">B) is_error: true、エラータイプ「rate_limit」、isRetryable: trueを含む構造化エラーを返す</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q2', 2, 1)">C) 「エラーが発生しました」というテキストのみ返す</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q2', 3, 1)">D) is_error: trueのみ設定し詳細省略</div>
+    <div class="quiz-explanation" id="exp-s3-q2">is_error: true + エラータイプ + isRetryable: trueの構造化エラーが最適です（B）。</div>
+  </div>
+  <div class="quiz-question" id="s3-q3">
+    <div class="q-text">Q3. AIが実在しないキャンペーン割引について回答してしまった場合の最も効果的な防止策は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q3', 0, 0)">A) グラウンディング手法で公式情報から引用させてから回答させる</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q3', 1, 0)">B) 「嘘をつかないこと」とプロンプトに記載</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q3', 2, 0)">C) 全件人間確認</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s3-q3', 3, 0)">D) temperature=0に設定</div>
+    <div class="quiz-explanation" id="exp-s3-q3">グラウンディングが最も効果的です（A）。引用ベースで回答させることで事実に基づかない情報生成を抑制。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a class="btn btn-outline" onclick="showPage('scenario-2')">&larr; シナリオ2</a>
+  <a class="btn btn-outline" onclick="showPage('scenario-guide')">シナリオ一覧</a>
+  <a class="btn btn-primary" onclick="showPage('scenario-4')">シナリオ4 &rarr;</a>
+</div>
+
+</div><!-- /page-scenario-3 -->
+
+
+<!-- ==================== -->
+<!-- シナリオ4             -->
+<!-- ==================== -->
+<div id="page-scenario-4" class="page" style="display:none">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 4</span>
+  <h1>マルチエージェント文書処理</h1>
+  <p class="subtitle">複数AIエージェントが協調する文書処理パイプラインの設計</p>
+  <span class="domain-tag">D1 エージェント設計 (27%)</span>
+  <span class="domain-tag">D2 ツール設計 (18%)</span>
+</div>
+
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p><strong>複数AIエージェントが協調して大量文書を処理</strong>。契約書レビュー、請求書データ抽出、レポート自動生成を専門エージェントに分担させる設計が問われます。</p>
+</div>
+
+<div class="card">
+  <h2>重要概念リスト</h2>
+  <table class="compare-table">
+    <tr><th>概念</th><th>英語名</th><th>ポイント</th></tr>
+    <tr><td>Hub-and-Spoke</td><td>Hub-and-Spoke Pattern</td><td>中央ハブが各スポークにタスク振り分け。最も一般的なパターン</td></tr>
+    <tr><td>コンテキスト隔離</td><td>Context Isolation</td><td>各エージェントが独立コンテキスト。情報漏洩防止</td></tr>
+    <tr><td>エラー伝搬</td><td>Error Propagation</td><td>サブエージェントのエラーをオーケストレーターに正しく伝達</td></tr>
+    <tr><td>情報出所</td><td>Information Provenance</td><td>どのエージェントがどのソースから取得したかを追跡</td></tr>
+    <tr><td>構造化出力</td><td>Structured Output</td><td>JSON形式で厳密制御。スキーマ100%準拠</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>対策ポイント</h2>
+  <div class="tip-box">
+    <div class="label">対策1: Hub-and-Spokeパターン</div>
+    <p>タスクが並列化可能で独立している場合に最適。依存関係があればパイプラインパターン。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策2: コンテキスト隔離の重要性</div>
+    <p>機密文書の内容が別エージェントに漏れないよう「部屋の仕切り壁」で区切る設計。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策3: エラー処理の3段階フォールバック</div>
+    <p>(1) リトライ (2) 別エージェントへの再割り当て (3) 人間へのエスカレーション</p>
+  </div>
+  <div class="warn-box">
+    <div class="label">よくある誤解</div>
+    <p>「エージェントを増やせば処理が速くなる」とは限らない。オーケストレーションのオーバーヘッドがある。</p>
+  </div>
+</div>
+
+<div class="quiz-section" id="quiz-s4">
+  <h3>練習問題</h3>
+  <div class="quiz-question" id="s4-q1">
+    <div class="q-text">Q1. 中央のオーケストレーターが各専門エージェントにタスクを振り分けるアーキテクチャパターンは？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q1', 0, 0)">A) Hub-and-Spoke（ハブ＆スポーク）パターン</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q1', 1, 0)">B) Pipeline（パイプライン）パターン</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q1', 2, 0)">C) Peer-to-Peer（ピアツーピア）パターン</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q1', 3, 0)">D) Broadcast（ブロードキャスト）パターン</div>
+    <div class="quiz-explanation" id="exp-s4-q1">Hub-and-Spokeパターンです（A）。車輪のハブからスポークが放射状に伸びる形。</div>
+  </div>
+  <div class="quiz-question" id="s4-q2">
+    <div class="q-text">Q2. サブエージェントがエラーを発生させた場合の最適な対応設計は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q2', 0, 2)">A) エラーを無視して残りの結果だけで出力する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q2', 1, 2)">B) システム全体を停止する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q2', 2, 2)">C) リトライ→別エージェント再割り当て→人間エスカレーションの順で段階的に対応</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q2', 3, 2)">D) コンテキストリセットして再実行</div>
+    <div class="quiz-explanation" id="exp-s4-q2">段階的なフォールバック戦略が最適です（C）。</div>
+  </div>
+  <div class="quiz-question" id="s4-q3">
+    <div class="q-text">Q3. 契約書分析エージェントの機密情報が請求書処理エージェントに混入する問題を防ぐ最重要設計原則は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q3', 0, 1)">A) 全エージェントで同一システムプロンプトを使用</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q3', 1, 1)">B) コンテキスト隔離（Context Isolation）を実装する</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q3', 2, 1)">C) 全出力を暗号化してから統合</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s4-q3', 3, 1)">D) 機密文書の処理を禁止</div>
+    <div class="quiz-explanation" id="exp-s4-q3">コンテキスト隔離が最重要です（B）。各エージェントが独立コンテキストを持つことで情報漏洩を防止。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a class="btn btn-outline" onclick="showPage('scenario-3')">&larr; シナリオ3</a>
+  <a class="btn btn-outline" onclick="showPage('scenario-guide')">シナリオ一覧</a>
+  <a class="btn btn-primary" onclick="showPage('scenario-5')">シナリオ5 &rarr;</a>
+</div>
+
+</div><!-- /page-scenario-4 -->
+
+
+<!-- ==================== -->
+<!-- シナリオ5             -->
+<!-- ==================== -->
+<div id="page-scenario-5" class="page" style="display:none">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 5</span>
+  <h1>API統合データパイプライン</h1>
+  <p class="subtitle">外部API連携の大規模データ処理とレート制限対策</p>
+  <span class="domain-tag">D2 ツール設計 (18%)</span>
+  <span class="domain-tag">D5 コンテキスト管理 (15%)</span>
+</div>
+
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p><strong>外部APIと連携した大量データ処理パイプライン</strong>を構築。レート制限対策、Batches API、エラーハンドリングなど運用面の設計力が問われます。</p>
+</div>
+
+<div class="card">
+  <h2>重要概念リスト</h2>
+  <table class="compare-table">
+    <tr><th>概念</th><th>英語名</th><th>ポイント</th></tr>
+    <tr><td>レート制限</td><td>Rate Limits</td><td>Token Bucket方式で管理</td></tr>
+    <tr><td>サービスティア</td><td>Service Tiers</td><td>Standard / Priority / Batch（50%割引）</td></tr>
+    <tr><td>Batches API</td><td>Message Batches API</td><td>非同期一括。50%コスト削減。最大24時間</td></tr>
+    <tr><td>指数バックオフ</td><td>Exponential Backoff</td><td>リトライ間隔を1秒→2秒→4秒と倍増</td></tr>
+    <tr><td>キャッシュ非カウント</td><td>Cache Hit Non-counting</td><td>キャッシュヒット分はレート制限にカウントされない</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>対策ポイント</h2>
+  <div class="tip-box">
+    <div class="label">対策1: 3つのサービスティアを区別する</div>
+    <p>Standard=通常、Priority=高優先（追加料金）、Batch=非同期50%割引。大量分類はBatch。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策2: レート制限対策</div>
+    <p>HTTP 429には指数バックオフ。キャッシュヒットはレート制限非カウント。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策3: モデル選択とコスト最適化</div>
+    <p>単純分類にはHaiku（高速・低コスト）。タスク複雑さに応じてモデル選択。</p>
+  </div>
+</div>
+
+<div class="quiz-section" id="quiz-s5">
+  <h3>練習問題</h3>
+  <div class="quiz-question" id="s5-q1">
+    <div class="q-text">Q1. 5,000件のレビュー分類（翌日完了でOK）に最もコスト効率の良いアプローチは？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q1', 0, 1)">A) Claude Opus + Standard API</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q1', 1, 1)">B) Claude Haiku + Message Batches API</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q1', 2, 1)">C) Claude Sonnet + Priority API</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q1', 3, 1)">D) Claude Haiku + Standard API並列</div>
+    <div class="quiz-explanation" id="exp-s5-q1">最安モデル（Haiku）+ 最安ティア（Batches: 50%割引）の組み合わせ（B）が最適。</div>
+  </div>
+  <div class="quiz-question" id="s5-q2">
+    <div class="q-text">Q2. Claude APIのレート制限について正しい説明は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q2', 0, 2)">A) 1日あたりのリクエスト数のみで管理</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q2', 1, 2)">B) 一度制限に達すると翌日まで利用不可</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q2', 2, 2)">C) Token Bucket方式で管理され、キャッシュヒット分はカウントされない</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q2', 3, 2)">D) Batches APIにはレート制限なし</div>
+    <div class="quiz-explanation" id="exp-s5-q2">Token Bucket方式 + キャッシュヒット非カウントが正解です（C）。</div>
+  </div>
+  <div class="quiz-question" id="s5-q3">
+    <div class="q-text">Q3. HTTP 429エラーへの最適なリトライ戦略は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q3', 0, 0)">A) 指数バックオフで1秒→2秒→4秒と増やす</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q3', 1, 0)">B) 即座に同じリクエストを再送</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q3', 2, 0)">C) 10分固定待機</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s5-q3', 3, 0)">D) リクエスト破棄</div>
+    <div class="quiz-explanation" id="exp-s5-q3">指数バックオフが最適です（A）。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a class="btn btn-outline" onclick="showPage('scenario-4')">&larr; シナリオ4</a>
+  <a class="btn btn-outline" onclick="showPage('scenario-guide')">シナリオ一覧</a>
+  <a class="btn btn-primary" onclick="showPage('scenario-6')">シナリオ6 &rarr;</a>
+</div>
+
+</div><!-- /page-scenario-5 -->
+
+
+<!-- ==================== -->
+<!-- シナリオ6             -->
+<!-- ==================== -->
+<div id="page-scenario-6" class="page" style="display:none">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 6</span>
+  <h1>エンタープライズAIガバナンス</h1>
+  <p class="subtitle">組織全体でのAI活用ルール整備とセキュリティ設計</p>
+  <span class="domain-tag">D5 コンテキスト管理 (15%)</span>
+  <span class="domain-tag">D3 Claude Code (20%)</span>
+</div>
+
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p><strong>組織全体でClaudeを安全かつ効果的に活用するためのガバナンス体制</strong>を構築。データプライバシー、アクセス権限管理、ジェイルブレイク対策、Claude Codeの安全デプロイが問われます。</p>
+</div>
+
+<div class="card">
+  <h2>重要概念リスト</h2>
+  <table class="compare-table">
+    <tr><th>概念</th><th>英語名</th><th>ポイント</th></tr>
+    <tr><td>ガードレール</td><td>Guardrails</td><td>プロンプト+プログラムの多層防御</td></tr>
+    <tr><td>ハルシネーション削減</td><td>Hallucination Mitigation</td><td>公式5手法: グラウンディング、引用、不確実性表明、CoT、知識制限</td></tr>
+    <tr><td>データ保持ポリシー</td><td>Data Retention Policy</td><td>Consumer: 最大2年 / Commercial: 30日 / ゼロ保持: 即時削除</td></tr>
+    <tr><td>最小権限の原則</td><td>Principle of Least Privilege</td><td>必要最低限の権限のみ付与</td></tr>
+    <tr><td>多層防御</td><td>Defense in Depth</td><td>隔離 + 最小権限 + 多層防御の3原則</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>対策ポイント</h2>
+  <div class="tip-box">
+    <div class="label">対策1: データプライバシー3区分</div>
+    <p>Consumer（最大2年、モデル改善利用可）、Commercial（30日、不使用）、ゼロ保持（即時削除）。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策2: ハルシネーション削減5手法</div>
+    <p>(1) グラウンディング (2) 引用要求 (3) 不確実性表明 (4) CoT (5) 知識制限。グラウンディングが最も効果的。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">対策3: 安全なデプロイの3原則</div>
+    <p>(1) 隔離 (2) 最小権限 (3) 多層防御。</p>
+  </div>
+  <div class="warn-box">
+    <div class="label">よくある誤解</div>
+    <p>「ガードレールはプロンプトだけで十分」ではない。プロンプトインジェクション対策にはプログラム側での入出力検証が不可欠。</p>
+  </div>
+</div>
+
+<div class="quiz-section" id="quiz-s6">
+  <h3>練習問題</h3>
+  <div class="quiz-question" id="s6-q1">
+    <div class="q-text">Q1. 顧客の個人情報を処理する場合の最適なAPI利用設定は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q1', 0, 2)">A) Consumer + モデル改善許可</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q1', 1, 2)">B) Commercial + 30日保持</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q1', 2, 2)">C) Commercial + ゼロ保持オプション</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q1', 3, 2)">D) 設定不要</div>
+    <div class="quiz-explanation" id="exp-s6-q1">Commercial + ゼロ保持が最も安全です（C）。</div>
+  </div>
+  <div class="quiz-question" id="s6-q2">
+    <div class="q-text">Q2. 開発チームが誤って本番DB認証情報をAIに渡すリスクを軽減する最も効果的な設計は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q2', 0, 1)">A) CLAUDE.mdに「認証情報を扱わない」と記載</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q2', 1, 1)">B) permissions.denyで.envアクセスブロック + PreToolUseフックで検証</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q2', 2, 1)">C) セキュリティ研修実施</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q2', 3, 1)">D) 本番環境以外に制限する運用ルール</div>
+    <div class="quiz-explanation" id="exp-s6-q2">技術的な強制力のある対策（B）が最も効果的。多層防御アプローチ。</div>
+  </div>
+  <div class="quiz-question" id="s6-q3">
+    <div class="q-text">Q3. ハルシネーション削減にAnthropicが推奨する最も効果的な手法は？</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q3', 0, 0)">A) グラウンディング: 原文から引用させ、引用に基づいて回答させる</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q3', 1, 0)">B) temperature=0</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q3', 2, 0)">C) max_tokens制限</div>
+    <div class="quiz-option" onclick="checkScenarioAnswer('s6-q3', 3, 0)">D) Opusにアップグレード</div>
+    <div class="quiz-explanation" id="exp-s6-q3">グラウンディングが最も効果的です（A）。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a class="btn btn-outline" onclick="showPage('scenario-5')">&larr; シナリオ5</a>
+  <a class="btn btn-outline" onclick="showPage('scenario-guide')">シナリオ一覧</a>
+</div>
+
+</div><!-- /page-scenario-6 -->
+
+
+<!-- シナリオ練習問題用JS（index.html既存のcheckAnswer/selectAnswerとは独立） -->
+
+<!-- ==================== CHEATSHEET PAGE ==================== -->
+<!-- 統合用断片: CCA-F 直前チートシート                            -->
+<!-- 元ファイル: cheatsheet.html (23KB)                            -->
+<!-- サイドバー推奨配置: 「ツール」カテゴリに追加                   -->
+<!--   - 直前チートシート → showPage('cheatsheet')                 -->
+<!-- ============================================================ -->
+
+<!-- 固有CSS: cheatsheet.html独自のレイアウト（印刷対応チートシート用） -->
+<div id="page-cheatsheet" class="page cheatsheet-page" style="display:none">
+<div class="sheet">
+
+<div class="cs-header">
+  <h1>CCA-F 直前チートシート</h1>
+  <div class="subtitle">Claude Certified Architect - Foundations 試験要点整理</div>
+  <div class="exam-overview">
+    <span>60問 / 120分</span>
+    <span>合格: 720/1000点</span>
+    <span>シナリオベース出題</span>
+    <span>全6シナリオからランダム4つ</span>
+  </div>
+</div>
+
+<!-- D1 -->
+<div class="cs-domain d1">
+  <div class="cs-domain-header">
+    <span>D1: エージェント型アーキテクチャとオーケストレーション (Agentic Architecture)</span>
+    <span class="weight">27%</span>
+  </div>
+  <div class="cs-domain-body">
+    <h4>必須暗記事項</h4>
+    <ul>
+      <li><strong>拡張LLM (Augmented LLM)</strong> = 脳 + ツール(手) + 検索(目) + メモリ(メモ帳)</li>
+      <li><strong>ワークフロー</strong>: 開発者が手順定義（予測可能・安定・低コスト） / <strong>エージェント</strong>: LLMが自律判断（柔軟・予測不可能・高コスト）</li>
+      <li><strong>Anthropic推奨: シンプルさ優先</strong> &#8212; 不必要にエージェント化しない</li>
+      <li><strong>stop_reason</strong>: <code>tool_use</code> = ループ続行 / <code>end_turn</code> = 完了</li>
+    </ul>
+    <h4>5つのワークフローパターン</h4>
+    <ul>
+      <li><strong>Prompt Chaining</strong> &#8212; 順次処理+ゲート</li>
+      <li><strong>Routing</strong> &#8212; 入力分類と振り分け</li>
+      <li><strong>Parallelization</strong> &#8212; Sectioning / Voting</li>
+      <li><strong>Orchestrator-Workers</strong> &#8212; 動的タスク分解・委任・統合</li>
+      <li><strong>Evaluator-Optimizer</strong> &#8212; 生成→評価→改善ループ</li>
+    </ul>
+    <h4>マルチエージェント</h4>
+    <ul>
+      <li><strong>通信方式</strong>: Message Passing / Shared State / Handoff</li>
+      <li><strong>Agent SDK連携</strong>: Agent-as-Tool（部分委任） / Handoff（完全移譲）</li>
+      <li><strong>Coordinator-Subagent</strong> = Hub-and-spoke（車輪型）</li>
+    </ul>
+    <h4>安全性設計</h4>
+    <ul>
+      <li><strong>Guardrails</strong>: Input Guardrail / Output Guardrail</li>
+      <li><strong>Human-in-the-loop</strong>: 読み取り→自動 / 書き込み→確認 / 不可逆→必ず承認</li>
+      <li><strong>エージェントループ4段階</strong>: Gather Context → Take Action → Verify Work → Iterate</li>
+    </ul>
+    <div class="trap">間違いやすい: Agent-as-Toolは「結果を統合して返す（部分委任）」、Handoffは「完全に制御権を渡す（担当交代）」。</div>
+  </div>
+</div>
+
+<!-- D2/D3 2カラム -->
+<div class="two-col">
+<div class="cs-domain d2">
+  <div class="cs-domain-header">
+    <span>D2: Claude Codeの設定とワークフロー</span>
+    <span class="weight">20%</span>
+  </div>
+  <div class="cs-domain-body">
+    <h4>必須暗記事項</h4>
+    <ul>
+      <li><strong>5つの権限モード</strong>: plan / default / acceptEdits / dontAsk / bypassPermissions</li>
+      <li><strong>権限評価順序</strong>: <strong>deny &gt; ask &gt; allow</strong></li>
+      <li><strong>設定優先順位</strong>: Managed &gt; CLI &gt; local &gt; project &gt; user</li>
+      <li><strong>サブエージェント3種</strong>: Explore(Haiku,読み取り専用), Plan(読み取り専用), General-purpose(全ツール)</li>
+    </ul>
+    <h4>CLAUDE.md</h4>
+    <ul>
+      <li><strong>3層階層</strong>: ~/.claude/CLAUDE.md → PROJECT_ROOT/CLAUDE.md → .claude/CLAUDE.md</li>
+      <li><strong>@import</strong>: 複数ファイルに分割管理</li>
+    </ul>
+    <h4>Hooks / CI/CD</h4>
+    <ul>
+      <li><strong>PreToolUse</strong>: exit code 2で実行阻止</li>
+      <li><strong>-p</strong>フラグ: 非対話モード / <strong>--max-turns</strong> / <strong>--max-budget-usd</strong></li>
+    </ul>
+    <div class="trap">間違いやすい: bypassPermissionsでも.gitへの書き込みは確認あり。MCP設定は .mcp.json &gt; ~/.claude.json。</div>
+  </div>
+</div>
+
+<div class="cs-domain d3">
+  <div class="cs-domain-header">
+    <span>D3: プロンプト工学と構造化出力</span>
+    <span class="weight">20%</span>
+  </div>
+  <div class="cs-domain-body">
+    <h4>必須暗記事項</h4>
+    <ul>
+      <li><strong>ゴールデンルール</strong>:「最小限のコンテキストしか持たない同僚に混乱させない指示」</li>
+      <li><strong>XMLタグ</strong>: Anthropic公式推奨</li>
+      <li><strong>Few-shot最適例数</strong>: 3&#12316;5個</li>
+    </ul>
+    <h4>プロンプトキャッシング</h4>
+    <ul>
+      <li>入力コスト<strong>90%削減</strong>、レイテンシ<strong>85%削減</strong></li>
+      <li>有効期間: <strong>5分</strong> / 初回: <strong>25%増加</strong> / 最小: <strong>1,024トークン</strong></li>
+    </ul>
+    <h4>構造化出力</h4>
+    <ul>
+      <li><strong>制約付きデコーディング</strong>: 100%スキーマ準拠</li>
+      <li>2方式: <strong>JSON Outputs</strong> / <strong>Strict Tool Use</strong></li>
+      <li><strong>additionalProperties: false</strong> 必須</li>
+    </ul>
+    <div class="trap">間違いやすい: minimum/maxLengthなどの数値制約はサポートされない。</div>
+  </div>
+</div>
+</div>
+
+<!-- D4/D5 2カラム -->
+<div class="two-col">
+<div class="cs-domain d4">
+  <div class="cs-domain-header">
+    <span>D4: ツール設計とMCP統合</span>
+    <span class="weight">18%</span>
+  </div>
+  <div class="cs-domain-body">
+    <h4>Tool Use 4ステップ</h4>
+    <ul>
+      <li>1. tools + message送信 → 2. tool_useブロック → 3. tool_result再送信 → 4. 最終回答</li>
+    </ul>
+    <h4>必須暗記事項</h4>
+    <ul>
+      <li><strong>ツール定義3要素</strong>: name, description(最重要), input_schema</li>
+      <li><strong>tool_choice 4モード</strong>: auto / any / tool / none</li>
+      <li><strong>tool_resultは必須</strong> &#8212; エラーでも返却が必要</li>
+    </ul>
+    <h4>MCP</h4>
+    <ul>
+      <li><strong>M&#215;N → M+N</strong>に削減 / <strong>JSON-RPC 2.0</strong>ベース</li>
+      <li>3つの役割: <strong>Host</strong> / <strong>Client</strong> / <strong>Server</strong></li>
+      <li>Resources(アプリ制御) / Tools(<strong>モデル制御</strong>) / Prompts(ユーザー制御)</li>
+    </ul>
+    <div class="trap">間違いやすい: MCPはTool Useを置き換えない（補完関係）。</div>
+  </div>
+</div>
+
+<div class="cs-domain d5">
+  <div class="cs-domain-header">
+    <span>D5: コンテキスト管理と信頼性</span>
+    <span class="weight">15%</span>
+  </div>
+  <div class="cs-domain-body">
+    <h4>必須暗記数値</h4>
+    <table class="num-table">
+      <tr><th>項目</th><th>数値</th></tr>
+      <tr><td>コンテキストウィンドウ</td><td>200,000トークン</td></tr>
+      <tr><td>Batches API割引</td><td>50%</td></tr>
+      <tr><td>Contextual Retrieval精度向上</td><td>最大67%</td></tr>
+    </table>
+    <h4>キーコンセプト</h4>
+    <ul>
+      <li><strong>入力トークン</strong>（低コスト） vs <strong>出力トークン</strong>（高コスト）</li>
+      <li><strong>RAG 3段階</strong>: Retrieval → Augmentation → Generation</li>
+      <li><strong>指数バックオフ</strong>: 1秒→2秒→4秒</li>
+    </ul>
+    <h4>ハルシネーション対策 / 検証パターン</h4>
+    <ul>
+      <li>明示指示 / コンテキスト限定 / 確信度表明 / Temperature制御 / RAG / Citations</li>
+      <li><strong>Multi-pass Review</strong>: 別の独立セッションでの検証</li>
+    </ul>
+    <div class="trap">間違いやすい: コンテキストウィンドウは入力+出力の合計が上限。キャッシュ初回は25%増加コスト。</div>
+  </div>
+</div>
+</div>
+
+<!-- シナリオ攻略 -->
+<div class="scenarios">
+  <div class="scenarios-header">シナリオ別攻略のコツ（全6シナリオからランダムに4つ出題）</div>
+  <div class="scenarios-body">
+    <div class="scenario-item"><span class="s-num">S1</span><span class="s-name">Customer Support</span><span>Routing + Guardrails + HITL。不可逆操作は必ず人間承認。</span></div>
+    <div class="scenario-item"><span class="s-num">S2</span><span class="s-name">Claude Code</span><span>権限モード(deny優先) + Hooks(PreToolUse) + CLAUDE.md階層。</span></div>
+    <div class="scenario-item"><span class="s-num">S3</span><span class="s-name">Multi-Agent Research</span><span>Coordinator-Subagent + コンテキスト隔離 + Provenance。</span></div>
+    <div class="scenario-item"><span class="s-num">S4</span><span class="s-name">Developer Productivity</span><span>Tool Use 4ステップ + MCP + Few-shot。descriptionが最重要。</span></div>
+    <div class="scenario-item"><span class="s-num">S5</span><span class="s-name">CI/CD</span><span>-pフラグ + --max-turns + --max-budget-usd。Batch APIで50%削減。</span></div>
+    <div class="scenario-item"><span class="s-num">S6</span><span class="s-name">Data Extraction</span><span>Strict Tool Use / JSON Outputs + additionalProperties: false必須。</span></div>
+  </div>
+</div>
+
+<!-- Tips -->
+<div class="tips">
+  <div class="tips-header">試験当日のTips</div>
+  <div class="tips-body">
+    <ul>
+      <li><strong>時間配分</strong>: 1問あたり約2分。迷ったらマークして先に進む</li>
+      <li><strong>「最も適切なもの」パターン</strong>: Anthropic推奨のベストプラクティス（シンプルさ優先、最小権限）を選ぶ</li>
+      <li><strong>消去法を活用</strong>: 明らかに間違い2つを消し、残り2つで判断</li>
+      <li><strong>Anthropicの哲学</strong>: 「シンプルさ優先」「段階的に複雑さを増やす」「deny優先」「最小権限」</li>
+    </ul>
+  </div>
+</div>
+
+<!-- API数値表 -->
+<div class="cs-domain" style="border-color: #6B7280;">
+  <div class="cs-domain-header" style="background: #6B7280;">
+    <span>覚えるべきAPI関連の数値・パラメータ</span>
+  </div>
+  <div class="cs-domain-body" style="background: #F9FAFB;">
+    <table class="num-table">
+      <tr><th>項目</th><th>値</th><th>備考</th></tr>
+      <tr><td>API必須ヘッダー</td><td>3つ</td><td>x-api-key, anthropic-version, content-type</td></tr>
+      <tr><td>Messages APIエンドポイント</td><td>POST</td><td>/v1/messages</td></tr>
+      <tr><td>モデル順位（性能）</td><td>Opus &gt; Sonnet &gt; Haiku</td><td>コストも同順</td></tr>
+      <tr><td>プロンプトキャッシング効果</td><td>コスト90%減 / 遅延85%減</td><td>有効5分、最小1,024トークン</td></tr>
+      <tr><td>Batches API</td><td>50%コスト削減</td><td>非同期、24時間以内</td></tr>
+      <tr><td>JSON Schema型</td><td>8つ</td><td>string/number/integer/boolean/array/object/enum/null</td></tr>
+      <tr><td>tool_choice</td><td>4モード</td><td>auto / any / tool / none</td></tr>
+      <tr><td>stop_reason</td><td>2種</td><td>tool_use(続行) / end_turn(完了)</td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- /sheet -->
+</div><!-- /page-cheatsheet -->
+
+<!-- ==================== GLOSSARY PAGE ==================== -->
+<!-- 統合用断片: CCA-F 英語用語集                                 -->
+<!-- 元ファイル: glossary-english.html (52KB)                      -->
+<!-- サイドバー推奨配置: 「ツール」カテゴリに追加                   -->
+<!--   - 英語用語集 → showPage('glossary')                        -->
+<!-- ============================================================ -->
+
+<!-- 固有CSS: glossary-english.html独自スタイル -->
+<div id="page-glossary" class="page glossary-page" style="display:none">
+
+  <div class="module-header">
+    <span class="week-badge">Reference</span>
+    <h1>CCA-F 英語用語集</h1>
+    <p class="subtitle">試験で登場する重要英語用語と日本語訳・解説の一覧</p>
+    <span class="domain-tag">全5ドメイン対応</span>
+  </div>
+
+  <div class="objectives">
+    <h3>この用語集の使い方</h3>
+    <ul>
+      <li>CCA-F試験は<strong>英語</strong>で出題されます。英語用語を見て意味がすぐ浮かぶようにしましょう</li>
+      <li><strong>ドメイン別</strong>で学習する場合は、各ドメインのセクションを順に確認してください</li>
+      <li><strong>アルファベット索引</strong>で特定の用語を素早く探せます</li>
+      <li>試験頻出度: <span class="freq-high">&#9733;&#9733;&#9733;</span> 最重要 / <span class="freq-mid">&#9733;&#9733;</span> 重要 / <span class="freq-low">&#9733;</span> 補足知識</li>
+    </ul>
+  </div>
+
+  <!-- Section Navigation -->
+  <div class="section-nav">
+    <a class="section-tab active" href="#gl-domain1">D1: エージェント設計</a>
+    <a class="section-tab" href="#gl-domain2">D2: ツール&amp;MCP</a>
+    <a class="section-tab" href="#gl-domain3">D3: Claude Code</a>
+    <a class="section-tab" href="#gl-domain4">D4: プロンプト&amp;構造化出力</a>
+    <a class="section-tab" href="#gl-domain5">D5: コンテキスト&amp;信頼性</a>
+    <a class="section-tab" href="#gl-alpha-index">A-Z索引</a>
+  </div>
+
+  <!-- Domain 1 -->
+  <div id="gl-domain1" class="card">
+    <div class="glossary-domain-header">Domain 1: エージェント型アーキテクチャとオーケストレーション（27%）</div>
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Agent</strong></td><td>エージェント</td><td>ツールを使いながら自律的にタスクを遂行するAIシステム。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agent Loop</strong></td><td>エージェントループ</td><td>「考える→ツール呼び出し→結果確認→次の行動」の中核サイクル。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agent SDK</strong></td><td>エージェントSDK</td><td>Anthropicのエージェント構築用ライブラリ。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agentic System</strong></td><td>エージェント的システム</td><td>LLMが自律的に動作するシステムの総称。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Augmented LLM</strong></td><td>拡張LLM</td><td>検索・ツール・メモリで強化されたLLM。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Coordinator</strong></td><td>コーディネーター</td><td>マルチエージェントでサブエージェントを統括する中央制御エージェント。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Defense in Depth</strong></td><td>多層防御</td><td>複数の防御層を重ねるセキュリティ設計思想。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Escalation</strong></td><td>エスカレーション</td><td>自力で処理できない問題を上位に引き上げる仕組み。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Evaluator-Optimizer</strong></td><td>評価者-最適化者</td><td>生成→評価→改善を繰り返すパターン。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Fallback</strong></td><td>フォールバック</td><td>主要処理が失敗した場合の代替手段。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Graceful Degradation</strong></td><td>段階的品質低下</td><td>障害時に機能を段階的に縮小して稼働し続ける設計。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Guardrails</strong></td><td>ガードレール</td><td>エージェントの動作範囲を制限する安全機構。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Handoff</strong></td><td>ハンドオフ</td><td>制御権を別エージェントに完全移譲するパターン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>HITL (Human-in-the-Loop)</strong></td><td>ヒューマン・イン・ザ・ループ</td><td>重要判断前に人間の確認・承認を挟む設計。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Hub-and-Spoke</strong></td><td>ハブ＆スポーク</td><td>中央リードエージェントがサブエージェントに並行作業を割り振る設計。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Idempotency</strong></td><td>べき等性</td><td>同じ操作を何度実行しても結果が変わらない性質。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Isolation</strong></td><td>隔離</td><td>実行環境を他から分離するセキュリティ原則。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Least Privilege</strong></td><td>最小権限</td><td>必要最小限の権限のみ付与。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Observability</strong></td><td>観測可能性</td><td>動作状況をログ・メトリクス・トレースで監視できる状態。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Orchestration</strong></td><td>オーケストレーション</td><td>複数AI処理の実行順序・依存関係を管理・調整。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Orchestrator-Workers</strong></td><td>オーケストレータ-ワーカー</td><td>中央が動的にタスク分解し複数ワーカーに割り振るパターン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Parallelization</strong></td><td>並列化</td><td>Sectioning（異種）とVoting（同種）の2種。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Programmatic Enforcement</strong></td><td>プログラム的エンフォースメント</td><td>ビジネスルールをコードで100%強制する仕組み。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompt Chaining</strong></td><td>プロンプト連鎖</td><td>LLM呼び出しを順番につなげるパターン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Routing</strong></td><td>ルーティング</td><td>入力を分類し適切な処理パスに振り分け。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Sectioning</strong></td><td>セクショニング</td><td>異なるサブタスクを並行処理する並列化パターン。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Secure Deployment</strong></td><td>安全なデプロイ</td><td>隔離・最小権限・多層防御の3原則。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Sub-agent</strong></td><td>サブエージェント</td><td>メインから起動される補助エージェント。独自コンテキスト。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Voting</strong></td><td>投票</td><td>同一タスクを複数実行し多数決で決定。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agent-as-Tool</strong></td><td>エージェント的ツール</td><td>呼び出し元が制御権保持のまま専門エージェントに委任。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- Domain 2 -->
+  <div id="gl-domain2" class="card">
+    <div class="glossary-domain-header">Domain 2: ツール設計とMCP統合（18%）</div>
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Tool Use / Function Calling</strong></td><td>ツール利用</td><td>Claudeが外部ツールやAPIを呼び出すための仕組み。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Tool Definition</strong></td><td>ツール定義</td><td>name、description、input_schemaのJSON構造。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>input_schema</strong></td><td>入力スキーマ</td><td>ツールのパラメータ型・制約をJSON Schemaで定義。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Tool Choice</strong></td><td>ツール選択</td><td>auto/any/tool指定の制御パラメータ。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Strict Mode</strong></td><td>厳密モード</td><td>パラメータのスキーマ100%準拠を保証。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>is_error</strong></td><td>エラーフラグ</td><td>ツール実行エラーをLLMに伝えるフラグ。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>isRetryable</strong></td><td>リトライ可能フラグ</td><td>リトライで解決可能かを伝えるフラグ。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Parallel Tool Use</strong></td><td>並列ツール呼び出し</td><td>1回の応答で複数ツールを同時呼び出し。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>MCP</strong></td><td>MCP</td><td>AIと外部ツール・データソースを接続するオープン標準プロトコル。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>MCP Host</strong></td><td>MCPホスト</td><td>ユーザー操作のAIアプリケーション。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>MCP Client</strong></td><td>MCPクライアント</td><td>ホスト内で1つのサーバーと1:1接続。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>MCP Server</strong></td><td>MCPサーバー</td><td>外部データやツールへのアクセスを提供。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Resources</strong></td><td>リソース</td><td>MCPサーバーが公開するデータ。アプリ側が読み取り。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompts (MCP)</strong></td><td>プロンプト（MCP）</td><td>再利用可能なプロンプトテンプレート。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Sampling</strong></td><td>サンプリング</td><td>サーバーからLLMへの逆方向通信。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>stdio</strong></td><td>標準入出力</td><td>ローカル接続向けトランスポート。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Streamable HTTP</strong></td><td>ストリーマブルHTTP</td><td>リモート接続向けトランスポート。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Roots</strong></td><td>ルーツ</td><td>MCPサーバーのファイルアクセス範囲制限。</td><td class="freq-low">&#9733;</td></tr>
+      <tr><td><strong>JSON-RPC 2.0</strong></td><td>JSON-RPC 2.0</td><td>MCPの通信メッセージ形式。</td><td class="freq-low">&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- Domain 3 -->
+  <div id="gl-domain3" class="card">
+    <div class="glossary-domain-header">Domain 3: Claude Codeの設定とワークフロー（20%）</div>
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Claude Code</strong></td><td>Claude Code</td><td>CLIベースのAI開発支援ツール。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>CLAUDE.md</strong></td><td>CLAUDE.md</td><td>プロジェクト固有ルールを伝える設定ファイル。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Headless Mode</strong></td><td>ヘッドレスモード</td><td><code>claude -p</code>の非対話モード。CI/CD用。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Hooks</strong></td><td>フック</td><td>特定イベントで自動実行されるスクリプト。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>PreToolUse Hook</strong></td><td>ツール実行前フック</td><td>exit code 2で実行を阻止。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Permission Mode</strong></td><td>権限モード</td><td>plan/default/acceptEdits/dontAsk/bypassPermissionsの5段階。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>settings.json</strong></td><td>設定ファイル</td><td>権限、MCP、環境変数をJSON形式で定義。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Managed Settings</strong></td><td>管理設定</td><td>IT管理者が配布する上書き不可の設定。最優先。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Custom Slash Command</strong></td><td>カスタムスラッシュコマンド</td><td>.claude/commands/に定義する再利用可能テンプレート。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Plan Mode</strong></td><td>計画モード</td><td>読み取り専用モード。Shift+Tabで切替。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Worktree</strong></td><td>ワークツリー</td><td>git worktreeの隔離コピーで並列作業。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>@import Directive</strong></td><td>@importディレクティブ</td><td>CLAUDE.md内で別ファイルを読み込む。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Rule File</strong></td><td>ルールファイル</td><td>.claude/rules/の条件付きルール。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Local Execution Model</strong></td><td>ローカル実行モデル</td><td>ユーザーマシン上で直接実行。コードはクラウドに永続保存されない。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- Domain 4 -->
+  <div id="gl-domain4" class="card">
+    <div class="glossary-domain-header">Domain 4: プロンプトエンジニアリングと構造化出力（20%）</div>
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Prompt Engineering</strong></td><td>プロンプトエンジニアリング</td><td>AIから望ましい出力を得るための設計・最適化技術。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>System Prompt</strong></td><td>システムプロンプト</td><td>AIの振る舞い・役割・制約を設定する特別なプロンプト。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Few-shot Prompting</strong></td><td>少数例学習</td><td>期待する入出力例を数個示す手法。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Chain of Thought (CoT)</strong></td><td>思考の連鎖</td><td>段階的に推論させて正確性を高める手法。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Extended Thinking</strong></td><td>拡張思考</td><td>Claudeが内部で深く推論してから回答する機能。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Structured Output</strong></td><td>構造化出力</td><td>JSONなどの形式で出力。プログラム後続処理に不可欠。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>JSON Outputs</strong></td><td>JSON出力</td><td>応答テキストをJSON形式で返す方式。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Strict Tool Use</strong></td><td>厳密ツール利用</td><td>パラメータのスキーマ100%準拠を保証。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Constrained Decoding</strong></td><td>制約付きデコーディング</td><td>出力をスキーマ通りに制限する技術。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>JSON Schema</strong></td><td>JSONスキーマ</td><td>JSONデータ構造の「設計図」。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompt Caching</strong></td><td>プロンプトキャッシング</td><td>同じプロンプト再利用時にキャッシュでコスト削減。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompt Injection</strong></td><td>プロンプトインジェクション</td><td>悪意ある入力でAI指示を上書きする攻撃。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Grounding</strong></td><td>グラウンディング</td><td>回答を事実・参照データに基づかせる手法。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Pydantic</strong></td><td>パイダンティック</td><td>Pythonのデータ検証ライブラリ。JSON Schema自動生成。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>stop_reason</strong></td><td>停止理由</td><td>end_turn/tool_use/max_tokens。ループ制御に使用。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- Domain 5 -->
+  <div id="gl-domain5" class="card">
+    <div class="glossary-domain-header">Domain 5: コンテキスト管理と信頼性（15%）</div>
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Context Window</strong></td><td>コンテキストウィンドウ</td><td>AIが一度に処理できるテキストの最大量。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Token</strong></td><td>トークン</td><td>テキスト処理の最小単位。英語1単語≒1トークン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>RAG</strong></td><td>検索拡張生成</td><td>外部DBから検索しAI回答に組み込む手法。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Contextual Retrieval</strong></td><td>文脈的検索</td><td>チャンクに文脈説明を付加して検索精度を改善。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Chunking</strong></td><td>チャンキング</td><td>長文書を検索可能な小単位に分割。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Hallucination</strong></td><td>ハルシネーション</td><td>事実に基づかない情報を生成する現象。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Citation</strong></td><td>引用</td><td>回答に情報源参照を付与。ハルシネーション対策。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Rate Limits</strong></td><td>レート制限</td><td>RPM/ITPM/OTPMで管理。Token Bucket方式。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Service Tiers</strong></td><td>サービスティア</td><td>Standard / Priority / Batch（50%割引）。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Message Batches API</strong></td><td>メッセージバッチAPI</td><td>非同期一括処理。50%割引、最大10万件/バッチ。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Exponential Backoff</strong></td><td>指数バックオフ</td><td>リトライ間隔を指数的に増やす手法。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Jailbreak</strong></td><td>ジェイルブレイク</td><td>AI安全制約を迂回する攻撃手法。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Zero Data Retention</strong></td><td>ゼロデータ保持</td><td>入出力データを一切保持しないオプション。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Progressive Summarization</strong></td><td>プログレッシブ要約</td><td>過去の会話を要約で置き換えてコンテキスト節約。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Lost in the Middle</strong></td><td>中間の情報損失</td><td>長いコンテキスト中間部の情報が見落とされやすい現象。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Provenance</strong></td><td>情報出所</td><td>情報がどこから来たかの追跡記録。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- A-Z Index -->
+  <div id="gl-alpha-index" class="card">
+    <h2>アルファベット索引（A-Z）</h2>
+    <p>全用語をアルファベット順に一覧表示。</p>
+    <div class="alpha-index">
+      <a href="#gl-idx-A">A</a><a href="#gl-idx-C">C</a><a href="#gl-idx-D">D</a>
+      <a href="#gl-idx-E">E</a><a href="#gl-idx-F">F</a><a href="#gl-idx-G">G</a>
+      <a href="#gl-idx-H">H</a><a href="#gl-idx-I">I</a><a href="#gl-idx-J">J</a>
+      <a href="#gl-idx-L">L</a><a href="#gl-idx-M">M</a><a href="#gl-idx-O">O</a>
+      <a href="#gl-idx-P">P</a><a href="#gl-idx-R">R</a><a href="#gl-idx-S">S</a>
+      <a href="#gl-idx-T">T</a><a href="#gl-idx-V">V</a><a href="#gl-idx-W">W</a>
+      <a href="#gl-idx-Z">Z</a>
+    </div>
+    <table class="compare-table">
+      <tr><th>英語用語</th><th>日本語訳</th><th>ドメイン</th></tr>
+      <tr id="gl-idx-A"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">A</td></tr>
+      <tr><td>additionalProperties</td><td>追加プロパティ</td><td>D4</td></tr>
+      <tr><td>Agent</td><td>エージェント</td><td>D1</td></tr>
+      <tr><td>Agent Loop</td><td>エージェントループ</td><td>D1</td></tr>
+      <tr><td>Agent SDK</td><td>エージェントSDK</td><td>D1</td></tr>
+      <tr><td>Agent-as-Tool</td><td>エージェント的ツール</td><td>D1</td></tr>
+      <tr><td>Augmented LLM</td><td>拡張LLM</td><td>D1</td></tr>
+      <tr id="gl-idx-C"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">C</td></tr>
+      <tr><td>Chain of Thought (CoT)</td><td>思考の連鎖</td><td>D4</td></tr>
+      <tr><td>Citation</td><td>引用</td><td>D5</td></tr>
+      <tr><td>Claude Code</td><td>Claude Code</td><td>D3</td></tr>
+      <tr><td>CLAUDE.md</td><td>CLAUDE.md</td><td>D3</td></tr>
+      <tr><td>Constrained Decoding</td><td>制約付きデコーディング</td><td>D4</td></tr>
+      <tr><td>Context Window</td><td>コンテキストウィンドウ</td><td>D5</td></tr>
+      <tr id="gl-idx-D"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">D</td></tr>
+      <tr><td>Defense in Depth</td><td>多層防御</td><td>D1</td></tr>
+      <tr id="gl-idx-E"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">E</td></tr>
+      <tr><td>Escalation</td><td>エスカレーション</td><td>D1</td></tr>
+      <tr><td>Exponential Backoff</td><td>指数バックオフ</td><td>D5</td></tr>
+      <tr><td>Extended Thinking</td><td>拡張思考</td><td>D4</td></tr>
+      <tr id="gl-idx-F"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">F</td></tr>
+      <tr><td>Fallback</td><td>フォールバック</td><td>D1</td></tr>
+      <tr><td>Few-shot Prompting</td><td>少数例学習</td><td>D4</td></tr>
+      <tr id="gl-idx-G"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">G</td></tr>
+      <tr><td>Grounding</td><td>グラウンディング</td><td>D4</td></tr>
+      <tr><td>Guardrails</td><td>ガードレール</td><td>D1</td></tr>
+      <tr id="gl-idx-H"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">H</td></tr>
+      <tr><td>Hallucination</td><td>ハルシネーション</td><td>D5</td></tr>
+      <tr><td>Handoff</td><td>ハンドオフ</td><td>D1</td></tr>
+      <tr><td>Headless Mode</td><td>ヘッドレスモード</td><td>D3</td></tr>
+      <tr><td>HITL</td><td>ヒューマン・イン・ザ・ループ</td><td>D1</td></tr>
+      <tr><td>Hooks</td><td>フック</td><td>D3</td></tr>
+      <tr><td>Hub-and-Spoke</td><td>ハブ＆スポーク</td><td>D1</td></tr>
+      <tr id="gl-idx-I"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">I</td></tr>
+      <tr><td>Idempotency</td><td>べき等性</td><td>D1</td></tr>
+      <tr><td>Isolation</td><td>隔離</td><td>D1</td></tr>
+      <tr id="gl-idx-J"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">J</td></tr>
+      <tr><td>Jailbreak</td><td>ジェイルブレイク</td><td>D5</td></tr>
+      <tr><td>JSON Schema</td><td>JSONスキーマ</td><td>D4</td></tr>
+      <tr id="gl-idx-L"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">L</td></tr>
+      <tr><td>Least Privilege</td><td>最小権限</td><td>D1</td></tr>
+      <tr><td>Lost in the Middle</td><td>中間の情報損失</td><td>D5</td></tr>
+      <tr id="gl-idx-M"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">M</td></tr>
+      <tr><td>MCP</td><td>MCP</td><td>D2</td></tr>
+      <tr><td>Message Batches API</td><td>メッセージバッチAPI</td><td>D5</td></tr>
+      <tr id="gl-idx-O"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">O</td></tr>
+      <tr><td>Orchestrator-Workers</td><td>オーケストレータ-ワーカー</td><td>D1</td></tr>
+      <tr id="gl-idx-P"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">P</td></tr>
+      <tr><td>Parallelization</td><td>並列化</td><td>D1</td></tr>
+      <tr><td>Permission Mode</td><td>権限モード</td><td>D3</td></tr>
+      <tr><td>PreToolUse Hook</td><td>ツール実行前フック</td><td>D3</td></tr>
+      <tr><td>Prompt Caching</td><td>プロンプトキャッシング</td><td>D4</td></tr>
+      <tr><td>Prompt Chaining</td><td>プロンプト連鎖</td><td>D1</td></tr>
+      <tr><td>Prompt Injection</td><td>プロンプトインジェクション</td><td>D4</td></tr>
+      <tr><td>Provenance</td><td>情報出所</td><td>D5</td></tr>
+      <tr id="gl-idx-R"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">R</td></tr>
+      <tr><td>RAG</td><td>検索拡張生成</td><td>D5</td></tr>
+      <tr><td>Rate Limits</td><td>レート制限</td><td>D5</td></tr>
+      <tr><td>Routing</td><td>ルーティング</td><td>D1</td></tr>
+      <tr id="gl-idx-S"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">S</td></tr>
+      <tr><td>Secure Deployment</td><td>安全なデプロイ</td><td>D1</td></tr>
+      <tr><td>Service Tiers</td><td>サービスティア</td><td>D5</td></tr>
+      <tr><td>Strict Tool Use</td><td>厳密ツール利用</td><td>D4</td></tr>
+      <tr><td>Structured Output</td><td>構造化出力</td><td>D4</td></tr>
+      <tr id="gl-idx-T"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">T</td></tr>
+      <tr><td>Token</td><td>トークン</td><td>D5</td></tr>
+      <tr><td>Tool Use</td><td>ツール利用</td><td>D2</td></tr>
+      <tr id="gl-idx-V"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">V</td></tr>
+      <tr><td>Voting</td><td>投票</td><td>D1</td></tr>
+      <tr id="gl-idx-W"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">W</td></tr>
+      <tr><td>Worktree</td><td>ワークツリー</td><td>D3</td></tr>
+      <tr id="gl-idx-Z"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">Z</td></tr>
+      <tr><td>Zero Data Retention</td><td>ゼロデータ保持</td><td>D5</td></tr>
+      <tr><td>Zod</td><td>ゾッド</td><td>D4</td></tr>
+    </table>
+  </div>
+
+</div><!-- /page-glossary -->
 
 <div id="page-drill" style="display:none">
   <div class="module-header">
@@ -9973,7 +11335,10 @@ const MODULE_GROUP = {
   m7:'code', m8:'code',
   m9:'agent', m10:'agent',
   m11:'trust',
-  m12:'review'
+  m12:'review',
+  'scenario-guide':'review', 'scenario-1':'review', 'scenario-2':'review',
+  'scenario-3':'review', 'scenario-4':'review', 'scenario-5':'review', 'scenario-6':'review',
+  cheatsheet:null, glossary:null
 };
 
 function toggleAccordion(groupId) {
