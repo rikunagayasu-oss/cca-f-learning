@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M5 拡充: ツール設計の実践パターン — CCA-F学習サイト</title>
+<style>
+  :root {
+    --primary: #D97706;
+    --primary-light: #FEF3C7;
+    --primary-dark: #92400E;
+    --accent: #7C3AED;
+    --accent-light: #EDE9FE;
+    --bg: #F9FAFB;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --success: #059669;
+    --success-light: #D1FAE5;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --info: #2563EB;
+    --info-light: #DBEAFE;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  .page-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+  }
+  .page-header h1 { font-size: 1.5rem; color: var(--text); margin-bottom: .25rem; }
+  .page-header .subtitle { color: var(--text-light); font-size: .95rem; }
+  .domain-tag {
+    display: inline-block;
+    background: var(--info-light);
+    color: var(--info);
+    padding: .2rem .6rem;
+    border-radius: 4px;
+    font-size: .8rem;
+    font-weight: 600;
+    margin-top: .5rem;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 1.5rem; }
+
+  .back-link { display: inline-block; margin-bottom: 1rem; color: var(--accent); text-decoration: none; font-size: .9rem; }
+  .back-link:hover { text-decoration: underline; }
+
+  .section-nav {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+    margin-bottom: 1.5rem;
+    padding: .75rem;
+    background: var(--card);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .section-tab {
+    padding: .4rem .8rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    cursor: pointer;
+    font-size: .85rem;
+    color: var(--text-light);
+    transition: all .2s;
+  }
+  .section-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .section-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .card h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); }
+  .card h3 { font-size: 1.05rem; margin: 1.5rem 0 .5rem; color: var(--text); }
+  .card p { margin-bottom: .75rem; }
+  .card ul, .card ol { margin: .5rem 0 1rem 1.5rem; }
+  .card li { margin-bottom: .3rem; }
+
+  .concept-box {
+    background: var(--accent-light);
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.25rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1rem 0;
+  }
+  .concept-box .label { font-weight: 700; color: var(--accent); font-size: .85rem; margin-bottom: .5rem; }
+
+  .tip-box {
+    background: var(--success-light);
+    border-left: 4px solid var(--success);
+    padding: 1rem 1.25rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1rem 0;
+  }
+  .tip-box .label { font-weight: 700; color: var(--success); font-size: .85rem; margin-bottom: .5rem; }
+
+  .warn-box {
+    background: var(--danger-light);
+    border-left: 4px solid var(--danger);
+    padding: 1rem 1.25rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1rem 0;
+  }
+  .warn-box .label { font-weight: 700; color: var(--danger); font-size: .85rem; margin-bottom: .5rem; }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: .9rem;
+  }
+  .compare-table th, .compare-table td {
+    border: 1px solid var(--border);
+    padding: .6rem .8rem;
+    text-align: left;
+  }
+  .compare-table th { background: var(--bg); font-weight: 600; }
+
+  pre {
+    background: #F3F4F6;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: .85rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+    line-height: 1.5;
+  }
+  code { font-family: "SF Mono", "Fira Code", monospace; font-size: .85em; background: #F3F4F6; padding: .1rem .3rem; border-radius: 3px; }
+
+  /* Quiz */
+  .quiz-section { margin-top: 1rem; }
+  .quiz-question { margin-bottom: 1.5rem; }
+  .q-text { font-weight: 600; margin-bottom: .75rem; font-size: .95rem; }
+  .quiz-option {
+    padding: .6rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: .4rem;
+    cursor: pointer;
+    font-size: .9rem;
+    transition: all .2s;
+  }
+  .quiz-option:hover { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.correct { border-color: var(--success); background: var(--success-light); }
+  .quiz-option.incorrect { border-color: var(--danger); background: var(--danger-light); }
+  .quiz-explanation {
+    display: none;
+    margin-top: .5rem;
+    padding: .75rem 1rem;
+    background: var(--bg);
+    border-radius: 6px;
+    font-size: .85rem;
+    line-height: 1.6;
+  }
+  .quiz-result {
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 1rem 0;
+  }
+  .btn { padding: .6rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-size: .9rem; font-weight: 600; }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { opacity: .9; }
+  .btn-outline { background: var(--card); color: var(--accent); border: 1px solid var(--accent); }
+  .btn-group { display: flex; gap: .5rem; margin-top: 1rem; }
+
+  /* Glossary */
+  .glossary-item { padding: .75rem 0; border-bottom: 1px solid var(--border); }
+  .glossary-term { font-weight: 700; font-size: .95rem; }
+  .glossary-en { color: var(--text-light); font-size: .85rem; font-style: italic; }
+  .glossary-def { margin-top: .25rem; font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Module 5 拡充: ツール設計の実践パターン</h1>
+  <p class="subtitle">公式ドキュメント準拠 - 説明文最適化・構造化エラー・ツール分配の深化</p>
+  <span class="domain-tag">Domain 4: Tools &amp; MCP (18%)</span>
+</div>
+
+<div class="container">
+  <a href="index.html" class="back-link">← メインサイトに戻る</a>
+
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('s1',this)">説明文の実践最適化</button>
+    <button class="section-tab" onclick="showSection('s2',this)">構造化エラーの実装</button>
+    <button class="section-tab" onclick="showSection('s3',this)">ツール分配と統合戦略</button>
+    <button class="section-tab" onclick="showSection('s4',this)">用語集</button>
+    <button class="section-tab" onclick="showSection('s5',this)">確認クイズ</button>
+  </div>
+
+  <!-- Section 1: ツール説明文の実践最適化 -->
+  <div id="s1" class="card">
+    <h2>ツール説明文（description）の実践最適化</h2>
+    <p>Anthropic公式ドキュメントでは、descriptionを<strong>「新しいチームメンバーにツールを説明するつもりで書く」</strong>ことが推奨されています。暗黙知を明示化し、LLMがツール選択で迷わない記述を目指します。</p>
+
+    <h3>公式推奨: 説明文に含めるべき5要素</h3>
+    <p>公式ドキュメントの"Best practices for tool definitions"では、以下を<strong>最低限含めること</strong>が明記されています。</p>
+
+    <table class="compare-table">
+      <tr><th>#</th><th>要素</th><th>説明</th><th>記載しない場合のリスク</th></tr>
+      <tr><td>1</td><td>何をするか</td><td>ツールの機能を1文で要約</td><td>Claudeが用途を誤認する</td></tr>
+      <tr><td>2</td><td>いつ使うべきか</td><td>使用トリガーとなる状況</td><td>適切な場面でツールが選ばれない</td></tr>
+      <tr><td>3</td><td>いつ使うべきでないか</td><td>非使用条件と代替ツール</td><td>類似ツール間で誤選択が頻発</td></tr>
+      <tr><td>4</td><td>各パラメータの意味と影響</td><td>パラメータが動作にどう影響するか</td><td>不正確な引数が生成される</td></tr>
+      <tr><td>5</td><td>制約と注意事項</td><td>戻り値の形式、件数制限、前提条件</td><td>ツール結果の解釈を誤る</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>公式推奨: descriptionは最低3-4文</strong>。公式ドキュメントでは「Aim for at least 3-4 sentences per tool description, more if the tool is complex」と明記されています。1文の簡潔な説明はアンチパターンです。</p>
+    </div>
+
+    <h3>新機能: input_examples（入力例の提供）</h3>
+    <p>2025年以降のAPIでは、ツール定義に<code>input_examples</code>フィールドを追加できるようになりました。これは、Claudeに「正しいツール呼び出しの具体例」を示す機能です。</p>
+
+    <pre>{
+  "name": "search_customer",
+  "description": "顧客を名前・メール・電話番号で検索する。部分一致で最大20件返す。顧客IDが既知の場合はget_customer_by_idを使うこと。",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "search_type": {
+        "type": "string",
+        "enum": ["name", "email", "phone"],
+        "description": "検索キーの種類"
+      },
+      "query": {
+        "type": "string",
+        "description": "検索キーワード（部分一致対応）"
+      }
+    },
+    "required": ["search_type", "query"]
+  },
+  "input_examples": [
+    {"search_type": "name", "query": "田中"},
+    {"search_type": "email", "query": "tanaka@example.com"},
+    {"search_type": "phone", "query": "090-1234"}
+  ]
+}</pre>
+
+    <table class="compare-table">
+      <tr><th>項目</th><th>詳細</th></tr>
+      <tr><td>目的</td><td>Claudeにツール呼び出しの「お手本」を示し、入力形式やオプショナル項目の使い方を学習させる</td></tr>
+      <tr><td>要件</td><td>各exampleはinput_schemaに対してバリデーションされる。不正な例は400エラー</td></tr>
+      <tr><td>トークンコスト</td><td>単純な例で約20-50トークン、複雑なネストで約100-200トークン</td></tr>
+      <tr><td>制限</td><td>サーバーサイドツール（web_search等）では使用不可。クライアントツール専用</td></tr>
+      <tr><td>推奨場面</td><td>複雑なネストオブジェクト、フォーマットに敏感なパラメータ、オプショナル項目の使い分け</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「ツール選択精度を上げるために最も効果的なアプローチ」が問われます。正解は「descriptionの充実化」が最優先で、input_examplesは複雑なツールへの補助手段です。「descriptionを空にしてinput_examplesだけで対応する」はアンチパターンです。</p>
+    </div>
+
+    <h3>ツール統合（Consolidation）パターン</h3>
+    <p>公式engineering blogでは、個別のAPIエンドポイントを1対1でツールにするのではなく、<strong>関連操作をまとめた高レベルなツール</strong>を作ることが推奨されています。</p>
+
+    <table class="compare-table">
+      <tr><th>アンチパターン（個別ツール）</th><th>推奨パターン（統合ツール）</th><th>メリット</th></tr>
+      <tr>
+        <td><code>create_pr</code>, <code>review_pr</code>, <code>merge_pr</code></td>
+        <td><code>github_pr</code> + <code>action</code>パラメータ（enum: create/review/merge）</td>
+        <td>ツール数削減、選択の曖昧さ解消</td>
+      </tr>
+      <tr>
+        <td><code>list_users</code>, <code>list_events</code>, <code>create_event</code></td>
+        <td><code>schedule_event</code>（空き確認+予約を1ツールで完結）</td>
+        <td>エージェントの認知負荷軽減</td>
+      </tr>
+      <tr>
+        <td><code>get_customer</code>, <code>get_transactions</code>, <code>get_notes</code></td>
+        <td><code>get_customer_context</code>（顧客情報+取引+メモを一括取得）</td>
+        <td>ツール呼び出し回数削減</td>
+      </tr>
+    </table>
+
+    <h3>名前空間（Namespacing）の重要性</h3>
+    <p>複数サービスのツールを扱う場合、<strong>サービスプレフィックス</strong>を付けることが公式推奨です。</p>
+    <ul>
+      <li><strong>サービスベース:</strong> <code>github_list_prs</code>, <code>slack_send_message</code>, <code>jira_create_issue</code></li>
+      <li><strong>リソースベース:</strong> <code>asana_projects_search</code>, <code>asana_users_search</code></li>
+    </ul>
+    <p>名前空間があると、ツール数が増えても選択の曖昧さが生じにくくなります。特にTool Search機能と組み合わせる場合に効果的です。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">ツール統合はやりすぎに注意。1つのツールに10以上のactionを詰め込むと、パラメータの組み合わせが複雑になり逆効果です。「1つのツールが1つの概念的な操作」が目安です。</p>
+    </div>
+  </div>
+
+  <!-- Section 2: 構造化エラーの実装 -->
+  <div id="s2" class="card" style="display:none">
+    <h2>構造化エラーハンドリングの実装パターン</h2>
+    <p>公式ドキュメントでは、エラーメッセージを<strong>「何が問題で、次に何をすべきか」を明示的に伝える</strong>ことが強く推奨されています。ここでは公式の最新仕様に基づく実装パターンを深掘りします。</p>
+
+    <h3>公式仕様: is_errorフラグの正確な理解</h3>
+    <p>tool_resultの<code>is_error</code>は<strong>オプショナルフィールド</strong>です。設定しなくてもAPIは動作しますが、Claudeのエラー認識精度が大きく変わります。</p>
+
+    <pre>// is_error: true を設定したエラーレスポンス（公式推奨）
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+  "content": "ConnectionError: the weather service API is not available (HTTP 500)",
+  "is_error": true
+}
+
+// is_error なしのエラーレスポンス（非推奨）
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+  "content": "エラーが発生しました"
+}</pre>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>is_errorの効果:</strong> <code>is_error: true</code>を設定すると、Claudeは明示的に「このツール呼び出しは失敗した」と認識し、(1) パラメータを修正して再試行、(2) ユーザーに追加情報を要求、(3) 代替手段の提案、のいずれかを自律的に判断します。設定しない場合、エラー文字列を「正常な結果」として解釈するリスクがあります。</p>
+    </div>
+
+    <h3>公式推奨: 指示的なエラーメッセージ</h3>
+    <p>公式ドキュメントでは「Write instructive error messages」として、以下のパターンが明示されています。</p>
+
+    <table class="compare-table">
+      <tr><th>パターン</th><th>悪い例</th><th>良い例</th></tr>
+      <tr>
+        <td>具体性</td>
+        <td><code>"failed"</code></td>
+        <td><code>"Rate limit exceeded. Retry after 60 seconds."</code></td>
+      </tr>
+      <tr>
+        <td>次のアクション</td>
+        <td><code>"Invalid input"</code></td>
+        <td><code>"Missing required 'location' parameter. Expected format: 'City, State'"</code></td>
+      </tr>
+      <tr>
+        <td>代替手段</td>
+        <td><code>"Service unavailable"</code></td>
+        <td><code>"Weather API is down. Try get_cached_weather for last-known data."</code></td>
+      </tr>
+    </table>
+
+    <h3>構造化エラーレスポンスの設計パターン</h3>
+    <p>tool_resultのcontent内に、エラーの種類・原因・リトライ可否を構造化して含めることで、Claudeの判断精度が向上します。</p>
+
+    <pre>// パターン1: リトライ可能なエラー
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_abc123",
+  "content": "{\"error\": {\"type\": \"rate_limited\", \"message\": \"API rate limit exceeded. Current limit: 100 requests/min.\", \"isRetryable\": true, \"suggestion\": \"Wait 30 seconds before retrying, or reduce request frequency.\"}}",
+  "is_error": true
+}
+
+// パターン2: リトライ不可のエラー
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_def456",
+  "content": "{\"error\": {\"type\": \"permission_denied\", \"message\": \"User does not have access to project 'confidential-2024'.\", \"isRetryable\": false, \"suggestion\": \"Ask the user to contact their administrator for access.\"}}",
+  "is_error": true
+}</pre>
+
+    <h3>エラータイプ別の対応マトリクス</h3>
+    <table class="compare-table">
+      <tr><th>エラータイプ</th><th>isRetryable</th><th>Claudeの推奨対応</th><th>開発者のアクション</th></tr>
+      <tr><td><code>invalid_parameter</code></td><td>true</td><td>パラメータを修正して再試行（2-3回まで）</td><td>エラーメッセージに正しい形式を記載</td></tr>
+      <tr><td><code>rate_limited</code></td><td>true</td><td>待機後に再試行、または代替手段を提案</td><td>待機時間を明示</td></tr>
+      <tr><td><code>service_unavailable</code></td><td>true</td><td>一時的な問題と伝え、代替手段を提案</td><td>代替ツール名を明示</td></tr>
+      <tr><td><code>not_found</code></td><td>false</td><td>ユーザーに「見つかりません」と報告</td><td>検索条件の修正ヒントを含める</td></tr>
+      <tr><td><code>permission_denied</code></td><td>false</td><td>権限不足を説明し、対処方法を案内</td><td>必要な権限レベルを明示</td></tr>
+      <tr><td><code>validation_error</code></td><td>true</td><td>正しい入力形式で再試行</td><td>バリデーションルールを記載</td></tr>
+    </table>
+
+    <h3>Claudeの自動リトライ動作</h3>
+    <p>公式ドキュメントによると、パラメータ不正でis_error: trueが返された場合、Claudeは<strong>2-3回まで修正を試みて再試行</strong>します。それでも失敗した場合はユーザーに謝罪メッセージを返します。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「エラー発生時のtool_resultの返し方」が頻出です。重要ポイント: (1) tool_resultは<strong>必ず返す</strong>（省略するとAPIエラー）、(2) is_error: trueを<strong>明示設定</strong>する、(3) エラーメッセージに<strong>次のアクション</strong>を含める。この3点が揃った選択肢が正解です。</p>
+    </div>
+
+    <h3>tool_resultのフォーマット要件</h3>
+    <p>公式ドキュメントで最近明確化された重要ルールがあります。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;"><strong>tool_resultの配置順序:</strong> ユーザーメッセージ内でtool_resultブロックは<strong>必ずcontentの先頭</strong>に配置する必要があります。テキストブロックを先に置くと400エラーになります。</p>
+    </div>
+
+    <pre>// 正しい順序
+{
+  "role": "user",
+  "content": [
+    {"type": "tool_result", "tool_use_id": "toolu_01", "content": "15 degrees"},
+    {"type": "text", "text": "次はどうすればいいですか？"}
+  ]
+}
+
+// 誤った順序（400エラー）
+{
+  "role": "user",
+  "content": [
+    {"type": "text", "text": "結果はこちらです:"},
+    {"type": "tool_result", "tool_use_id": "toolu_01", "content": "15 degrees"}
+  ]
+}</pre>
+
+    <h3>Strict Modeとエラー予防</h3>
+    <p>ツール定義に<code>"strict": true</code>を設定すると、Claudeの出力が<strong>input_schemaに100%準拠する</strong>ことが保証されます。これにより、パラメータ不足や型不一致によるエラーを<strong>完全に排除</strong>できます。</p>
+
+    <table class="compare-table">
+      <tr><th>アプローチ</th><th>エラー防止率</th><th>トレードオフ</th></tr>
+      <tr><td>descriptionのみ</td><td>高い（ただし100%ではない）</td><td>柔軟性が最も高い</td></tr>
+      <tr><td>description + input_examples</td><td>非常に高い</td><td>トークンコストが若干増加</td></tr>
+      <tr><td>strict: true</td><td><strong>100%</strong></td><td>全プロパティがrequired必須、オプショナルはnull型併用</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 3: ツール分配と統合戦略 -->
+  <div id="s3" class="card" style="display:none">
+    <h2>ツール分配と統合戦略（公式推奨パターン）</h2>
+    <p>Anthropic公式のengineering blogでは、ツール設計の最も重要な原則として<strong>「エージェントが人間と同じようにタスクを分解・解決できる粒度でツールを設計する」</strong>ことが掲げられています。</p>
+
+    <h3>ツール分配の3層モデル</h3>
+    <p>大規模システムでのツール管理を、3つのレイヤーに整理します。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>ツール分配の3層モデル:</strong></p>
+      <p><strong>Layer 1 - 静的分類:</strong> ツールをカテゴリ別にグループ化し、最初のインテント判定で該当カテゴリのツールだけを渡す。</p>
+      <p><strong>Layer 2 - 動的フィルタリング:</strong> 会話の進行に応じて、渡すツールセットをリアルタイムで変更する。</p>
+      <p><strong>Layer 3 - ツールルーティング:</strong> 最初のリクエストで軽量な「ルーティングツール」だけを渡し、結果に応じて専門ツールセットに切り替える。</p>
+    </div>
+
+    <h3>Layer 3: ツールルーティングの実装パターン</h3>
+    <p>大量のツール（50個以上）を扱う場合の推奨アーキテクチャです。</p>
+
+    <pre>// Step 1: ルーティングツールのみを渡す
+tools: [{
+  "name": "classify_request",
+  "description": "ユーザーの要求を分類する。order（注文関連）、product（商品関連）、account（アカウント関連）、payment（支払い関連）のいずれかを返す。",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "category": {
+        "type": "string",
+        "enum": ["order", "product", "account", "payment"]
+      },
+      "confidence": {
+        "type": "string",
+        "enum": ["high", "medium", "low"]
+      }
+    },
+    "required": ["category", "confidence"]
+  }
+}]
+tool_choice: {"type": "tool", "name": "classify_request"}
+
+// Step 2: 分類結果に応じた専門ツールセットに切り替え
+// category === "order" の場合:
+tools: [search_orders, get_order_status, cancel_order, modify_order]
+tool_choice: {"type": "auto"}</pre>
+
+    <p>このパターンのメリットは、<strong>最初のリクエストではルーティングツール1個だけ</strong>でコンテキスト消費を最小化し、以降は関連ツールのみで効率的に処理できる点です。</p>
+
+    <h3>ツール応答の最適化</h3>
+    <p>公式では、ツールの応答も設計対象として重視されています。「高信号な情報のみ返す」ことが推奨されます。</p>
+
+    <table class="compare-table">
+      <tr><th>観点</th><th>アンチパターン</th><th>推奨パターン</th></tr>
+      <tr>
+        <td>返却データ量</td>
+        <td>APIレスポンスをそのまま全て返す</td>
+        <td>Claudeが次のステップを判断するのに必要な情報だけに絞る</td>
+      </tr>
+      <tr>
+        <td>識別子</td>
+        <td>内部UUID（<code>a1b2c3d4-e5f6...</code>）</td>
+        <td>意味のある名前やslug（<code>customer-tanaka-001</code>）</td>
+      </tr>
+      <tr>
+        <td>大量データ</td>
+        <td>全件を一度に返す</td>
+        <td>ページネーション+フィルタリング+sensibleなデフォルト件数</td>
+      </tr>
+      <tr>
+        <td>冗長性</td>
+        <td>全フィールドを常にDETAILED形式で返す</td>
+        <td>ResponseFormatパラメータ（CONCISE/DETAILED）で制御</td>
+      </tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「ツール応答が大きすぎる場合の対策」が問われます。正解は「必要な情報だけを含むよう結果を整形する」です。「max_tokensを増やす」「コンテキストウィンドウが大きいモデルに変更する」は根本解決ではありません。</p>
+    </div>
+
+    <h3>推論オーバーロード: 定量的な影響</h3>
+    <p>公式データに基づくツール数とパフォーマンスの関係を整理します。</p>
+
+    <table class="compare-table">
+      <tr><th>ツール数</th><th>選択精度</th><th>トークンコスト</th><th>推奨対策</th></tr>
+      <tr><td>1-10個</td><td>安定</td><td>低い</td><td>特別な対策不要</td></tr>
+      <tr><td>10-20個</td><td>安定</td><td>中程度</td><td>descriptionの明確化、名前空間の活用</td></tr>
+      <tr><td>20-50個</td><td>低下傾向</td><td>高い</td><td>動的フィルタリング、カテゴリ分け必須</td></tr>
+      <tr><td>50個以上</td><td>顕著な低下</td><td>非常に高い</td><td>ツールルーティング、Tool Search機能の活用</td></tr>
+    </table>
+
+    <h3>新機能: Tool Search（ツール検索）</h3>
+    <p>大量のツールを扱う場合、Anthropicが提供する<strong>Tool Search</strong>機能を活用できます。これはサーバーサイドツールの一種で、Claudeが必要なツールを自動的に検索・選択する仕組みです。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Tool Search:</strong> 大量のツール定義の中から、ユーザーのリクエストに関連するツールをClaudeが自動的に検索・絞り込むサーバーサイド機能。開発者がクライアント側でフィルタリングロジックを実装する必要がなくなる。</p>
+    </div>
+
+    <h3>サーバーツール vs クライアントツール</h3>
+    <p>公式ドキュメントではツールを<strong>実行場所</strong>で2つに分類しています。</p>
+
+    <table class="compare-table">
+      <tr><th>分類</th><th>実行場所</th><th>開発者の役割</th><th>例</th></tr>
+      <tr>
+        <td><strong>クライアントツール</strong></td>
+        <td>開発者のアプリケーション内</td>
+        <td>tool_useを受け取り、実行し、tool_resultを返す</td>
+        <td>ユーザー定義ツール、bash、text_editor</td>
+      </tr>
+      <tr>
+        <td><strong>サーバーツール</strong></td>
+        <td>Anthropicのインフラ</td>
+        <td>結果を直接受け取る（実行不要）</td>
+        <td>web_search、web_fetch、code_execution、tool_search</td>
+      </tr>
+    </table>
+
+    <h3>プロンプトキャッシングとの併用</h3>
+    <p>ツール定義は毎回のリクエストに含まれるため、入力トークンコストに直結します。<code>cache_control</code>を付与することで、変更のないツール定義をキャッシュし、コストを削減できます。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;"><code>tool_choice</code>パラメータを変更すると、キャッシュされたメッセージブロックが無効化されます。ツール定義やシステムプロンプトはキャッシュが維持されますが、メッセージ内容は再処理が必要です。ワークフロー内でtool_choiceを頻繁に切り替える場合、キャッシュ効率が低下することに注意してください。</p>
+    </div>
+
+    <h3>Extended Thinkingとの互換性</h3>
+    <p>Extended Thinking（拡張思考）モードを使う場合、tool_choiceに制限があります。</p>
+    <ul>
+      <li><code>auto</code>（デフォルト）: 使用可能</li>
+      <li><code>none</code>: 使用可能</li>
+      <li><code>any</code>: <strong>使用不可</strong>（エラーになる）</li>
+      <li><code>tool</code>（特定指定）: <strong>使用不可</strong>（エラーになる）</li>
+    </ul>
+    <p>Extended ThinkingでProgrammatic Enforcementが使えないため、<strong>プロンプトベースのガイダンス</strong>で代替する必要があります。</p>
+  </div>
+
+  <!-- Section 4: 用語集 -->
+  <div id="s4" class="card" style="display:none">
+    <h2>追加用語集</h2>
+    <p>このM5拡充セクションで登場した新規用語をまとめています。</p>
+
+    <div class="glossary-item">
+      <div class="glossary-term">入力例</div>
+      <div class="glossary-en">Input Examples (input_examples)</div>
+      <div class="glossary-def">ツール定義に追加できるオプショナルフィールド。正しいツール呼び出しの具体例をClaudeに示すことで、複雑な入力パターンの理解を助ける。各例はinput_schemaに対してバリデーションされる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ツール統合</div>
+      <div class="glossary-en">Tool Consolidation</div>
+      <div class="glossary-def">関連する複数のツールを1つに統合し、actionパラメータ等で操作を切り替える設計パターン。ツール数の削減と選択の曖昧さ解消に効果的。公式engineering blogで推奨。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">名前空間</div>
+      <div class="glossary-en">Namespacing</div>
+      <div class="glossary-def">ツール名にサービスやリソースのプレフィックスを付与する命名規則（例: github_list_prs, slack_send_message）。ツール数が増えても選択の曖昧さを防ぐ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ツールルーティング</div>
+      <div class="glossary-en">Tool Routing</div>
+      <div class="glossary-def">最初のリクエストで軽量なルーティングツールだけを渡してユーザーの意図を分類し、結果に応じて専門ツールセットに切り替える設計パターン。大量ツール管理の最終手段。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ツール検索</div>
+      <div class="glossary-en">Tool Search</div>
+      <div class="glossary-def">Anthropicが提供するサーバーサイド機能。大量のツール定義の中から、ユーザーのリクエストに関連するツールをClaudeが自動的に検索・選択する仕組み。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">サーバーツール</div>
+      <div class="glossary-en">Server Tool</div>
+      <div class="glossary-def">Anthropicのインフラ上で実行されるツール（web_search, web_fetch, code_execution, tool_search等）。クライアント側でのtool_result返却が不要。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">クライアントツール</div>
+      <div class="glossary-en">Client Tool</div>
+      <div class="glossary-def">開発者のアプリケーション内で実行されるツール。Claudeがtool_useブロックを返し、開発者が実行してtool_resultを返す従来型のツール。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">応答フォーマット制御</div>
+      <div class="glossary-en">Response Format (CONCISE / DETAILED)</div>
+      <div class="glossary-def">ツールの応答データ量をパラメータで制御する設計パターン。CONCISEは必要最小限（トークン約1/3）、DETAILEDは下流ツール呼び出しに必要なID等を含む完全版。</div>
+    </div>
+  </div>
+
+  <!-- Section 5: 確認クイズ -->
+  <div id="s5" class="card" style="display:none">
+    <div class="quiz-section">
+      <h3>M5 拡充 確認クイズ</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">各セクションの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
+
+      <!-- Q1: 説明文最適化 -->
+      <div class="quiz-question" id="exp-q1">
+        <div class="q-text">Q1. Anthropic公式ドキュメントで推奨されているツール説明文（description）の最低文量はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer(0,0)">1文で簡潔に書くべき</div>
+        <div class="quiz-option" onclick="selectAnswer(0,1)">最低3-4文。複雑なツールはそれ以上</div>
+        <div class="quiz-option" onclick="selectAnswer(0,2)">文量は関係なく、ツール名が明確であれば空でもよい</div>
+        <div class="quiz-option" onclick="selectAnswer(0,3)">1段落（10文以上）が推奨される</div>
+        <div class="quiz-explanation" id="exp-q1-exp"></div>
+      </div>
+
+      <!-- Q2: 説明文最適化 -->
+      <div class="quiz-question" id="exp-q2">
+        <div class="q-text">Q2. input_examplesフィールドについて正しい記述はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer(1,0)">全てのツールタイプ（サーバーツール含む）で使用できる</div>
+        <div class="quiz-option" onclick="selectAnswer(1,1)">各exampleはinput_schemaでバリデーションされ、不正な場合は400エラーになる</div>
+        <div class="quiz-option" onclick="selectAnswer(1,2)">input_examplesがあればdescriptionは不要になる</div>
+        <div class="quiz-option" onclick="selectAnswer(1,3)">トークンコストは発生せず、無制限に追加できる</div>
+        <div class="quiz-explanation" id="exp-q2-exp"></div>
+      </div>
+
+      <!-- Q3: 構造化エラー -->
+      <div class="quiz-question" id="exp-q3">
+        <div class="q-text">Q3. ツール実行でエラーが発生し、is_error: trueでtool_resultを返した場合、Claudeの動作として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer(2,0)">即座にユーザーにエラーを報告し、会話を終了する</div>
+        <div class="quiz-option" onclick="selectAnswer(2,1)">パラメータを修正して2-3回まで再試行し、それでも失敗したらユーザーに報告する</div>
+        <div class="quiz-option" onclick="selectAnswer(2,2)">エラーを無視して次のツールを呼び出す</div>
+        <div class="quiz-option" onclick="selectAnswer(2,3)">自動的に別のモデル（Haiku等）にフォールバックする</div>
+        <div class="quiz-explanation" id="exp-q3-exp"></div>
+      </div>
+
+      <!-- Q4: 構造化エラー -->
+      <div class="quiz-question" id="exp-q4">
+        <div class="q-text">Q4. tool_resultブロックの配置について、公式ドキュメントで明記されているルールはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer(3,0)">tool_resultはcontentの任意の位置に配置できる</div>
+        <div class="quiz-option" onclick="selectAnswer(3,1)">tool_resultはcontentの末尾に配置する必要がある</div>
+        <div class="quiz-option" onclick="selectAnswer(3,2)">tool_resultはcontent配列の先頭に配置し、テキストはその後に置く必要がある</div>
+        <div class="quiz-option" onclick="selectAnswer(3,3)">tool_resultとテキストは別々のメッセージに分けて送信する必要がある</div>
+        <div class="quiz-explanation" id="exp-q4-exp"></div>
+      </div>
+
+      <!-- Q5: ツール分配 -->
+      <div class="quiz-question" id="exp-q5">
+        <div class="q-text">Q5. 50個以上のツールを持つシステムで、公式が推奨するアーキテクチャとして最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer(4,0)">全ツールを毎回渡し、system promptで使い分けを指示する</div>
+        <div class="quiz-option" onclick="selectAnswer(4,1)">ツール数を10個以下に削減し、残りの機能は削除する</div>
+        <div class="quiz-option" onclick="selectAnswer(4,2)">ルーティングツールで意図を分類し、分類結果に応じた専門ツールセットに切り替える</div>
+        <div class="quiz-option" onclick="selectAnswer(4,3)">Extended Thinkingを有効にし、Claudeの推論能力を高めて全ツールから正確に選ばせる</div>
+        <div class="quiz-explanation" id="exp-q5-exp"></div>
+      </div>
+
+      <!-- Q6: ツール分配 -->
+      <div class="quiz-question" id="exp-q6">
+        <div class="q-text">Q6. Extended Thinking（拡張思考）モードでtool_choiceを使う場合の制限として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer(5,0)">全てのtool_choiceモード（auto/any/tool/none）が使用可能</div>
+        <div class="quiz-option" onclick="selectAnswer(5,1)">autoとnoneのみ使用可能。anyとtool（特定指定）はエラーになる</div>
+        <div class="quiz-option" onclick="selectAnswer(5,2)">Extended Thinkingではtool_choice自体が使用不可</div>
+        <div class="quiz-option" onclick="selectAnswer(5,3)">toolモードのみ使用可能で、auto/any/noneは無効</div>
+        <div class="quiz-explanation" id="exp-q6-exp"></div>
+      </div>
+
+      <div id="exp-quiz-result" class="quiz-result" style="display:none"></div>
+      <div class="btn-group">
+        <button class="btn btn-accent" onclick="submitQuiz()" id="exp-submit-btn">回答を確定する</button>
+        <button class="btn btn-outline" onclick="retryQuiz()" id="exp-retry-btn" style="display:none">もう一度挑戦</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Quiz data
+const QUIZ = {
+  answers: [1, 1, 1, 2, 2, 1],
+  explanations: [
+    "公式ドキュメント（Define tools > Best practices）では「Aim for at least 3-4 sentences per tool description, more if the tool is complex」と明記されています。1文の簡潔な説明はアンチパターンであり、「何をするか」「いつ使うか」「いつ使わないか」「パラメータの意味」「制約」を含める必要があります。",
+    "input_examplesの各exampleはinput_schemaに対してバリデーションされ、不正な例を含むと400エラーが返されます。サーバーサイドツール（web_search等）では使用不可（A誤り）、descriptionが最重要でexamplesは補助手段（C誤り）、トークンコストは発生します（D誤り: 単純な例で20-50トークン、複雑な例で100-200トークン）。",
+    "公式ドキュメントによると、パラメータ不正でis_error: trueが返された場合、Claudeは2-3回まで修正を試みて再試行します。それでも失敗した場合はユーザーに謝罪メッセージを返します。即座の会話終了（A）、エラー無視（C）、モデルフォールバック（D）は正しくありません。",
+    "公式ドキュメントでは「tool_result blocks must come FIRST in the content array. Any text must come AFTER all tool results」と明記されています。テキストをtool_resultの前に置くと400エラーになります。これは2025年以降に明確化された重要な仕様です。",
+    "50個以上のツールがある場合、ルーティングツール（classify_request等）で意図を分類し、tool_choiceで強制呼び出しした上で、分類結果に応じた専門ツールセットに切り替えるのが推奨パターンです。全ツール渡し（A）はオーバーロード、機能削除（B）は本末転倒、Extended Thinking（D）はtool_choice制限があり併用できません。",
+    "Extended Thinkingモードでは、tool_choiceのauto（デフォルト）とnoneのみが使用可能です。any（いずれかを強制）とtool（特定ツール指定）を使うとエラーになります。これは、Extended Thinkingの内部処理とProgrammatic Enforcementの互換性の問題によるものです。"
+  ]
+};
+
+let userAnswers = new Array(QUIZ.answers.length).fill(-1);
+let quizSubmitted = false;
+
+function showSection(id, btn) {
+  document.querySelectorAll('.container > .card').forEach(c => c.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+  document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function selectAnswer(qIndex, optIndex) {
+  if (quizSubmitted) return;
+  userAnswers[qIndex] = optIndex;
+  const question = document.getElementById('exp-q' + (qIndex + 1));
+  const options = question.querySelectorAll('.quiz-option');
+  options.forEach((opt, i) => {
+    opt.classList.toggle('selected', i === optIndex);
+  });
+}
+
+function submitQuiz() {
+  if (userAnswers.includes(-1)) {
+    alert('全ての問題に回答してください。');
+    return;
+  }
+  quizSubmitted = true;
+  let correct = 0;
+
+  QUIZ.answers.forEach((ans, i) => {
+    const question = document.getElementById('exp-q' + (i + 1));
+    const options = question.querySelectorAll('.quiz-option');
+    const expEl = document.getElementById('exp-q' + (i + 1) + '-exp');
+
+    options.forEach((opt, j) => {
+      opt.style.cursor = 'default';
+      if (j === ans) opt.classList.add('correct');
+      if (j === userAnswers[i] && j !== ans) opt.classList.add('incorrect');
+    });
+
+    if (userAnswers[i] === ans) correct++;
+    expEl.style.display = 'block';
+    expEl.textContent = QUIZ.explanations[i];
+  });
+
+  const resultEl = document.getElementById('exp-quiz-result');
+  const pct = Math.round((correct / QUIZ.answers.length) * 100);
+  resultEl.style.display = 'block';
+  resultEl.style.background = pct >= 70 ? 'var(--success-light)' : 'var(--danger-light)';
+  resultEl.style.color = pct >= 70 ? 'var(--success)' : 'var(--danger)';
+  resultEl.textContent = correct + ' / ' + QUIZ.answers.length + ' 正解 (' + pct + '%)' + (pct >= 70 ? ' — 合格!' : ' — もう一度挑戦しましょう');
+
+  document.getElementById('exp-submit-btn').style.display = 'none';
+  document.getElementById('exp-retry-btn').style.display = 'inline-block';
+}
+
+function retryQuiz() {
+  quizSubmitted = false;
+  userAnswers = new Array(QUIZ.answers.length).fill(-1);
+
+  QUIZ.answers.forEach((_, i) => {
+    const question = document.getElementById('exp-q' + (i + 1));
+    const options = question.querySelectorAll('.quiz-option');
+    options.forEach(opt => {
+      opt.classList.remove('selected', 'correct', 'incorrect');
+      opt.style.cursor = 'pointer';
+    });
+    document.getElementById('exp-q' + (i + 1) + '-exp').style.display = 'none';
+  });
+
+  document.getElementById('exp-quiz-result').style.display = 'none';
+  document.getElementById('exp-submit-btn').style.display = 'inline-block';
+  document.getElementById('exp-retry-btn').style.display = 'none';
+}
+</script>
+</body>
+</html>
