@@ -2357,6 +2357,9 @@
     <button class="section-tab" onclick="showSection('m5','s7',this)">ツール分配と管理</button>
     <button class="section-tab" onclick="showSection('m5','s8',this)">推論オーバーロード防止</button>
     <button class="section-tab" onclick="showSection('m5','s9',this)">tool_choice応用</button>
+    <button class="section-tab" onclick="showSection('m5','s12',this)">説明文の実践</button>
+    <button class="section-tab" onclick="showSection('m5','s13',this)">構造化エラー実装</button>
+    <button class="section-tab" onclick="showSection('m5','s14',this)">ツール分配戦略</button>
     <button class="section-tab" onclick="showSection('m5','s10',this)">用語集</button>
     <button class="section-tab" onclick="showSection('m5','s11',this)">クイズ</button>
   </div>
@@ -2895,6 +2898,367 @@
     </div>
   </div>
 
+  <!-- Section 12: 説明文の実践最適化 -->
+  <div id="m5-s12" class="card" style="display:none">
+    <h2>ツール説明文（description）の実践最適化</h2>
+    <p>Anthropic公式ドキュメントでは、descriptionを<strong>「新しいチームメンバーにツールを説明するつもりで書く」</strong>ことが推奨されています。暗黙知を明示化し、LLMがツール選択で迷わない記述を目指します。</p>
+
+    <h3>公式推奨: 説明文に含めるべき5要素</h3>
+    <p>公式ドキュメントの"Best practices for tool definitions"では、以下を<strong>最低限含めること</strong>が明記されています。</p>
+
+    <table class="compare-table">
+      <tr><th>#</th><th>要素</th><th>説明</th><th>記載しない場合のリスク</th></tr>
+      <tr><td>1</td><td>何をするか</td><td>ツールの機能を1文で要約</td><td>Claudeが用途を誤認する</td></tr>
+      <tr><td>2</td><td>いつ使うべきか</td><td>使用トリガーとなる状況</td><td>適切な場面でツールが選ばれない</td></tr>
+      <tr><td>3</td><td>いつ使うべきでないか</td><td>非使用条件と代替ツール</td><td>類似ツール間で誤選択が頻発</td></tr>
+      <tr><td>4</td><td>各パラメータの意味と影響</td><td>パラメータが動作にどう影響するか</td><td>不正確な引数が生成される</td></tr>
+      <tr><td>5</td><td>制約と注意事項</td><td>戻り値の形式、件数制限、前提条件</td><td>ツール結果の解釈を誤る</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>公式推奨: descriptionは最低3-4文</strong>。公式ドキュメントでは「Aim for at least 3-4 sentences per tool description, more if the tool is complex」と明記されています。1文の簡潔な説明はアンチパターンです。</p>
+    </div>
+
+    <h3>新機能: input_examples（入力例の提供）</h3>
+    <p>2025年以降のAPIでは、ツール定義に<code>input_examples</code>フィールドを追加できるようになりました。これは、Claudeに「正しいツール呼び出しの具体例」を示す機能です。</p>
+
+    <pre>{
+  "name": "search_customer",
+  "description": "顧客を名前・メール・電話番号で検索する。部分一致で最大20件返す。顧客IDが既知の場合はget_customer_by_idを使うこと。",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "search_type": {
+        "type": "string",
+        "enum": ["name", "email", "phone"],
+        "description": "検索キーの種類"
+      },
+      "query": {
+        "type": "string",
+        "description": "検索キーワード（部分一致対応）"
+      }
+    },
+    "required": ["search_type", "query"]
+  },
+  "input_examples": [
+    {"search_type": "name", "query": "田中"},
+    {"search_type": "email", "query": "tanaka@example.com"},
+    {"search_type": "phone", "query": "090-1234"}
+  ]
+}</pre>
+
+    <table class="compare-table">
+      <tr><th>項目</th><th>詳細</th></tr>
+      <tr><td>目的</td><td>Claudeにツール呼び出しの「お手本」を示し、入力形式やオプショナル項目の使い方を学習させる</td></tr>
+      <tr><td>要件</td><td>各exampleはinput_schemaに対してバリデーションされる。不正な例は400エラー</td></tr>
+      <tr><td>トークンコスト</td><td>単純な例で約20-50トークン、複雑なネストで約100-200トークン</td></tr>
+      <tr><td>制限</td><td>サーバーサイドツール（web_search等）では使用不可。クライアントツール専用</td></tr>
+      <tr><td>推奨場面</td><td>複雑なネストオブジェクト、フォーマットに敏感なパラメータ、オプショナル項目の使い分け</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「ツール選択精度を上げるために最も効果的なアプローチ」が問われます。正解は「descriptionの充実化」が最優先で、input_examplesは複雑なツールへの補助手段です。「descriptionを空にしてinput_examplesだけで対応する」はアンチパターンです。</p>
+    </div>
+
+    <h3>ツール統合（Consolidation）パターン</h3>
+    <p>公式engineering blogでは、個別のAPIエンドポイントを1対1でツールにするのではなく、<strong>関連操作をまとめた高レベルなツール</strong>を作ることが推奨されています。</p>
+
+    <table class="compare-table">
+      <tr><th>アンチパターン（個別ツール）</th><th>推奨パターン（統合ツール）</th><th>メリット</th></tr>
+      <tr>
+        <td><code>create_pr</code>, <code>review_pr</code>, <code>merge_pr</code></td>
+        <td><code>github_pr</code> + <code>action</code>パラメータ（enum: create/review/merge）</td>
+        <td>ツール数削減、選択の曖昧さ解消</td>
+      </tr>
+      <tr>
+        <td><code>list_users</code>, <code>list_events</code>, <code>create_event</code></td>
+        <td><code>schedule_event</code>（空き確認+予約を1ツールで完結）</td>
+        <td>エージェントの認知負荷軽減</td>
+      </tr>
+      <tr>
+        <td><code>get_customer</code>, <code>get_transactions</code>, <code>get_notes</code></td>
+        <td><code>get_customer_context</code>（顧客情報+取引+メモを一括取得）</td>
+        <td>ツール呼び出し回数削減</td>
+      </tr>
+    </table>
+
+    <h3>名前空間（Namespacing）の重要性</h3>
+    <p>複数サービスのツールを扱う場合、<strong>サービスプレフィックス</strong>を付けることが公式推奨です。</p>
+    <ul>
+      <li><strong>サービスベース:</strong> <code>github_list_prs</code>, <code>slack_send_message</code>, <code>jira_create_issue</code></li>
+      <li><strong>リソースベース:</strong> <code>asana_projects_search</code>, <code>asana_users_search</code></li>
+    </ul>
+    <p>名前空間があると、ツール数が増えても選択の曖昧さが生じにくくなります。特にTool Search機能と組み合わせる場合に効果的です。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">ツール統合はやりすぎに注意。1つのツールに10以上のactionを詰め込むと、パラメータの組み合わせが複雑になり逆効果です。「1つのツールが1つの概念的な操作」が目安です。</p>
+    </div>
+  </div>
+
+  <!-- Section 13: 構造化エラーの実装 -->
+  <div id="m5-s13" class="card" style="display:none">
+    <h2>構造化エラーハンドリングの実装パターン</h2>
+    <p>公式ドキュメントでは、エラーメッセージを<strong>「何が問題で、次に何をすべきか」を明示的に伝える</strong>ことが強く推奨されています。ここでは公式の最新仕様に基づく実装パターンを深掘りします。</p>
+
+    <h3>公式仕様: is_errorフラグの正確な理解</h3>
+    <p>tool_resultの<code>is_error</code>は<strong>オプショナルフィールド</strong>です。設定しなくてもAPIは動作しますが、Claudeのエラー認識精度が大きく変わります。</p>
+
+    <pre>// is_error: true を設定したエラーレスポンス（公式推奨）
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+  "content": "ConnectionError: the weather service API is not available (HTTP 500)",
+  "is_error": true
+}
+
+// is_error なしのエラーレスポンス（非推奨）
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+  "content": "エラーが発生しました"
+}</pre>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>is_errorの効果:</strong> <code>is_error: true</code>を設定すると、Claudeは明示的に「このツール呼び出しは失敗した」と認識し、(1) パラメータを修正して再試行、(2) ユーザーに追加情報を要求、(3) 代替手段の提案、のいずれかを自律的に判断します。設定しない場合、エラー文字列を「正常な結果」として解釈するリスクがあります。</p>
+    </div>
+
+    <h3>公式推奨: 指示的なエラーメッセージ</h3>
+    <p>公式ドキュメントでは「Write instructive error messages」として、以下のパターンが明示されています。</p>
+
+    <table class="compare-table">
+      <tr><th>パターン</th><th>悪い例</th><th>良い例</th></tr>
+      <tr>
+        <td>具体性</td>
+        <td><code>"failed"</code></td>
+        <td><code>"Rate limit exceeded. Retry after 60 seconds."</code></td>
+      </tr>
+      <tr>
+        <td>次のアクション</td>
+        <td><code>"Invalid input"</code></td>
+        <td><code>"Missing required 'location' parameter. Expected format: 'City, State'"</code></td>
+      </tr>
+      <tr>
+        <td>代替手段</td>
+        <td><code>"Service unavailable"</code></td>
+        <td><code>"Weather API is down. Try get_cached_weather for last-known data."</code></td>
+      </tr>
+    </table>
+
+    <h3>構造化エラーレスポンスの設計パターン</h3>
+    <p>tool_resultのcontent内に、エラーの種類・原因・リトライ可否を構造化して含めることで、Claudeの判断精度が向上します。</p>
+
+    <pre>// パターン1: リトライ可能なエラー
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_abc123",
+  "content": "{\"error\": {\"type\": \"rate_limited\", \"message\": \"API rate limit exceeded. Current limit: 100 requests/min.\", \"isRetryable\": true, \"suggestion\": \"Wait 30 seconds before retrying, or reduce request frequency.\"}}",
+  "is_error": true
+}
+
+// パターン2: リトライ不可のエラー
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_def456",
+  "content": "{\"error\": {\"type\": \"permission_denied\", \"message\": \"User does not have access to project 'confidential-2024'.\", \"isRetryable\": false, \"suggestion\": \"Ask the user to contact their administrator for access.\"}}",
+  "is_error": true
+}</pre>
+
+    <h3>エラータイプ別の対応マトリクス</h3>
+    <table class="compare-table">
+      <tr><th>エラータイプ</th><th>isRetryable</th><th>Claudeの推奨対応</th><th>開発者のアクション</th></tr>
+      <tr><td><code>invalid_parameter</code></td><td>true</td><td>パラメータを修正して再試行（2-3回まで）</td><td>エラーメッセージに正しい形式を記載</td></tr>
+      <tr><td><code>rate_limited</code></td><td>true</td><td>待機後に再試行、または代替手段を提案</td><td>待機時間を明示</td></tr>
+      <tr><td><code>service_unavailable</code></td><td>true</td><td>一時的な問題と伝え、代替手段を提案</td><td>代替ツール名を明示</td></tr>
+      <tr><td><code>not_found</code></td><td>false</td><td>ユーザーに「見つかりません」と報告</td><td>検索条件の修正ヒントを含める</td></tr>
+      <tr><td><code>permission_denied</code></td><td>false</td><td>権限不足を説明し、対処方法を案内</td><td>必要な権限レベルを明示</td></tr>
+      <tr><td><code>validation_error</code></td><td>true</td><td>正しい入力形式で再試行</td><td>バリデーションルールを記載</td></tr>
+    </table>
+
+    <h3>Claudeの自動リトライ動作</h3>
+    <p>公式ドキュメントによると、パラメータ不正でis_error: trueが返された場合、Claudeは<strong>2-3回まで修正を試みて再試行</strong>します。それでも失敗した場合はユーザーに謝罪メッセージを返します。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「エラー発生時のtool_resultの返し方」が頻出です。重要ポイント: (1) tool_resultは<strong>必ず返す</strong>（省略するとAPIエラー）、(2) is_error: trueを<strong>明示設定</strong>する、(3) エラーメッセージに<strong>次のアクション</strong>を含める。この3点が揃った選択肢が正解です。</p>
+    </div>
+
+    <h3>tool_resultのフォーマット要件</h3>
+    <p>公式ドキュメントで最近明確化された重要ルールがあります。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;"><strong>tool_resultの配置順序:</strong> ユーザーメッセージ内でtool_resultブロックは<strong>必ずcontentの先頭</strong>に配置する必要があります。テキストブロックを先に置くと400エラーになります。</p>
+    </div>
+
+    <pre>// 正しい順序
+{
+  "role": "user",
+  "content": [
+    {"type": "tool_result", "tool_use_id": "toolu_01", "content": "15 degrees"},
+    {"type": "text", "text": "次はどうすればいいですか？"}
+  ]
+}
+
+// 誤った順序（400エラー）
+{
+  "role": "user",
+  "content": [
+    {"type": "text", "text": "結果はこちらです:"},
+    {"type": "tool_result", "tool_use_id": "toolu_01", "content": "15 degrees"}
+  ]
+}</pre>
+
+    <h3>Strict Modeとエラー予防</h3>
+    <p>ツール定義に<code>"strict": true</code>を設定すると、Claudeの出力が<strong>input_schemaに100%準拠する</strong>ことが保証されます。これにより、パラメータ不足や型不一致によるエラーを<strong>完全に排除</strong>できます。</p>
+
+    <table class="compare-table">
+      <tr><th>アプローチ</th><th>エラー防止率</th><th>トレードオフ</th></tr>
+      <tr><td>descriptionのみ</td><td>高い（ただし100%ではない）</td><td>柔軟性が最も高い</td></tr>
+      <tr><td>description + input_examples</td><td>非常に高い</td><td>トークンコストが若干増加</td></tr>
+      <tr><td>strict: true</td><td><strong>100%</strong></td><td>全プロパティがrequired必須、オプショナルはnull型併用</td></tr>
+    </table>
+  </div>
+
+  <!-- Section 14: ツール分配と統合戦略 -->
+  <div id="m5-s14" class="card" style="display:none">
+    <h2>ツール分配と統合戦略（公式推奨パターン）</h2>
+    <p>Anthropic公式のengineering blogでは、ツール設計の最も重要な原則として<strong>「エージェントが人間と同じようにタスクを分解・解決できる粒度でツールを設計する」</strong>ことが掲げられています。</p>
+
+    <h3>ツール分配の3層モデル</h3>
+    <p>大規模システムでのツール管理を、3つのレイヤーに整理します。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>ツール分配の3層モデル:</strong></p>
+      <p><strong>Layer 1 - 静的分類:</strong> ツールをカテゴリ別にグループ化し、最初のインテント判定で該当カテゴリのツールだけを渡す。</p>
+      <p><strong>Layer 2 - 動的フィルタリング:</strong> 会話の進行に応じて、渡すツールセットをリアルタイムで変更する。</p>
+      <p><strong>Layer 3 - ツールルーティング:</strong> 最初のリクエストで軽量な「ルーティングツール」だけを渡し、結果に応じて専門ツールセットに切り替える。</p>
+    </div>
+
+    <h3>Layer 3: ツールルーティングの実装パターン</h3>
+    <p>大量のツール（50個以上）を扱う場合の推奨アーキテクチャです。</p>
+
+    <pre>// Step 1: ルーティングツールのみを渡す
+tools: [{
+  "name": "classify_request",
+  "description": "ユーザーの要求を分類する。order（注文関連）、product（商品関連）、account（アカウント関連）、payment（支払い関連）のいずれかを返す。",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "category": {
+        "type": "string",
+        "enum": ["order", "product", "account", "payment"]
+      },
+      "confidence": {
+        "type": "string",
+        "enum": ["high", "medium", "low"]
+      }
+    },
+    "required": ["category", "confidence"]
+  }
+}]
+tool_choice: {"type": "tool", "name": "classify_request"}
+
+// Step 2: 分類結果に応じた専門ツールセットに切り替え
+// category === "order" の場合:
+tools: [search_orders, get_order_status, cancel_order, modify_order]
+tool_choice: {"type": "auto"}</pre>
+
+    <p>このパターンのメリットは、<strong>最初のリクエストではルーティングツール1個だけ</strong>でコンテキスト消費を最小化し、以降は関連ツールのみで効率的に処理できる点です。</p>
+
+    <h3>ツール応答の最適化</h3>
+    <p>公式では、ツールの応答も設計対象として重視されています。「高信号な情報のみ返す」ことが推奨されます。</p>
+
+    <table class="compare-table">
+      <tr><th>観点</th><th>アンチパターン</th><th>推奨パターン</th></tr>
+      <tr>
+        <td>返却データ量</td>
+        <td>APIレスポンスをそのまま全て返す</td>
+        <td>Claudeが次のステップを判断するのに必要な情報だけに絞る</td>
+      </tr>
+      <tr>
+        <td>識別子</td>
+        <td>内部UUID（<code>a1b2c3d4-e5f6...</code>）</td>
+        <td>意味のある名前やslug（<code>customer-tanaka-001</code>）</td>
+      </tr>
+      <tr>
+        <td>大量データ</td>
+        <td>全件を一度に返す</td>
+        <td>ページネーション+フィルタリング+sensibleなデフォルト件数</td>
+      </tr>
+      <tr>
+        <td>冗長性</td>
+        <td>全フィールドを常にDETAILED形式で返す</td>
+        <td>ResponseFormatパラメータ（CONCISE/DETAILED）で制御</td>
+      </tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験では「ツール応答が大きすぎる場合の対策」が問われます。正解は「必要な情報だけを含むよう結果を整形する」です。「max_tokensを増やす」「コンテキストウィンドウが大きいモデルに変更する」は根本解決ではありません。</p>
+    </div>
+
+    <h3>推論オーバーロード: 定量的な影響</h3>
+    <p>公式データに基づくツール数とパフォーマンスの関係を整理します。</p>
+
+    <table class="compare-table">
+      <tr><th>ツール数</th><th>選択精度</th><th>トークンコスト</th><th>推奨対策</th></tr>
+      <tr><td>1-10個</td><td>安定</td><td>低い</td><td>特別な対策不要</td></tr>
+      <tr><td>10-20個</td><td>安定</td><td>中程度</td><td>descriptionの明確化、名前空間の活用</td></tr>
+      <tr><td>20-50個</td><td>低下傾向</td><td>高い</td><td>動的フィルタリング、カテゴリ分け必須</td></tr>
+      <tr><td>50個以上</td><td>顕著な低下</td><td>非常に高い</td><td>ツールルーティング、Tool Search機能の活用</td></tr>
+    </table>
+
+    <h3>新機能: Tool Search（ツール検索）</h3>
+    <p>大量のツールを扱う場合、Anthropicが提供する<strong>Tool Search</strong>機能を活用できます。これはサーバーサイドツールの一種で、Claudeが必要なツールを自動的に検索・選択する仕組みです。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Tool Search:</strong> 大量のツール定義の中から、ユーザーのリクエストに関連するツールをClaudeが自動的に検索・絞り込むサーバーサイド機能。開発者がクライアント側でフィルタリングロジックを実装する必要がなくなる。</p>
+    </div>
+
+    <h3>サーバーツール vs クライアントツール</h3>
+    <p>公式ドキュメントではツールを<strong>実行場所</strong>で2つに分類しています。</p>
+
+    <table class="compare-table">
+      <tr><th>分類</th><th>実行場所</th><th>開発者の役割</th><th>例</th></tr>
+      <tr>
+        <td><strong>クライアントツール</strong></td>
+        <td>開発者のアプリケーション内</td>
+        <td>tool_useを受け取り、実行し、tool_resultを返す</td>
+        <td>ユーザー定義ツール、bash、text_editor</td>
+      </tr>
+      <tr>
+        <td><strong>サーバーツール</strong></td>
+        <td>Anthropicのインフラ</td>
+        <td>結果を直接受け取る（実行不要）</td>
+        <td>web_search、code_execution、tool_search</td>
+      </tr>
+    </table>
+
+    <h3>プロンプトキャッシングとの併用</h3>
+    <p>ツール定義は毎回のリクエストに含まれるため、入力トークンコストに直結します。<code>cache_control</code>を付与することで、変更のないツール定義をキャッシュし、コストを削減できます。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;"><code>tool_choice</code>パラメータを変更すると、キャッシュされたメッセージブロックが無効化されます。ツール定義やシステムプロンプトはキャッシュが維持されますが、メッセージ内容は再処理が必要です。ワークフロー内でtool_choiceを頻繁に切り替える場合、キャッシュ効率が低下することに注意してください。</p>
+    </div>
+
+    <h3>Extended Thinkingとの互換性</h3>
+    <p>Extended Thinking（拡張思考）モードを使う場合、tool_choiceに制限があります。</p>
+    <ul>
+      <li><code>auto</code>（デフォルト）: 使用可能</li>
+      <li><code>none</code>: 使用可能</li>
+      <li><code>any</code>: <strong>使用不可</strong>（エラーになる）</li>
+      <li><code>tool</code>（特定指定）: <strong>使用不可</strong>（エラーになる）</li>
+    </ul>
+    <p>Extended ThinkingでProgrammatic Enforcementが使えないため、<strong>プロンプトベースのガイダンス</strong>で代替する必要があります。</p>
+  </div>
+
   <!-- Section 10: 用語集 -->
   <div id="m5-s10" class="card" style="display:none">
     <h2>ツール設計 用語集</h2>
@@ -2964,6 +3328,46 @@
       <div class="glossary-term">プログラム的エンフォースメント</div>
       <div class="glossary-en">Programmatic Enforcement</div>
       <div class="glossary-def">tool_choiceやツール定義の設計によって、Claudeの行動をAPIレベルで確実に制御すること。プロンプトでの指示とは異なり、100%の確実性がある。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">入力例</div>
+      <div class="glossary-en">Input Examples (input_examples)</div>
+      <div class="glossary-def">ツール定義に追加できるオプショナルフィールド。正しいツール呼び出しの具体例をClaudeに示すことで、複雑な入力パターンの理解を助ける。各例はinput_schemaに対してバリデーションされる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ツール統合</div>
+      <div class="glossary-en">Tool Consolidation</div>
+      <div class="glossary-def">関連する複数のツールを1つに統合し、actionパラメータ等で操作を切り替える設計パターン。ツール数の削減と選択の曖昧さ解消に効果的。公式engineering blogで推奨。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">名前空間</div>
+      <div class="glossary-en">Namespacing</div>
+      <div class="glossary-def">ツール名にサービスやリソースのプレフィックスを付与する命名規則（例: github_list_prs, slack_send_message）。ツール数が増えても選択の曖昧さを防ぐ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ツールルーティング</div>
+      <div class="glossary-en">Tool Routing</div>
+      <div class="glossary-def">最初のリクエストで軽量なルーティングツールだけを渡してユーザーの意図を分類し、結果に応じて専門ツールセットに切り替える設計パターン。大量ツール管理の最終手段。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ツール検索</div>
+      <div class="glossary-en">Tool Search</div>
+      <div class="glossary-def">Anthropicが提供するサーバーサイド機能。大量のツール定義の中から、ユーザーのリクエストに関連するツールをClaudeが自動的に検索・選択する仕組み。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">サーバーツール</div>
+      <div class="glossary-en">Server Tool</div>
+      <div class="glossary-def">Anthropicのインフラ上で実行されるツール（web_search, code_execution, tool_search等）。クライアント側でのtool_result返却が不要。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">クライアントツール</div>
+      <div class="glossary-en">Client Tool</div>
+      <div class="glossary-def">開発者のアプリケーション内で実行されるツール。Claudeがtool_useブロックを返し、開発者が実行してtool_resultを返す従来型のツール。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">応答フォーマット制御</div>
+      <div class="glossary-en">Response Format (CONCISE / DETAILED)</div>
+      <div class="glossary-def">ツールの応答データ量をパラメータで制御する設計パターン。CONCISEは必要最小限（トークン約1/3）、DETAILEDは下流ツール呼び出しに必要なID等を含む完全版。</div>
     </div>
   </div>
 
@@ -3063,6 +3467,60 @@
         <div class="quiz-explanation" id="m5-q10-exp"></div>
       </div>
 
+      <div class="quiz-question" id="m5-q11">
+        <div class="q-text">Q11. Anthropic公式ドキュメントで推奨されているツール説明文（description）の最低文量はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',10,0)">1文で簡潔に書くべき</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',10,1)">最低3-4文。複雑なツールはそれ以上</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',10,2)">文量は関係なく、ツール名が明確であれば空でもよい</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',10,3)">1段落（10文以上）が推奨される</div>
+        <div class="quiz-explanation" id="m5-q11-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q12">
+        <div class="q-text">Q12. input_examplesフィールドについて正しい記述はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',11,0)">全てのツールタイプ（サーバーツール含む）で使用できる</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',11,1)">各exampleはinput_schemaでバリデーションされ、不正な場合は400エラーになる</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',11,2)">input_examplesがあればdescriptionは不要になる</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',11,3)">トークンコストは発生せず、無制限に追加できる</div>
+        <div class="quiz-explanation" id="m5-q12-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q13">
+        <div class="q-text">Q13. ツール実行でエラーが発生し、is_error: trueでtool_resultを返した場合、Claudeの動作として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',12,0)">即座にユーザーにエラーを報告し、会話を終了する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',12,1)">パラメータを修正して2-3回まで再試行し、それでも失敗したらユーザーに報告する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',12,2)">エラーを無視して次のツールを呼び出す</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',12,3)">自動的に別のモデル（Haiku等）にフォールバックする</div>
+        <div class="quiz-explanation" id="m5-q13-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q14">
+        <div class="q-text">Q14. tool_resultブロックの配置について、公式ドキュメントで明記されているルールはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',13,0)">tool_resultはcontentの任意の位置に配置できる</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',13,1)">tool_resultはcontentの末尾に配置する必要がある</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',13,2)">tool_resultはcontent配列の先頭に配置し、テキストはその後に置く必要がある</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',13,3)">tool_resultとテキストは別々のメッセージに分けて送信する必要がある</div>
+        <div class="quiz-explanation" id="m5-q14-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q15">
+        <div class="q-text">Q15. 50個以上のツールを持つシステムで、公式が推奨するアーキテクチャとして最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',14,0)">全ツールを毎回渡し、system promptで使い分けを指示する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',14,1)">ツール数を10個以下に削減し、残りの機能は削除する</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',14,2)">ルーティングツールで意図を分類し、分類結果に応じた専門ツールセットに切り替える</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',14,3)">Extended Thinkingを有効にし、Claudeの推論能力を高めて全ツールから正確に選ばせる</div>
+        <div class="quiz-explanation" id="m5-q15-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m5-q16">
+        <div class="q-text">Q16. Extended Thinking（拡張思考）モードでtool_choiceを使う場合の制限として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',15,0)">全てのtool_choiceモード（auto/any/tool/none）が使用可能</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',15,1)">autoとnoneのみ使用可能。anyとtool（特定指定）はエラーになる</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',15,2)">Extended Thinkingではtool_choice自体が使用不可</div>
+        <div class="quiz-option" onclick="selectAnswer('m5',15,3)">toolモードのみ使用可能で、auto/any/noneは無効</div>
+        <div class="quiz-explanation" id="m5-q16-exp"></div>
+      </div>
+
       <div id="m5-quiz-result" class="quiz-result" style="display:none"></div>
       <div class="btn-group">
         <button class="btn btn-accent" onclick="submitQuiz('m5')" id="m5-submit-btn">回答を確定する</button>
@@ -3106,6 +3564,9 @@
     <button class="section-tab" onclick="showSection('m6','s6',this)">サーバー設計</button>
     <button class="section-tab" onclick="showSection('m6','s7',this)">高度な機能</button>
     <button class="section-tab" onclick="showSection('m6','s8',this)">トランスポート選定</button>
+    <button class="section-tab" onclick="showSection('m6','s11',this)">設定の実践</button>
+    <button class="section-tab" onclick="showSection('m6','s12',this)">認証とセキュリティ</button>
+    <button class="section-tab" onclick="showSection('m6','s13',this)">高度な通信</button>
     <button class="section-tab" onclick="showSection('m6','s9',this)">用語集</button>
     <button class="section-tab" onclick="showSection('m6','s10',this)">クイズ</button>
   </div>
@@ -3506,6 +3967,277 @@
     </div>
   </div>
 
+  <!-- Section 11: 設定の実践 -->
+  <div id="m6-s11" class="card" style="display:none">
+    <h2>MCP設定ファイルの実践ガイド</h2>
+    <p>Module 6の基礎編で学んだ<strong>.mcp.json</strong>（プロジェクト設定）と<strong>~/.claude.json</strong>（グローバル設定）の使い分けを、実践的な場面に沿ってさらに深掘りします。</p>
+
+    <h3>チーム共有パターン</h3>
+    <p>チームでMCPサーバーを共有する場合、<strong>設定ファイルをどこに置くか</strong>がセキュリティと利便性のバランスを決めます。</p>
+
+    <table class="compare-table">
+      <tr><th>パターン</th><th>設定ファイル</th><th>認証情報の扱い</th><th>メリット</th></tr>
+      <tr>
+        <td><strong>チーム共有</strong></td>
+        <td><code>.mcp.json</code>（Git管理）</td>
+        <td>環境変数で外出し（<code>${GITHUB_TOKEN}</code>形式）</td>
+        <td>新メンバーがクローンするだけで設定完了</td>
+      </tr>
+      <tr>
+        <td><strong>個人ツール</strong></td>
+        <td><code>~/.claude.json</code>（個人）</td>
+        <td>ファイル内に直接記述可能（Gitに入らない）</td>
+        <td>全プロジェクトで横断利用可能</td>
+      </tr>
+      <tr>
+        <td><strong>ハイブリッド</strong></td>
+        <td>両方を併用</td>
+        <td>PJ固有サーバーは.mcp.json、個人ツールは~/.claude.json</td>
+        <td>役割分担が明確</td>
+      </tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>環境変数方式（Environment Variable Pattern）：</strong><code>.mcp.json</code>の<code>env</code>フィールドで<code>"GITHUB_TOKEN": "${GITHUB_TOKEN}"</code>のように参照する。トークンの実体はチームメンバーそれぞれの環境変数に保管するため、Gitに認証情報がコミットされない。</p>
+    </div>
+
+    <h3>設定の優先順位と競合解決</h3>
+    <p>同じMCPサーバーが両方の設定ファイルに定義されている場合、以下のルールで解決されます。</p>
+
+    <table class="compare-table">
+      <tr><th>状況</th><th>適用される設定</th><th>理由</th></tr>
+      <tr>
+        <td>同じサーバー名が両方にある</td>
+        <td><strong>.mcp.json が優先</strong></td>
+        <td>プロジェクト固有の設定が、個人の汎用設定より優先</td>
+      </tr>
+      <tr>
+        <td>.mcp.jsonにのみ定義</td>
+        <td>.mcp.jsonの設定が適用</td>
+        <td>プロジェクト固有のサーバー</td>
+      </tr>
+      <tr>
+        <td>~/.claude.jsonにのみ定義</td>
+        <td>~/.claude.jsonの設定が適用</td>
+        <td>個人のグローバルサーバー</td>
+      </tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">MCP設定の優先順位（<strong>.mcp.json &gt; ~/.claude.json</strong>）は、Claude Codeの権限設定の優先順位（Managed &gt; CLI &gt; local &gt; project &gt; user）とは<strong>別の体系</strong>です。混同しないよう注意しましょう。MCPは「プロジェクトが優先」、権限設定は「組織管理が優先」です。</p>
+    </div>
+
+    <h3>Enterprise環境でのMCP管理</h3>
+    <p>企業のEnterprise/Teamプランでは、<strong>管理者がMCPコネクターを制御</strong>できます。</p>
+    <ul>
+      <li><strong>許可リスト方式</strong>: 管理者が承認したMCPサーバーのみ接続可能にする</li>
+      <li><strong>Managed Settings</strong>（管理設定）との連携: 組織全体のMCPポリシーを強制適用</li>
+      <li>ユーザーが<strong>未承認のMCPサーバーを追加できない</strong>よう制限可能</li>
+    </ul>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;"><code>.mcp.json</code>はGitにコミットされるため、<strong>APIキーやパスワードを直接書かない</strong>でください。必ず<code>env</code>フィールドで環境変数を参照する形にしましょう。これはセキュリティの基本原則です。</p>
+    </div>
+  </div>
+
+  <!-- Section 12: 認証とセキュリティ -->
+  <div id="m6-s12" class="card" style="display:none">
+    <h2>MCPサーバーの認証とセキュリティ</h2>
+    <p>MCPサーバーを安全に運用するには、<strong>「誰がアクセスしているか（認証）」</strong>と<strong>「何ができるか（認可）」</strong>を適切に管理する必要があります。</p>
+
+    <div class="concept-box">
+      <div class="label">たとえ話で理解する</div>
+      <p><strong>認証（Authentication）</strong>は「パスポートで身元を確認する」こと。<strong>認可（Authorization）</strong>は「ビザの種類で入れる国や活動を制限する」こと。MCPでは認証でユーザーを特定し、認可でアクセスできるリソースやツールを制限します。</p>
+    </div>
+
+    <h3>3つの認証パターン</h3>
+    <table class="compare-table">
+      <tr><th>パターン</th><th>仕組み</th><th>適した場面</th><th>セキュリティレベル</th></tr>
+      <tr>
+        <td><strong>環境変数方式</strong></td>
+        <td>APIキーやトークンを環境変数で渡す</td>
+        <td>ローカル開発、個人利用、stdioトランスポート</td>
+        <td>中（ローカル環境に依存）</td>
+      </tr>
+      <tr>
+        <td><strong>OAuth連携</strong></td>
+        <td>ユーザーがサービスに直接ログインし、アクセストークンを取得</td>
+        <td>チーム利用、リモートサーバー、Streamable HTTP</td>
+        <td>高（標準的な認証フロー）</td>
+      </tr>
+      <tr>
+        <td><strong>Bearer Token / カスタムヘッダー</strong></td>
+        <td>HTTPヘッダーにトークンを付与</td>
+        <td>API連携、マイクロサービス間通信</td>
+        <td>中〜高（トークン管理に依存）</td>
+      </tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>OAuth（オーオース）：</strong>ユーザーのパスワードを直接渡さずに、サービス間でアクセス権を委譲する仕組み。MCP仕様では、リモートサーバーの認証方式として<strong>OAuthの使用を推奨</strong>しています。ユーザーがサービスにログインし、発行されたアクセストークンをMCPクライアントが使ってサーバーにアクセスします。</p>
+    </div>
+
+    <h3>セキュリティ上の脅威と対策</h3>
+    <table class="compare-table">
+      <tr><th>脅威</th><th>説明</th><th>対策</th></tr>
+      <tr>
+        <td><strong>DNS Rebinding攻撃</strong></td>
+        <td>悪意あるWebサイトがローカルのMCPサーバーにアクセスを試みる</td>
+        <td>サーバーは<strong>Originヘッダーを必ず検証</strong>する</td>
+      </tr>
+      <tr>
+        <td><strong>認証情報の漏洩</strong></td>
+        <td>.mcp.jsonにAPIキーを直書きし、Gitにコミットしてしまう</td>
+        <td>環境変数方式（<code>env</code>フィールド）を使用</td>
+      </tr>
+      <tr>
+        <td><strong>過剰な権限付与</strong></td>
+        <td>MCPサーバーに必要以上のアクセス権を与えてしまう</td>
+        <td><strong>Roots</strong>でアクセス範囲を制限 + 最小権限の原則</td>
+      </tr>
+      <tr>
+        <td><strong>不正なサーバー接続</strong></td>
+        <td>信頼できないMCPサーバーに接続してしまう</td>
+        <td>Enterprise管理者によるMCP許可リスト管理</td>
+      </tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">セキュリティ要件（公式仕様より）</div>
+      <p style="margin-top:.25rem;">Streamable HTTPトランスポートを実装する際、サーバーは以下を<strong>必ず</strong>実施する必要があります: (1) <strong>Originヘッダーの検証</strong>（DNS Rebinding対策）、(2) ローカル実行時は<strong>localhost（127.0.0.1）にのみバインド</strong>（0.0.0.0で全インターフェースに公開しない）、(3) <strong>適切な認証の実装</strong>。</p>
+    </div>
+
+    <h3>ツール定義のセキュリティ設計</h3>
+    <p>MCPサーバーが公開するツールには、<strong>操作の危険度に応じた設計</strong>が求められます。</p>
+    <table class="compare-table">
+      <tr><th>危険度</th><th>操作例</th><th>推奨設計</th></tr>
+      <tr>
+        <td><strong>低</strong>（読み取り）</td>
+        <td>ファイル一覧取得、DB検索</td>
+        <td>Rootsで範囲制限。自動実行可能</td>
+      </tr>
+      <tr>
+        <td><strong>中</strong>（書き込み）</td>
+        <td>ファイル作成、レコード更新</td>
+        <td>Human-in-the-loop（ユーザー確認）を挟む</td>
+      </tr>
+      <tr>
+        <td><strong>高</strong>（不可逆操作）</td>
+        <td>ファイル削除、データベースDROP</td>
+        <td>必ずユーザー承認 + 確認ダイアログ</td>
+      </tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">MCP仕様が推奨する認証方式は<strong>OAuth</strong>です。また、DNS Rebinding攻撃への対策として<strong>Originヘッダーの検証</strong>が必須とされている点は、セキュリティ関連の問題で出題される可能性があります。Rootsによるアクセス範囲制限とHuman-in-the-loopを組み合わせた<strong>多層防御</strong>も重要なキーワードです。</p>
+    </div>
+  </div>
+
+  <!-- Section 13: 高度な通信 -->
+  <div id="m6-s13" class="card" style="display:none">
+    <h2>MCPの高度な通信パターン</h2>
+    <p>MCPの高度な機能をさらに深掘りし、<strong>サンプリングの詳細</strong>、<strong>新しいプリミティブ</strong>、<strong>トランスポート選定の実践基準</strong>を学びます。</p>
+
+    <h3>サンプリング（Sampling）の詳細</h3>
+    <p>サンプリングでは、MCPサーバーがクライアントを通じてLLMに推論を依頼する際、<strong>モデルの選び方</strong>を指定できます。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>モデル優先度（Model Preferences）：</strong>サンプリングリクエストでは、サーバーは特定のモデル名を直接指定するのではなく、<strong>3つの優先度</strong>を0〜1の値で指定します。クライアント側が最終的なモデルを選択するため、サーバーは特定のAIプロバイダーに依存しません。</p>
+    </div>
+
+    <table class="compare-table">
+      <tr><th>優先度パラメータ</th><th>英語名</th><th>意味</th><th>高い値の場合</th></tr>
+      <tr>
+        <td><strong>知能優先度</strong></td>
+        <td>intelligencePriority</td>
+        <td>高度な推論能力の重要度</td>
+        <td>Opus等の高性能モデルを選択</td>
+      </tr>
+      <tr>
+        <td><strong>速度優先度</strong></td>
+        <td>speedPriority</td>
+        <td>低レイテンシの重要度</td>
+        <td>Haiku等の高速モデルを選択</td>
+      </tr>
+      <tr>
+        <td><strong>コスト優先度</strong></td>
+        <td>costPriority</td>
+        <td>低コストの重要度</td>
+        <td>安価なモデルを選択</td>
+      </tr>
+    </table>
+
+    <h4>サンプリングのHuman-in-the-loop</h4>
+    <p>サンプリングでは、<strong>信頼と安全のため、人間による確認</strong>が常に推奨されます。</p>
+    <ol>
+      <li>サーバーが<code>sampling/createMessage</code>リクエストを送信</li>
+      <li>クライアントがユーザーにリクエスト内容を<strong>提示して承認を求める</strong></li>
+      <li>ユーザーが承認（または修正）→ クライアントがLLMに送信</li>
+      <li>LLMの応答をユーザーが<strong>再度確認</strong>してからサーバーに返送</li>
+    </ol>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">サンプリングでは、リクエストと応答の<strong>両方</strong>でユーザー確認が推奨されます。サーバーがLLMを無制限に利用することを防ぐ設計です。これは「<strong>人間が常にループに入る</strong>（Human-in-the-loop）」という原則に基づいています。</p>
+    </div>
+
+    <h3>Elicitation（引き出し） — 新しいプリミティブ</h3>
+    <p>MCP仕様には<strong>Elicitation（エリシテーション / 引き出し）</strong>という機能があります。サーバーがクライアントを通じて<strong>ユーザーから追加情報を直接取得</strong>できる仕組みです。</p>
+
+    <div class="concept-box">
+      <div class="label">たとえ話で理解する</div>
+      <p><strong>サンプリング</strong>が「サーバーがAIに判断を仰ぐ」なら、<strong>Elicitation</strong>は「サーバーがユーザーに質問する」。レストランの料理人（サーバー）が、料理の味付けについてお客さん（ユーザー）に直接「辛さはどうしますか？」と聞くイメージです。</p>
+    </div>
+
+    <table class="compare-table">
+      <tr><th>機能</th><th>通信方向</th><th>対話相手</th><th>用途</th></tr>
+      <tr><td><strong>Sampling</strong></td><td>サーバー → LLM</td><td>AIモデル</td><td>推論・判断を依頼</td></tr>
+      <tr><td><strong>Elicitation</strong></td><td>サーバー → ユーザー</td><td>人間</td><td>追加情報の取得、操作の確認</td></tr>
+      <tr><td><strong>通知（Notification）</strong></td><td>サーバー → クライアント</td><td>—（一方通行）</td><td>進捗報告、ログ送信</td></tr>
+    </table>
+
+    <h3>セッション管理（Session Management）</h3>
+    <p>Streamable HTTPトランスポートでは、<strong>セッション管理</strong>の仕組みが提供されています。</p>
+
+    <table class="compare-table">
+      <tr><th>項目</th><th>説明</th></tr>
+      <tr><td><strong>セッションID</strong></td><td>初期化時にサーバーが<code>Mcp-Session-Id</code>ヘッダーで発行</td></tr>
+      <tr><td><strong>セッション維持</strong></td><td>クライアントは以降のリクエストに必ずセッションIDを含める</td></tr>
+      <tr><td><strong>セッション終了</strong></td><td>クライアントがHTTP DELETEで明示的に終了。サーバーも任意に終了可能</td></tr>
+      <tr><td><strong>セッション切れ</strong></td><td>サーバーがHTTP 404を返した場合、クライアントは新しい初期化から再開</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">stdioとの違い</div>
+      <p><strong>stdio</strong>トランスポートではプロセス自体がセッションを表すため、明示的なセッション管理は不要です。プロセスの起動=接続開始、プロセスの終了=接続終了です。<strong>Streamable HTTP</strong>はHTTPベースのため、セッションIDで状態を管理する必要があります。</p>
+    </div>
+
+    <h3>トランスポート選定の実践基準</h3>
+    <p>トランスポート選定の詳細な判断基準を整理します。</p>
+
+    <table class="compare-table">
+      <tr><th>判断基準</th><th>stdio</th><th>Streamable HTTP</th></tr>
+      <tr><td><strong>実行場所</strong></td><td>ローカル（同一マシン）</td><td>ローカルまたはリモート</td></tr>
+      <tr><td><strong>クライアント数</strong></td><td>通常1つ（単一プロセス）</td><td>複数クライアントに対応可能</td></tr>
+      <tr><td><strong>認証方式</strong></td><td>プロセス権限に依存</td><td>OAuth / Bearer Token / カスタムヘッダー</td></tr>
+      <tr><td><strong>サンプリング対応</strong></td><td>対応</td><td>対応</td></tr>
+      <tr><td><strong>通知（Notification）</strong></td><td>対応</td><td>対応（SSEストリーム経由）</td></tr>
+      <tr><td><strong>再接続・再配信</strong></td><td>非対応（プロセス終了=終了）</td><td><strong>対応</strong>（Last-Event-IDで再開）</td></tr>
+      <tr><td><strong>ネットワーク経由</strong></td><td>不可</td><td>可能</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">トランスポート選定で覚えるべきポイント: (1) <strong>stdioはローカル専用</strong>で最もシンプル、(2) <strong>Streamable HTTPはリモート対応</strong>でサンプリング・通知に対応、(3) Streamable HTTPでは<strong>セッション管理</strong>（Mcp-Session-Id）が必要、(4) 旧HTTP+SSEトランスポートはStreamable HTTPに<strong>置き換えられた</strong>。</p>
+    </div>
+  </div>
+
   <!-- Section 9: 用語集 -->
   <div id="m6-s9" class="card" style="display:none">
     <h2>用語集</h2>
@@ -3527,6 +4259,11 @@
     <div class="glossary-item"><div class="glossary-term">初期化ハンドシェイク</div><div class="glossary-en">Initialization Handshake</div><div class="glossary-def">MCPクライアントとサーバーが接続時に互いの能力を確認し合う手順。</div></div>
     <div class="glossary-item"><div class="glossary-term">ステートレスHTTP</div><div class="glossary-en">Stateless HTTP</div><div class="glossary-def">状態を保持しないHTTPトランスポート。水平スケーリングが容易だが、サンプリングや通知は非対応。</div></div>
     <div class="glossary-item"><div class="glossary-term">Streamable HTTP</div><div class="glossary-en">Streamable HTTP</div><div class="glossary-def">HTTP通信にストリーミング機能を加えたMCPトランスポート。リモート接続で進捗通知やサンプリングに対応。</div></div>
+    <div class="glossary-item"><div class="glossary-term">OAuth</div><div class="glossary-en">OAuth</div><div class="glossary-def">ユーザーのパスワードを直接渡さずにサービス間でアクセス権を委譲する認証の仕組み。MCP仕様がリモートサーバーの認証方式として推奨。</div></div>
+    <div class="glossary-item"><div class="glossary-term">DNS Rebinding攻撃</div><div class="glossary-en">DNS Rebinding Attack</div><div class="glossary-def">悪意あるWebサイトがDNSを操作してローカルサーバーにアクセスする攻撃。Originヘッダーの検証で防止する。</div></div>
+    <div class="glossary-item"><div class="glossary-term">Elicitation</div><div class="glossary-en">Elicitation</div><div class="glossary-def">MCPサーバーがクライアントを通じてユーザーから追加情報を直接取得する仕組み。操作の確認や追加入力の要求に使う。</div></div>
+    <div class="glossary-item"><div class="glossary-term">モデル優先度</div><div class="glossary-en">Model Preferences</div><div class="glossary-def">サンプリング時にサーバーが指定する3つの優先度（知能/速度/コスト）。クライアントが最終的なモデルを選択する。</div></div>
+    <div class="glossary-item"><div class="glossary-term">セッション管理</div><div class="glossary-en">Session Management</div><div class="glossary-def">Streamable HTTPでクライアントとサーバーの状態を維持する仕組み。Mcp-Session-Idヘッダーで管理される。</div></div>
   </div>
 
   <div id="m6-s10" class="card" style="display:none">
@@ -3617,6 +4354,60 @@
         <div class="quiz-option" onclick="selectAnswer('m6',9,2)">メリット: セッション管理が自動化される / 失う: HTTP通信の安定性</div>
         <div class="quiz-option" onclick="selectAnswer('m6',9,3)">メリット: サンプリングが高速化される / 失う: ログ通知</div>
         <div class="quiz-explanation" id="m6-q10-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m6-q11">
+        <div class="q-text">Q11. チームでGitHub MCPサーバーを共有する際、.mcp.jsonにおけるアクセストークンの最も安全な扱い方はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',10,0)">.mcp.jsonのenvフィールドにトークンの値を直接書き、Gitにコミットする</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',10,1)">.mcp.jsonのenvフィールドで環境変数を参照し（${GITHUB_TOKEN}形式）、トークンの実体は各メンバーの環境変数に保管する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',10,2)">~/.claude.jsonにトークンを含めて設定し、.mcp.jsonは使わない</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',10,3)">CLAUDE.mdにトークンを記述してClaude Codeに読み込ませる</div>
+        <div class="quiz-explanation" id="m6-q11-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m6-q12">
+        <div class="q-text">Q12. MCPのStreamable HTTPトランスポートを実装する際、セキュリティ対策として公式仕様が必須としているものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',11,0)">すべてのHTTPリクエストを暗号化し、VPN経由でのみ接続を許可する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',11,1)">Originヘッダーの検証（DNS Rebinding攻撃対策）と、ローカル実行時のlocalhost限定バインド</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',11,2)">MCPサーバーにファイアウォールルールを設定し、特定IPのみ許可する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',11,3)">サーバー起動時にユーザーの生体認証を要求する</div>
+        <div class="quiz-explanation" id="m6-q12-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m6-q13">
+        <div class="q-text">Q13. MCPのサンプリング機能で、サーバーがLLMに推論を依頼する際のモデル選択方法として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',12,0)">サーバーが使用するモデル名を直接指定し、クライアントはそのモデルを必ず使用する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',12,1)">サーバーはモデルのヒントと3つの優先度（知能/速度/コスト）を指定し、クライアントが最終的なモデルを選択する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',12,2)">クライアントがサーバーの機能を分析して自動的に最適なモデルを選択する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',12,3)">サーバーとクライアントがネゴシエーションして共同でモデルを決定する</div>
+        <div class="quiz-explanation" id="m6-q13-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m6-q14">
+        <div class="q-text">Q14. MCPのElicitation機能について正しい説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',13,0)">サーバーがLLMに推論を依頼する機能で、サンプリングの別名である</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',13,1)">クライアントがサーバーの能力を問い合わせる初期化ハンドシェイクの一部である</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',13,2)">サーバーがクライアントを通じてユーザーから追加情報を直接取得できる機能で、操作の確認や追加入力の要求に使う</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',13,3)">MCPサーバーのログをクライアントに送信するための通知メカニズムである</div>
+        <div class="quiz-explanation" id="m6-q14-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m6-q15">
+        <div class="q-text">Q15. ローカル環境でMCPサーバーを使う場合とリモート環境で使う場合のトランスポート選定として、最も適切な組み合わせはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',14,0)">ローカル: Streamable HTTP / リモート: stdio</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',14,1)">ローカル: stdio / リモート: Streamable HTTP</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',14,2)">ローカル: ステートレスHTTP / リモート: stdio</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',14,3)">どちらの場合もStreamable HTTPを使用する</div>
+        <div class="quiz-explanation" id="m6-q15-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m6-q16">
+        <div class="q-text">Q16. Streamable HTTPトランスポートのセッション管理について正しい記述はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',15,0)">セッションIDはクライアントが生成し、サーバーに通知する</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',15,1)">セッションIDは初期化時にサーバーがMcp-Session-Idヘッダーで発行し、クライアントは以降のリクエストにこのIDを含める</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',15,2)">セッション管理はオプションではなく、すべてのStreamable HTTPサーバーで必須である</div>
+        <div class="quiz-option" onclick="selectAnswer('m6',15,3)">セッションはHTTP Cookieで自動管理されるため、特別な実装は不要である</div>
+        <div class="quiz-explanation" id="m6-q16-exp"></div>
       </div>
 
       <div id="m6-quiz-result" class="quiz-result" style="display:none"></div>
@@ -4545,6 +5336,10 @@
     <button class="section-tab" onclick="showSection('m9','s9',this)">エラー処理</button>
     <button class="section-tab" onclick="showSection('m9','s10',this)">コンテキスト隔離</button>
     <button class="section-tab" onclick="showSection('m9','s11',this)">安全なデプロイ</button>
+    <button class="section-tab" onclick="showSection('m9','s12',this)">SDK実装詳細</button>
+    <button class="section-tab" onclick="showSection('m9','s13',this)">Hooks実践</button>
+    <button class="section-tab" onclick="showSection('m9','s14',this)">エラー伝搬設計</button>
+    <button class="section-tab" onclick="showSection('m9','s15',this)">安全なデプロイ実践</button>
   </div>
 
   <!-- Section 1: エージェントとは -->
@@ -4880,6 +5675,56 @@
       <div class="glossary-en">Idempotency</div>
       <div class="glossary-def">同じ操作を複数回実行しても結果が変わらない性質。リトライを安全に行うための重要な設計原則。</div>
     </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Client SDK</div>
+      <div class="glossary-en">Client SDK</div>
+      <div class="glossary-def">Claude APIを直接呼び出すためのライブラリ。開発者がツールループを自前で実装する。Agent SDKとは異なり、エージェントループの自動管理機能を持たない。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ストリーミング</div>
+      <div class="glossary-en">Streaming</div>
+      <div class="glossary-def">エージェントの実行結果を完了を待たずにリアルタイムで受け取る仕組み。Agent SDKのquery()がasync iteratorを返す形式で実現。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">最大ターン数</div>
+      <div class="glossary-en">max_turns</div>
+      <div class="glossary-def">エージェントループの最大繰り返し回数を制限する安全装置。正常な終了条件ではなく、異常時の暴走防止パラメータ。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">権限判定優先順位</div>
+      <div class="glossary-en">Permission Decision Priority</div>
+      <div class="glossary-def">複数のHookが異なる権限判定を返した場合の優先順位。deny > ask > allowの順で、最も制限的な判定が採用される。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">非同期Hook</div>
+      <div class="glossary-en">Async Hook</div>
+      <div class="glossary-def">エージェントの処理をブロックしないHook。ログ記録や通知送信など副作用のみに使用。操作のブロックやコンテキスト注入はできない。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">エスカレーション</div>
+      <div class="glossary-en">Escalation</div>
+      <div class="glossary-def">サブエージェントが自力で解決できない問題をコーディネーター（親エージェント）に報告し、判断を仰ぐ仕組み。構造化エラー情報とともに伝搬する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">サンドボックス</div>
+      <div class="glossary-en">Sandbox</div>
+      <div class="glossary-def">エージェントの実行環境を制限し、許可された操作のみ実行可能にする仕組み。Sandbox Runtime、Docker、gVisor、VMの4種類がある。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">プロキシパターン</div>
+      <div class="glossary-en">Proxy Pattern</div>
+      <div class="glossary-def">エージェントのセキュリティ境界外でプロキシを実行し、認証情報を注入するアーキテクチャ。エージェント自体はAPIキーを知らない。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">プロンプトインジェクション</div>
+      <div class="glossary-en">Prompt Injection</div>
+      <div class="glossary-def">エージェントが処理するコンテンツに悪意ある指示を埋め込む攻撃。ツール結果を「信頼できない外部入力」として検証することが対策。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">データフロー制御</div>
+      <div class="glossary-en">Data Flow Control</div>
+      <div class="glossary-def">エージェントのアクセス先だけでなく、データの流れ（入口と出口）を管理する設計。ネットワーク制御、ファイルシステム制御、プロキシ認証の3要素で構成。</div>
+    </div>
   </div>
 
   <!-- Section 6: クイズ -->
@@ -4976,6 +5821,78 @@
         <div class="quiz-option" onclick="selectAnswer('m9',9,2)">is_errorはUI表示用のフラグなので、エージェントの動作には影響しない</div>
         <div class="quiz-option" onclick="selectAnswer('m9',9,3)">エラー時はツール結果を返さず、エージェントに空のレスポンスを返すのが正しい</div>
         <div class="quiz-explanation" id="m9-q10-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q11">
+        <div class="q-text">Q11. Agent SDKとClient SDK（直接API呼び出し）の最も重要な違いは何ですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',10,0)">Agent SDKのほうが多くのモデルに対応している</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',10,1)">Agent SDKはエージェントループを自動管理し、Client SDKは開発者が自前でループを実装する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',10,2)">Client SDKのほうがストリーミングに対応している</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',10,3)">Agent SDKはPythonのみ対応で、Client SDKは多言語対応</div>
+        <div class="quiz-explanation" id="m9-q11-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q12">
+        <div class="q-text">Q12. Agent SDKのmax_turnsパラメータについて、正しい説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',11,0)">エージェントの正常な終了条件として使用すべきパラメータである</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',11,1)">max_turnsに到達するとHooksが必ず実行される</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',11,2)">異常時の暴走防止用の安全装置であり、正常時はstop_reasonによる自然な終了を目指すべき</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',11,3)">max_turnsの設定はオプションであり、設定しなくても問題はない</div>
+        <div class="quiz-explanation" id="m9-q12-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q13">
+        <div class="q-text">Q13. 複数のHookが同じツール呼び出しに対して異なる権限判定を返した場合、どの判定が優先されますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',12,0)">最初に登録されたHookの判定が優先される</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',12,1)">多数決で判定される</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',12,2)">allowが常に優先される（許可優先）</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',12,3)">denyが最優先される（deny > ask > allow）</div>
+        <div class="quiz-explanation" id="m9-q13-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q14">
+        <div class="q-text">Q14. 監査ログの記録にHookを使う場合、最も適切な設計はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',13,0)">PreToolUse Hookで同期的にログを記録し、記録完了後にツールを実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',13,1)">PostToolUse Hookで非同期（async: true）にログを記録し、エージェントの処理をブロックしない</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',13,2)">プロンプトで「全操作をログに記録してください」と指示する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',13,3)">Stop Hookでセッション終了時にまとめてログを記録する</div>
+        <div class="quiz-explanation" id="m9-q14-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q15">
+        <div class="q-text">Q15. マルチエージェントシステムで、3つのサブエージェントのうち1つがエラーで失敗した場合、最も適切な対応はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',14,0)">全体を失敗とし、全てのサブエージェントの結果を破棄する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',14,1)">失敗したサブエージェントを無限にリトライする</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',14,2)">成功した2つのサブエージェントの結果で部分的な報告書を作成し、欠落情報を明記する（グレースフルデグラデーション）</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',14,3)">エラーを無視して、失敗したサブエージェントの結果をダミーデータで補完する</div>
+        <div class="quiz-explanation" id="m9-q15-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q16">
+        <div class="q-text">Q16. エージェントが外部APIにアクセスする際の認証情報管理として、Anthropicが推奨するアーキテクチャはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',15,0)">エージェントの環境変数にAPIキーを設定する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',15,1)">システムプロンプトにAPIキーを記載する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',15,2)">エージェントのセキュリティ境界外にプロキシを配置し、プロキシが認証情報を注入する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',15,3)">APIキーをツールのdescriptionに含める</div>
+        <div class="quiz-explanation" id="m9-q16-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q17">
+        <div class="q-text">Q17. エージェントのネットワーク分離として最も安全な構成はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',16,0)">ファイアウォールで危険なポートだけをブロックする</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',16,1)">--network noneで全ネットワークを遮断し、Unixソケット経由のプロキシのみで通信する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',16,2)">VPNを使用してトラフィックを暗号化する</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',16,3)">ドメインのブラックリストで危険なサイトをブロックする</div>
+        <div class="quiz-explanation" id="m9-q17-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m9-q18">
+        <div class="q-text">Q18. エージェントの分離技術について、Sandbox Runtimeの特徴として正しいのはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',17,0)">分離強度は最高だが、パフォーマンスへの影響が大きい</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',17,1)">パフォーマンスへの影響は非常に小さいが、ホストカーネルを共有するため分離は限定的</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',17,2)">仮想マシンと同等の分離強度を持つ</div>
+        <div class="quiz-option" onclick="selectAnswer('m9',17,3)">Linux環境でのみ使用可能で、macOSでは動作しない</div>
+        <div class="quiz-explanation" id="m9-q18-exp"></div>
       </div>
 
       <div id="m9-quiz-result" class="quiz-result" style="display:none"></div>
@@ -5290,6 +6207,353 @@
     </div>
   </div>
 
+  <!-- Section 12: Agent SDK実装詳細 -->
+  <div id="m9-s12" class="card" style="display:none">
+    <h2>Agent SDK実装詳細 &mdash; ストリーミング・max_turns・SDK vs 直接API</h2>
+    <p>Section 7ではAgent SDKの基本を学びました。ここでは、実際にエージェントを動かすときに知っておくべき<strong>実装レベルの詳細</strong>を掘り下げます。</p>
+
+    <h3>Client SDK vs Agent SDK &mdash; 2つのSDKの違い</h3>
+    <p>Anthropicは2種類のSDKを提供しています。名前が似ているため混乱しやすいですが、役割が全く異なります。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Client SDK（クライアントSDK）：</strong>Claude APIを直接呼び出すためのライブラリ。開発者がツールループを自前で実装する必要があります。<code>while response.stop_reason == "tool_use"</code> のようなループを自分で書く「マニュアル車」のようなもの。</p>
+      <p><strong>Agent SDK（エージェントSDK）：</strong>Claude Codeと同じエージェントループ・ツール統合・コンテキスト管理をライブラリとして提供。<code>query()</code>を呼ぶだけでエージェントが自律的に動く「オートマ車」のようなもの。</p>
+    </div>
+
+    <table class="compare-table">
+      <tr><th>比較項目</th><th>Client SDK（直接API）</th><th>Agent SDK</th></tr>
+      <tr><td>ツールループ</td><td>開発者が自前実装</td><td>SDKが自動管理</td></tr>
+      <tr><td>ツール定義</td><td>JSON Schemaを自分で記述</td><td>組み込みツール（Read/Write/Bash等）が利用可能</td></tr>
+      <tr><td>サブエージェント</td><td>自前で実装が必要</td><td><code>Agent</code>ツールで簡単に生成</td></tr>
+      <tr><td>コンテキスト管理</td><td>自前で管理</td><td>自動的にコンテキスト圧縮が動作</td></tr>
+      <tr><td>適した場面</td><td>細かい制御が必要、軽量な処理</td><td>複雑なエージェント、ファイル操作、マルチステップ作業</td></tr>
+      <tr><td>提供言語</td><td>Python / TypeScript</td><td>Python（<code>claude-agent-sdk</code>） / TypeScript（<code>@anthropic-ai/claude-agent-sdk</code>）</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">「エージェントを作るにはClient SDKで十分か、Agent SDKが必要か」はシナリオ問題で問われやすいテーマです。単純なAPI呼び出し+ツール1つ程度ならClient SDKで十分ですが、ファイル操作・マルチステップ・サブエージェントが必要な場面ではAgent SDKが適切です。</p>
+    </div>
+
+    <h3>Agent SDKの組み込みツール</h3>
+    <p>Agent SDKには、Claude Codeと同じ組み込みツールが搭載されています。独自にツールを定義しなくても、すぐに使える「標準装備」です。</p>
+
+    <table class="compare-table">
+      <tr><th>ツール名</th><th>機能</th><th>たとえ</th></tr>
+      <tr><td><strong>Read</strong></td><td>ファイル読み取り</td><td>本を開いて読む</td></tr>
+      <tr><td><strong>Write</strong></td><td>ファイル新規作成</td><td>白紙のノートに書く</td></tr>
+      <tr><td><strong>Edit</strong></td><td>既存ファイルの編集</td><td>既存の文書を赤ペンで修正する</td></tr>
+      <tr><td><strong>Bash</strong></td><td>ターミナルコマンド実行</td><td>パソコンのコマンド入力</td></tr>
+      <tr><td><strong>Glob / Grep</strong></td><td>ファイル検索 / 内容検索</td><td>図書館の蔵書検索</td></tr>
+      <tr><td><strong>WebSearch / WebFetch</strong></td><td>Web検索 / Webページ取得</td><td>インターネットで調べ物</td></tr>
+      <tr><td><strong>Agent</strong></td><td>サブエージェント起動</td><td>部下に仕事を委任する</td></tr>
+    </table>
+
+    <h3>ストリーミング（Streaming）</h3>
+    <p>Agent SDKの<code>query()</code>関数は、結果を<strong>ストリーミング形式</strong>で返します。これは、「手紙を全部書き終わってから投函する」のではなく、「書きながらリアルタイムに1文字ずつ送る」ようなイメージです。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>ストリーミング（Streaming）：</strong>エージェントの実行結果を、完了を待たずにリアルタイムで受け取る仕組み。Agent SDKでは<code>query()</code>がasync iterator（非同期イテレータ）を返し、メッセージが生成されるたびに順次取得できます。</p>
+    </div>
+
+    <p>ストリーミングでは、エージェントの動作状況をリアルタイムに追跡できます。</p>
+    <ul>
+      <li><strong>initメッセージ</strong> &mdash; セッションの開始を知らせる。<code>session_id</code>が含まれ、セッション再開に使える</li>
+      <li><strong>assistantメッセージ</strong> &mdash; Claudeの応答テキスト</li>
+      <li><strong>tool_useメッセージ</strong> &mdash; ツール呼び出しの内容</li>
+      <li><strong>tool_resultメッセージ</strong> &mdash; ツール実行の結果</li>
+      <li><strong>resultメッセージ</strong> &mdash; エージェントの最終結果</li>
+    </ul>
+
+    <h3>max_turns &mdash; 安全装置としてのループ制限</h3>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>max_turns（最大ターン数）：</strong>エージェントループの最大繰り返し回数を制限するパラメータ。暴走を防ぐ安全装置です。</p>
+      <p>エージェントループは<code>stop_reason</code>で制御されますが、万が一ループが終了しない場合に備えて、<strong>ハードリミット</strong>としてmax_turnsを設定します。これは「制限時間」のようなもので、正常動作時には到達しませんが、異常時に無限ループを防ぎます。</p>
+    </div>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">max_turnsに到達した場合、エージェントの実行は強制停止されます。この際、Hooksが実行されないことがある点に注意してください。max_turnsは「正常な終了条件」ではなく「異常時の安全装置」として設計し、通常はstop_reasonによる自然な終了を目指しましょう。</p>
+    </div>
+
+    <h3>セッション管理</h3>
+    <p>Agent SDKは、長時間のエージェント作業を中断・再開する仕組みも提供しています。</p>
+
+    <table class="compare-table">
+      <tr><th>機能</th><th>英語名</th><th>仕組み</th><th>注意点</th></tr>
+      <tr><td><strong>セッション再開</strong></td><td>Resume</td><td>initメッセージの<code>session_id</code>を使い、<code>resume=session_id</code>で再開</td><td>コード変更があった場合、変更内容をエージェントに明示的に通知する必要がある</td></tr>
+      <tr><td><strong>設定ソース統合</strong></td><td>Setting Sources</td><td><code>setting_sources=["project"]</code>でCLAUDE.md・Skills・Commandsを読み込み</td><td>プロジェクトの規約をAgent SDKベースのアプリに適用できる</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Agent SDKとClient SDKの使い分けは頻出です。判断基準は「エージェントループを自前で管理したいか、SDKに任せたいか」です。また、Agent SDKの<code>query()</code>がストリーミング形式であること、max_turnsは安全装置であること（正常な終了条件ではない）も覚えておきましょう。</p>
+    </div>
+  </div>
+
+  <!-- Section 13: Hooks実践 -->
+  <div id="m9-s13" class="card" style="display:none">
+    <h2>Hooks実践 &mdash; ガードレール・監査ログ・権限制御</h2>
+    <p>Section 8ではHooksの基本（4つのタイミング）を学びました。ここでは公式ドキュメントに基づいた<strong>実践的な設計パターン</strong>を深掘りします。</p>
+
+    <h3>Hookイベントの全体像</h3>
+    <p>公式ドキュメントでは、基本の4つに加えてさらに多くのイベントが定義されています。主要なものを押さえましょう。</p>
+
+    <table class="compare-table">
+      <tr><th>イベント</th><th>英語名</th><th>トリガー</th><th>用途</th></tr>
+      <tr><td><strong>ツール実行前</strong></td><td>PreToolUse</td><td>ツール呼び出しの直前</td><td>入力検証、操作ブロック、ログ記録</td></tr>
+      <tr><td><strong>ツール実行後</strong></td><td>PostToolUse</td><td>ツール実行完了後</td><td>結果検証、監査ログ、追加情報注入</td></tr>
+      <tr><td><strong>ツール失敗時</strong></td><td>PostToolUseFailure</td><td>ツール実行が失敗した時</td><td>エラー分析、アラート、代替手段の提案</td></tr>
+      <tr><td><strong>ユーザー入力時</strong></td><td>UserPromptSubmit</td><td>ユーザーがプロンプトを送信した時</td><td>入力のサニタイズ、プリフライトチェック</td></tr>
+      <tr><td><strong>実行停止時</strong></td><td>Stop</td><td>エージェントが実行を停止した時</td><td>クリーンアップ処理、最終レポート生成</td></tr>
+      <tr><td><strong>サブエージェント開始</strong></td><td>SubagentStart</td><td>サブエージェントの初期化</td><td>サブエージェントの追跡、リソース割り当て</td></tr>
+      <tr><td><strong>サブエージェント終了</strong></td><td>SubagentStop</td><td>サブエージェントの完了</td><td>結果の検証、リソース解放</td></tr>
+      <tr><td><strong>権限要求時</strong></td><td>PermissionRequest</td><td>権限ダイアログ表示時</td><td>自動的な権限判定（allow/deny/ask）</td></tr>
+    </table>
+
+    <h3>権限判定の優先順位</h3>
+    <p>複数のHookが同じイベントに登録されている場合、権限判定には<strong>明確な優先順位</strong>があります。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>権限判定の優先順位: deny &gt; ask &gt; allow</strong></p>
+      <p>複数のHookが異なる判定を返した場合、最も制限的な判定が優先されます。</p>
+      <p>・いずれかのHookが<strong>deny</strong>を返す → 他のHookの結果に関係なく<strong>操作はブロック</strong></p>
+      <p>・denyがなく、いずれかが<strong>ask</strong>を返す → ユーザーに<strong>確認を求める</strong></p>
+      <p>・全てのHookが<strong>allow</strong>を返す → 操作を<strong>許可</strong></p>
+    </div>
+
+    <p>この仕組みは「拒否権」のようなものです。10人中9人が「OK」と言っても、1人が「ダメ」と言えば操作は止まります。これにより、安全側に倒す設計になっています。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">権限判定の優先順位「<strong>deny &gt; ask &gt; allow</strong>」は非常に重要です。これは「安全側に倒す（Fail-safe）」の原則に基づいています。試験では「複数のHookが矛盾する判定を返した場合どうなるか？」という問題が出る可能性があります。</p>
+    </div>
+
+    <h3>ルールベースガードレールの設計パターン</h3>
+    <p>Hooksを使ったガードレールには、いくつかの典型的なパターンがあります。</p>
+
+    <div class="concept-box">
+      <div class="label">パターン1: 入力バリデーション（PreToolUse）</div>
+      <p><strong>目的:</strong> ツールに渡されるパラメータを検証し、不正な値をブロックする</p>
+      <p><strong>例:</strong> ファイル削除ツールが呼ばれた際、対象パスが許可されたディレクトリ内かチェック。<code>/etc/</code>や<code>/usr/</code>への操作はブロックする</p>
+      <p><strong>実装:</strong> PreToolUseフックのコールバック内で<code>tool_input.file_path</code>をチェックし、許可リスト外なら<code>permissionDecision: "deny"</code>を返す</p>
+    </div>
+
+    <div class="concept-box">
+      <div class="label">パターン2: 出力検証（PostToolUse）</div>
+      <p><strong>目的:</strong> ツール実行結果を検証し、追加情報を注入する</p>
+      <p><strong>例:</strong> データベース検索の結果に個人情報が含まれていた場合、<code>additionalContext</code>で「この結果には個人情報が含まれています。マスキングして表示してください」とモデルに指示を追加</p>
+    </div>
+
+    <div class="concept-box">
+      <div class="label">パターン3: 操作監査（PostToolUse）</div>
+      <p><strong>目的:</strong> 全ての操作を監査ログに記録する</p>
+      <p><strong>例:</strong> ツール名、入力パラメータ、実行結果、タイムスタンプを外部ログサービスに送信。<code>async: true</code>を使えば、ログ送信の完了を待たずにエージェントの処理を続行できる</p>
+    </div>
+
+    <h3>非同期Hook &mdash; ブロックしない副作用</h3>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>非同期Hook（Async Hook）：</strong>Hookのコールバックが<code>{ async: true }</code>を返すと、エージェントはHookの完了を待たずに処理を続行します。ログ記録や通知送信など、結果がエージェントの動作に影響しない<strong>副作用（Side Effect）</strong>にのみ使用します。</p>
+      <p><strong>制限:</strong> 非同期Hookでは操作のブロック・入力の変更・コンテキスト注入はできません。</p>
+    </div>
+
+    <h3>matcherによるフィルタリング</h3>
+    <p>全てのツール呼び出しに対してHookを実行するのではなく、特定のツールだけを対象にできます。</p>
+
+    <table class="compare-table">
+      <tr><th>matcher設定</th><th>対象</th><th>たとえ</th></tr>
+      <tr><td>指定なし</td><td>全てのイベントに対して発火</td><td>全社一律のルール</td></tr>
+      <tr><td><code>"Bash"</code></td><td>Bashツールの呼び出しのみ</td><td>コマンド実行だけをチェック</td></tr>
+      <tr><td><code>"mcp__.*"</code>（正規表現）</td><td>全てのMCPツール呼び出し</td><td>外部ツール全般をチェック</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">Hookイベント名は<strong>大文字小文字を区別</strong>します。<code>PreToolUse</code>は正しいですが、<code>preToolUse</code>や<code>pretooluse</code>では発火しません。また、matcherはツール名のみにマッチします。ファイルパスでフィルタしたい場合は、コールバック内で<code>tool_input.file_path</code>をチェックしてください。</p>
+    </div>
+  </div>
+
+  <!-- Section 14: エラー伝搬設計 -->
+  <div id="m9-s14" class="card" style="display:none">
+    <h2>エラー伝搬設計 &mdash; スキップ・エスカレーション・構造化エラー</h2>
+    <p>Section 9ではエラー処理の基本を学びました。ここでは、マルチエージェントシステムにおける<strong>より高度なエラー伝搬パターン</strong>を掘り下げます。</p>
+
+    <h3>エラー対応の4つの戦略</h3>
+    <p>エージェントがエラーに遭遇したとき、取りうる対応は4つあります。状況に応じて最適な戦略を選ぶことが重要です。</p>
+
+    <table class="compare-table">
+      <tr><th>戦略</th><th>英語名</th><th>いつ使うか</th><th>たとえ</th></tr>
+      <tr><td><strong>リトライ</strong></td><td>Retry</td><td>一時的なエラー（isRetryable: true）</td><td>電話が話し中 → 少し待ってかけ直す</td></tr>
+      <tr><td><strong>スキップ</strong></td><td>Skip</td><td>オプショナルな処理の失敗</td><td>追加資料の取得に失敗 → メインの報告書は作成できる</td></tr>
+      <tr><td><strong>代替手段</strong></td><td>Fallback</td><td>メインの方法が使えない</td><td>正面玄関が閉まっている → 裏口から入る</td></tr>
+      <tr><td><strong>エスカレーション</strong></td><td>Escalation</td><td>自力では解決不能</td><td>部下が上司に相談 → 上司が判断する</td></tr>
+    </table>
+
+    <h3>エスカレーションの仕組み</h3>
+    <p>マルチエージェントシステムでは、サブエージェントが解決できない問題をコーディネーター（親エージェント）に報告する「エスカレーション」が非常に重要です。</p>
+
+    <div class="concept-box">
+      <div class="label">エスカレーションの3段階</div>
+      <p><strong>段階1: サブエージェント内リトライ</strong> &mdash; まず自分で解決を試みる。リトライ可能なエラーなら指数バックオフで再試行（1秒→2秒→4秒）</p>
+      <p><strong>段階2: 構造化エラー報告</strong> &mdash; 自力で解決できない場合、「何が失敗したか」「リトライ済みか」「部分的な結果はあるか」を構造化して親に報告</p>
+      <p><strong>段階3: コーディネーターの判断</strong> &mdash; 親エージェントが「別のサブエージェントに再委任」「代替手段を試行」「グレースフルデグラデーション」のいずれかを選択</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Anthropicは「ツールが失敗していることをエージェントに伝え、エージェント自身に適応させる」アプローチが非常にうまく機能すると報告しています。構造化されたエラー情報（is_error、エラー種類、推奨アクション）を渡すことで、エージェントが最適な代替手段を自ら選択できます。</p>
+    </div>
+
+    <h3>PostToolUseFailure Hook &mdash; ツール失敗時の自動対応</h3>
+    <p>Agent SDKには、ツールが失敗した場合に自動的に呼ばれる専用のHookがあります。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>PostToolUseFailure Hook：</strong>ツールの実行が失敗したときだけ発火する特別なHook。通常のPostToolUseとは別に定義でき、エラー固有の処理（アラート送信、エラー分析、フォールバック起動など）を記述できます。</p>
+    </div>
+
+    <h3>スキップ戦略の設計</h3>
+    <p>全てのエラーが致命的なわけではありません。オプショナル（あれば嬉しいが、なくても目的は達成できる）な処理の失敗は、スキップして先に進むのが正しい判断です。</p>
+
+    <div class="concept-box">
+      <div class="label">スキップの判断基準</div>
+      <p><strong>スキップしてよいもの:</strong></p>
+      <p>・追加の装飾情報（関連記事の取得、サムネイル画像の生成等）</p>
+      <p>・冗長な検証（メインの検証は成功しているが、追加検証が失敗した）</p>
+      <p>・補足データ（メインの分析は完了しているが、比較データの取得に失敗）</p>
+      <p><strong>スキップしてはいけないもの:</strong></p>
+      <p>・コアな処理結果（検索結果なしにレポートは書けない）</p>
+      <p>・セキュリティ関連の検証（個人情報のマスキングは省略不可）</p>
+      <p>・依存関係のある前工程（次の工程の入力が得られない）</p>
+    </div>
+
+    <h3>グレースフルデグラデーションの実践</h3>
+    <p>Section 9で学んだグレースフルデグラデーションを、マルチエージェントの文脈でより具体的に見てみましょう。</p>
+
+    <div class="concept-box">
+      <div class="label">実践例: リサーチエージェント</div>
+      <p><strong>シナリオ:</strong> コーディネーターが3つのサブエージェント（Web検索/データベース検索/社内文書検索）に調査を委任</p>
+      <p><strong>データベース検索が失敗した場合:</strong></p>
+      <p>・全体を失敗にするのではなく、Web検索と社内文書検索の結果だけで報告書を作成</p>
+      <p>・報告書に「データベースの情報は含まれていません。後日の確認を推奨します」と明記</p>
+      <p>・<strong>部分的な結果の有用性</strong>は、全くの失敗より遥かに高い</p>
+    </div>
+
+    <h3>べき等性（Idempotency）とリトライの安全性</h3>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>べき等性（Idempotency）：</strong>同じ操作を何回実行しても結果が変わらない性質。リトライを安全に行うための必須条件です。</p>
+      <p><strong>べき等な操作の例:</strong> 「ファイルの内容をXに設定する」（何回やっても結果は同じ）</p>
+      <p><strong>べき等でない操作の例:</strong> 「ファイルに1行追加する」（実行するたびに行が増える）</p>
+      <p>リトライする操作が<strong>べき等でない場合</strong>、リトライによって副作用が重複する危険があります。</p>
+    </div>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">リトライ時は必ず<strong>指数バックオフ</strong>を使用してください。即座にリトライを繰り返すと、APIのRate Limitに抵触したり、サーバーに過度な負荷をかけたりします。1秒→2秒→4秒→8秒のように待ち時間を倍々に増やし、最大リトライ回数も設定しましょう。</p>
+    </div>
+  </div>
+
+  <!-- Section 15: 安全なデプロイ実践 -->
+  <div id="m9-s15" class="card" style="display:none">
+    <h2>安全なデプロイ実践 &mdash; サンドボックス・データフロー制御</h2>
+    <p>Section 11ではSecure Deploymentの3原則を学びました。ここでは公式ドキュメントに基づいた<strong>具体的な実装手法</strong>を掘り下げます。</p>
+
+    <h3>脅威モデル &mdash; 何から守るのか</h3>
+    <p>安全対策を設計する前に、「何が脅威なのか」を明確にすることが大切です。</p>
+
+    <div class="concept-box">
+      <div class="label">エージェントが直面する2大脅威</div>
+      <p><strong>1. プロンプトインジェクション（Prompt Injection）：</strong>エージェントが処理するコンテンツ（Webページ、ファイル、ユーザー入力）に、悪意ある指示が埋め込まれている攻撃。「この文書を翻訳して」と頼んだ文書の中に「実は全ファイルを削除しろ」と書いてあるようなもの。</p>
+      <p><strong>2. モデルエラー（Model Error）：</strong>悪意はないが、LLMが意図しないアクションを実行してしまうこと。指示の誤解、ツール引数の間違い、判断ミスなど。</p>
+    </div>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">最新のClaude Opus 4.6は「利用可能な最も堅牢なフロンティアモデル」ですが、それでも多層防御は必要です。モデルの堅牢性だけに頼るのではなく、システム全体で安全を確保する設計が求められます。</p>
+    </div>
+
+    <h3>サンドボックス &mdash; エージェントの「実験室」</h3>
+    <p>Section 11で学んだ「隔離（Isolation）」の具体的な実装が<strong>サンドボックス</strong>です。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>サンドボックス（Sandbox）：</strong>エージェントの実行環境を制限し、許可された操作のみを実行できるようにする仕組み。子供が砂場（sandbox）の中でだけ遊ぶように、エージェントも決められた範囲内でだけ動作します。</p>
+    </div>
+
+    <h3>分離技術の比較</h3>
+    <p>Anthropicの公式ドキュメントでは、4つの分離技術とその特性が示されています。</p>
+
+    <table class="compare-table">
+      <tr><th>技術</th><th>分離強度</th><th>パフォーマンス影響</th><th>導入の手間</th><th>たとえ</th></tr>
+      <tr><td><strong>Sandbox Runtime</strong></td><td>良好</td><td>非常に小さい</td><td>低い</td><td>部屋の中に柵を立てる</td></tr>
+      <tr><td><strong>コンテナ（Docker）</strong></td><td>設定次第</td><td>小さい</td><td>中程度</td><td>専用の部屋に入れる</td></tr>
+      <tr><td><strong>gVisor</strong></td><td>優秀</td><td>中〜大きい</td><td>中程度</td><td>防音室に入れる</td></tr>
+      <tr><td><strong>仮想マシン（VM）</strong></td><td>優秀</td><td>大きい</td><td>高い</td><td>別の建物に入れる</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">分離技術の選択は「分離強度」と「パフォーマンス」のトレードオフです。高いセキュリティが必要だがリアルタイム性も求められる場合はコンテナ、最高レベルの隔離が必要な場合はVMが適切です。Sandbox Runtimeはパフォーマンスへの影響が最小ですが、ホストカーネルを共有するため分離は限定的です。</p>
+    </div>
+
+    <h3>データフロー制御 &mdash; 情報の入口と出口を管理する</h3>
+    <p>エージェントが「何にアクセスできるか」だけでなく、「データがどこに流れるか」を制御することも重要です。</p>
+
+    <div class="concept-box">
+      <div class="label">データフロー制御の3要素</div>
+      <p><strong>1. ネットワーク制御：</strong>エージェントがアクセスできるネットワーク先を制限する。「必要なAPIだけに接続を許可する」という考え方。<code>--network none</code>で全ネットワークを遮断し、Unixソケット経由でプロキシのみ通信を許可するのが最も安全な構成。</p>
+      <p><strong>2. ファイルシステム制御：</strong>エージェントが読み書きできるファイルの範囲を限定する。作業ディレクトリのみ書き込み可能にし、機密ファイル（<code>.env</code>、<code>.git-credentials</code>、<code>~/.aws/credentials</code>等）へのアクセスをブロック。</p>
+      <p><strong>3. プロキシによる認証情報管理：</strong>エージェント自体にAPIキーや認証情報を渡さず、セキュリティ境界の外にあるプロキシが認証情報を注入する。</p>
+    </div>
+
+    <h3>プロキシパターン &mdash; 認証情報をエージェントから隔離する</h3>
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>プロキシパターン：</strong>エージェントのセキュリティ境界の<strong>外</strong>でプロキシサーバーを実行し、エージェントからのリクエストに認証情報を注入するアーキテクチャ。エージェント自体はAPIキーを知らず、プロキシが認証を代行します。</p>
+      <p><strong>たとえ:</strong> 会社の代表電話。外部への電話は全て受付を通す。受付が「どこにかけるか」をチェックし、許可された先にのみ接続する。社員は外部の電話番号を直接知る必要がない。</p>
+    </div>
+
+    <table class="compare-table">
+      <tr><th>方式</th><th>設定</th><th>特徴</th><th>用途</th></tr>
+      <tr><td><strong>ANTHROPIC_BASE_URL</strong></td><td>Claude APIリクエストのみプロキシ転送</td><td>プレーンテキストHTTPで検査・変更が可能</td><td>Claude API通信の監視・制御</td></tr>
+      <tr><td><strong>HTTP_PROXY / HTTPS_PROXY</strong></td><td>システム全体のトラフィックを転送</td><td>HTTPSではトンネル接続のため中身は見えない</td><td>全通信の経路制御</td></tr>
+    </table>
+
+    <h3>機密ファイルの除外リスト</h3>
+    <p>エージェントからアクセスをブロックすべきファイルの例です。</p>
+
+    <table class="compare-table">
+      <tr><th>カテゴリ</th><th>ファイル例</th><th>リスク</th></tr>
+      <tr><td>環境変数</td><td><code>.env</code></td><td>APIキー・秘密情報の漏洩</td></tr>
+      <tr><td>Git認証</td><td><code>.git-credentials</code></td><td>リポジトリへの不正アクセス</td></tr>
+      <tr><td>クラウド認証</td><td><code>~/.aws/credentials</code>, <code>~/.config/gcloud/</code></td><td>クラウドリソースへの不正操作</td></tr>
+      <tr><td>暗号鍵</td><td><code>*.pem</code>, <code>*.key</code></td><td>暗号化の突破、なりすまし</td></tr>
+      <tr><td>パッケージ認証</td><td><code>.npmrc</code>, <code>.pypirc</code></td><td>パッケージの不正公開</td></tr>
+    </table>
+
+    <h3>クラウド環境でのデプロイパターン</h3>
+    <div class="concept-box">
+      <div class="label">推奨アーキテクチャ</div>
+      <p><strong>5つの構成要素を組み合わせます:</strong></p>
+      <p><strong>1. プライベートサブネット:</strong> エージェントのコンテナはインターネットに直接接続できないプライベートネットワーク内で実行</p>
+      <p><strong>2. ファイアウォール:</strong> プロキシ以外への外部通信（Egress）を全てブロック</p>
+      <p><strong>3. プロキシ:</strong> ドメイン許可リストの適用、認証情報の注入、全トラフィックのログ記録</p>
+      <p><strong>4. 最小IAM権限:</strong> エージェントのサービスアカウントに必要最小限のクラウド権限だけを付与</p>
+      <p><strong>5. 監査ログ:</strong> プロキシで全通信を記録し、後から「何をしたか」を確認可能にする</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">安全なデプロイの設計問題では、「認証情報をエージェントに直接渡す」選択肢はアンチパターンです。プロキシパターンで認証情報をセキュリティ境界の外に保持し、エージェントには触れさせないのがベストプラクティスです。また、<code>--network none</code> + Unixソケットプロキシの構成は、ネットワーク分離の模範的なパターンとして覚えておきましょう。</p>
+    </div>
+  </div>
+
   <!-- Navigation -->
   <div class="btn-group" style="margin-top:2rem; justify-content: space-between;">
     <button class="btn btn-outline" onclick="showPage('m8')">&#8592; 前のモジュールへ</button>
@@ -5326,6 +6590,10 @@
     <button class="section-tab" onclick="showSection('m10','s6',this)">クイズ</button>
     <button class="section-tab" onclick="showSection('m10','s7',this)">高度なパターン</button>
     <button class="section-tab" onclick="showSection('m10','s8',this)">情報追跡と障害対応</button>
+    <button class="section-tab" onclick="showSection('m10','s9',this)">Hub-and-Spoke実装詳細</button>
+    <button class="section-tab" onclick="showSection('m10','s10',this)">Agent-as-Tool vs Handoff詳細</button>
+    <button class="section-tab" onclick="showSection('m10','s11',this)">情報出所追跡詳細</button>
+    <button class="section-tab" onclick="showSection('m10','s12',this)">フォールバックループ詳細</button>
   </div>
 
   <!-- Section 1: マルチエージェントとは -->
@@ -5708,6 +6976,324 @@
     </div>
   </div>
 
+  <!-- Section 9: Hub-and-Spoke実装詳細（拡充コンテンツ） -->
+  <div id="m10-s9" class="card" style="display:none">
+    <h2>Hub-and-Spoke実装の詳細</h2>
+    <p>Module 10の基礎編でHub-and-Spokeの概要を学びました。この拡充セクションでは、Anthropicが公式に構築した<strong>マルチエージェントリサーチシステム</strong>の実装を手がかりに、オーケストレーター（リードエージェント）の具体的な設計方法を掘り下げます。</p>
+
+    <h3>オーケストレーターの5つの責務</h3>
+    <p>Anthropicの公式実装では、リードエージェント（ハブ）が以下の5つの責務を担います。会社の<strong>プロジェクトマネージャー</strong>に例えると分かりやすいでしょう。</p>
+
+    <table class="compare-table">
+      <tr><th>責務</th><th>英語名</th><th>内容</th><th>PM比喩</th></tr>
+      <tr><td><strong>1. 戦略立案</strong></td><td>Strategy Planning</td><td>リクエストを分析し、Extended Thinkingを使って調査戦略を立案する</td><td>プロジェクト計画書の作成</td></tr>
+      <tr><td><strong>2. タスク分解</strong></td><td>Task Decomposition</td><td>戦略を3〜5個の具体的なサブタスクに分解する</td><td>WBSの作成・担当割り振り</td></tr>
+      <tr><td><strong>3. サブエージェント起動</strong></td><td>Subagent Spawning</td><td>各サブタスクに専用のサブエージェントを並行起動する</td><td>チームメンバーへのタスク指示</td></tr>
+      <tr><td><strong>4. 結果統合</strong></td><td>Result Synthesis</td><td>サブエージェントの成果を統合し、不足があれば追加調査を指示する</td><td>レビュー・差し戻し・最終報告書の作成</td></tr>
+      <tr><td><strong>5. 外部記憶管理</strong></td><td>External Memory</td><td>コンテキストウィンドウが200Kトークンに近づく前に、調査戦略・中間成果を外部メモリに保存する</td><td>議事録の保存・引き継ぎ資料の作成</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Extended Thinking（拡張思考）：</strong>Claudeが回答を生成する前に、内部で長い思考プロセスを行う機能。リードエージェントは戦略立案フェーズでこれを使い、より深い分析と計画を行います。PMが「まず30分考えてから指示を出す」のに似ています。</p>
+    </div>
+
+    <h3>労力スケーリング（Effort Scaling）の実装</h3>
+    <p>Anthropicの実装では、リクエストの複雑さに応じて投入するリソースを動的に調整します。これは<strong>「全ての仕事に同じ人数を投入しない」</strong>という当たり前の原則です。</p>
+
+    <table class="compare-table">
+      <tr><th>複雑さ</th><th>サブエージェント数</th><th>ツール呼び出し回数</th><th>例</th></tr>
+      <tr><td><strong>低（Simple）</strong></td><td>0〜1</td><td>3〜10回</td><td>「APIの料金はいくら？」のような事実確認</td></tr>
+      <tr><td><strong>中（Moderate）</strong></td><td>2〜3</td><td>10〜30回</td><td>「認証方式の比較表を作って」のような整理タスク</td></tr>
+      <tr><td><strong>高（Complex）</strong></td><td>3〜5+</td><td>30回以上</td><td>「AI医療活用の調査レポートを書いて」のような深い調査</td></tr>
+    </table>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">Anthropicの実測によれば、マルチエージェントではシングルエージェントの約<strong>15倍</strong>のトークンを消費することがあります。労力スケーリングのルールをシステムプロンプトに明記し、過剰な投入を防ぎましょう。英語では "scale effort to match task complexity" と表現されます。</p>
+    </div>
+
+    <h3>サブエージェントの設計原則</h3>
+    <p>各サブエージェント（スポーク）は独立したコンテキストウィンドウを持ちます。これは新入社員にメモ帳1冊を渡して「これだけ見て仕事して」と言うようなものです。</p>
+
+    <div class="concept-box">
+      <div class="label">Anthropicの推奨設計</div>
+      <p><strong>サブエージェントへの指示に含めるべき4要素：</strong></p>
+      <p>1. <strong>目的（Objective）</strong> — 何を調査・実行するか</p>
+      <p>2. <strong>出力形式（Output Format）</strong> — どんな形式で結果を返すか</p>
+      <p>3. <strong>使用ツール（Available Tools）</strong> — どのツールが利用可能か</p>
+      <p>4. <strong>タスク境界（Task Boundary）</strong> — 何をしてはいけないか</p>
+    </div>
+
+    <p>Anthropicの公式システムでは、サブエージェントは<strong>3つ以上のツールを並行して使用</strong>し、ツール結果を受け取るたびに<strong>Interleaved Thinking（交互思考）</strong>で品質を評価し、不足があれば追加調査を行います。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Interleaved Thinking（交互思考）：</strong>ツール呼び出しの結果を受け取るたびに、次のアクションを決める前に内部で「考える」ステップを挟む手法。「結果を見て → 考えて → 次の手を打つ」というサイクルで、無駄なツール呼び出しを減らし、品質を向上させます。</p>
+    </div>
+
+    <h3>同期実行の制約と将来展望</h3>
+    <p>現時点のAnthropicの公式実装では、リードエージェントがサブエージェントを<strong>同期的に実行</strong>しています。つまり、1セットのサブエージェントが全て完了するのを待ってから次のステップに進みます。</p>
+
+    <table class="compare-table">
+      <tr><th>実行方式</th><th>英語名</th><th>現状</th><th>特徴</th></tr>
+      <tr><td><strong>同期実行</strong></td><td>Synchronous Execution</td><td>現在の実装</td><td>結果の整合性を保ちやすい。サブエージェントの完了を待つため、時間がかかる場合がある</td></tr>
+      <tr><td><strong>非同期実行</strong></td><td>Asynchronous Execution</td><td>将来の課題</td><td>リアルタイムに結果を活用できるが、状態の一貫性維持・エラー伝搬が複雑になる</td></tr>
+    </table>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Hub-and-Spokeの実装で最も重要なのは<strong>「兄弟サブエージェント間に直接通信チャネルがない」</strong>という制約です。全ての情報がリードエージェントを経由する設計は、複雑さを抑える一方、リードがボトルネックになるリスクがあります。試験では「サブエージェント同士が直接やり取りする」選択肢が不正解になるパターンが頻出します。英語: "sibling subagents cannot communicate directly; all information flows through the lead agent."</p>
+    </div>
+
+    <h3>プロダクション環境の安全策: Rainbow Deployment</h3>
+    <p>マルチエージェントシステムは長時間実行されるため、<strong>デプロイ（更新）のタイミング</strong>に注意が必要です。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Rainbow Deployment（レインボーデプロイ）：</strong>実行中のエージェントを中断せずにシステムを更新する手法。新バージョンへのトラフィックを段階的に移行し、既存のエージェントセッションは旧バージョンで完了させます。工場の生産ラインを止めずに設備を入れ替えるイメージです。</p>
+    </div>
+  </div>
+
+  <!-- Section 10: Agent-as-Tool vs Handoff詳細（拡充コンテンツ） -->
+  <div id="m10-s10" class="card" style="display:none">
+    <h2>Agent-as-ToolとHandoff: 実装パターンの詳細</h2>
+    <p>Module 10基礎編で2つの連携方式の概要を学びました。ここでは、Anthropicの公式ドキュメントとAgent SDKに基づいて、それぞれの<strong>実装パターン</strong>と<strong>設計上の判断基準</strong>を深掘りします。</p>
+
+    <h3>Agent-as-Toolパターンの実装</h3>
+    <p>Agent-as-Toolは、あるエージェントを別のエージェントの<strong>ツール（関数）として登録</strong>する方式です。電話で専門家に相談してアドバイスをもらい、自分で判断を下す流れに似ています。</p>
+
+    <div class="flow-diagram">
+      <span class="flow-step">ユーザー</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">メインエージェント</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">サブエージェント（ツールとして呼び出し）</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">結果をメインに返す</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">メインエージェントが統合・回答</span>
+    </div>
+
+    <h4>Agent-as-Toolの3つの特徴</h4>
+    <table class="compare-table">
+      <tr><th>特徴</th><th>内容</th><th>実装上の意味</th></tr>
+      <tr><td><strong>制御権の保持</strong></td><td>呼び出し元が常にメインループを握る</td><td>サブエージェントの結果を加工・統合してからユーザーに返す</td></tr>
+      <tr><td><strong>コンテキスト隔離</strong></td><td>サブエージェントは独自のコンテキストウィンドウで動作</td><td>メインのコンテキストを消費せず、専門的な深い処理が可能</td></tr>
+      <tr><td><strong>並列実行</strong></td><td>複数のAgent-as-Toolを同時に呼び出せる</td><td>Hub-and-Spokeのスポーク部分として使われることが多い</td></tr>
+    </table>
+
+    <h3>Handoffパターンの実装</h3>
+    <p>Handoffは、<strong>会話の制御権を完全に別のエージェントに移譲</strong>する方式です。電話の転送と同じで、転送後は元のオペレーターは通話から離脱します。</p>
+
+    <div class="flow-diagram">
+      <span class="flow-step">ユーザー</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">エージェントA</span>
+      <span class="flow-arrow">&rarr; Handoff &rarr;</span>
+      <span class="flow-step">エージェントB（制御権移譲）</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">エージェントBが直接ユーザーと対話</span>
+    </div>
+
+    <h4>Handoffの3つの特徴</h4>
+    <table class="compare-table">
+      <tr><th>特徴</th><th>内容</th><th>実装上の意味</th></tr>
+      <tr><td><strong>完全な制御権移譲</strong></td><td>移譲先がユーザーと直接対話する</td><td>明示的に「戻す」Handoffを定義しない限り、元には戻らない</td></tr>
+      <tr><td><strong>会話履歴の引き継ぎ</strong></td><td>移譲先は過去の会話コンテキストを受け取れる</td><td>ユーザーが同じ説明を繰り返す必要がない</td></tr>
+      <tr><td><strong>単一方向が基本</strong></td><td>A→Bへの一方通行が標準</td><td>B→Aの「戻り」が必要なら、別途Handoffの定義が必要</td></tr>
+    </table>
+
+    <h3>5段階の判断フレームワーク</h3>
+    <p>どちらのパターンを使うかを体系的に判断するためのフレームワークです。上から順に確認し、最初に「Yes」になった選択を採用します。</p>
+
+    <table class="compare-table">
+      <tr><th>順番</th><th>判断基準</th><th>Yesなら</th></tr>
+      <tr><td><strong>1</strong></td><td>サブタスクの結果を統合・加工する必要があるか？</td><td>Agent-as-Tool</td></tr>
+      <tr><td><strong>2</strong></td><td>複数の専門処理を並列に実行したいか？</td><td>Agent-as-Tool</td></tr>
+      <tr><td><strong>3</strong></td><td>ユーザーとの対話を完全に別の担当に引き継ぎたいか？</td><td>Handoff</td></tr>
+      <tr><td><strong>4</strong></td><td>言語や専門領域が異なり、元のエージェントでは対応困難か？</td><td>Handoff</td></tr>
+      <tr><td><strong>5</strong></td><td>いずれにも該当しない場合</td><td>Agent-as-Tool（制御を保持する方が安全）</td></tr>
+    </table>
+
+    <h3>実践シナリオ: 保険請求処理システム</h3>
+    <p>保険会社のAIアシスタントを例に、両パターンの使い分けを見てみましょう。</p>
+
+    <table class="compare-table">
+      <tr><th>シーン</th><th>適切な方式</th><th>理由</th></tr>
+      <tr><td>請求書類の不備チェック</td><td><strong>Agent-as-Tool</strong></td><td>書類チェックエージェントの結果をメインが判断材料にする</td></tr>
+      <tr><td>医療用語の専門査定</td><td><strong>Agent-as-Tool</strong></td><td>医療専門エージェントの所見をメインが統合して回答する</td></tr>
+      <tr><td>クレーム対応の法務部門移管</td><td><strong>Handoff</strong></td><td>法務専門のエージェントが直接対応すべき（責任の明確化）</td></tr>
+      <tr><td>外国語での問い合わせ</td><td><strong>Handoff</strong></td><td>該当言語の専門エージェントに完全移管</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">Anthropic公式の設計指針</div>
+      <p>Anthropicは<strong>「ツール設計をプロンプト設計と同じ厳密さで扱え」</strong>と明言しています。Agent-as-Toolとして登録するエージェントにも、通常のツールと同じように<strong>明確な説明文（docstring）</strong>を書くことが重要です。「新人開発者向けに書く良いdocstringだと思って書け」が公式の推奨です。</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験のシナリオ問題では「このユースケースでAgent-as-ToolとHandoffのどちらを使うべきか？」が確実に出題されます。迷ったときの鉄則: <strong>「結果を使うか、担当を代えるか」</strong>。結果を受け取って何かする → Agent-as-Tool。担当ごと交代 → Handoff。英語: "If you need the result back, use agent-as-tool. If you need to change the responder, use handoff."</p>
+    </div>
+  </div>
+
+  <!-- Section 11: 情報出所追跡詳細（拡充コンテンツ） -->
+  <div id="m10-s11" class="card" style="display:none">
+    <h2>情報出所（Provenance）追跡の実装</h2>
+    <p>マルチエージェントシステムでは、複数のエージェントが情報を収集・加工します。最終レポートの各主張が<strong>「どこから来たのか」</strong>を追跡できなければ、ハルシネーション（事実でない情報の生成）を見抜けません。Anthropicの公式マルチエージェントリサーチシステムでは、これを<strong>3層のProvenance追跡アーキテクチャ</strong>で解決しています。</p>
+
+    <h3>Provenance追跡の3層アーキテクチャ</h3>
+
+    <div class="flow-diagram">
+      <span class="flow-step">Layer 1: 収集時メタデータ付与</span>
+      <span class="flow-arrow">&darr;</span><br>
+      <span class="flow-step">Layer 2: 統合時の引用紐づけ</span>
+      <span class="flow-arrow">&darr;</span><br>
+      <span class="flow-step">Layer 3: Citation Agentによる検証</span>
+    </div>
+
+    <h4>Layer 1: 収集時メタデータ付与</h4>
+    <p>各サブエージェントが情報を取得する際に、<strong>情報源のメタデータ</strong>を自動的に付与します。</p>
+
+    <table class="compare-table">
+      <tr><th>メタデータ項目</th><th>英語名</th><th>内容</th><th>例</th></tr>
+      <tr><td><strong>情報源URL</strong></td><td>Source URL</td><td>情報の取得元</td><td>docs.anthropic.com/...</td></tr>
+      <tr><td><strong>取得時刻</strong></td><td>Retrieval Timestamp</td><td>いつ取得したか</td><td>2026-03-27T10:30:00Z</td></tr>
+      <tr><td><strong>情報源の種類</strong></td><td>Source Type</td><td>公式ドキュメント/論文/ブログ等</td><td>Official Documentation</td></tr>
+      <tr><td><strong>取得エージェント</strong></td><td>Collecting Agent</td><td>どのサブエージェントが取得したか</td><td>research_subagent_02</td></tr>
+    </table>
+
+    <h4>Layer 2: 統合時の引用紐づけ</h4>
+    <p>リードエージェントが最終レポートを作成する際に、各主張（claim）に対応する情報源を紐づけます。新聞記事で「関係者によると」と出典を示すのと同じ原理です。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Citation Mapping（引用マッピング）：</strong>レポート内の各主張と、それを裏付ける情報源を1対多で紐づける処理。1つの主張が複数の情報源で裏付けられるほど信頼度が高いと評価されます。</p>
+    </div>
+
+    <h4>Layer 3: Citation Agentによる検証</h4>
+    <p>Anthropicの公式実装では、専用の<strong>Citation Agent（引用エージェント）</strong>がレポートの全主張に対して引用元との整合性を検証します。校閲者が記事と参考文献を突き合わせるのと同じ役割です。</p>
+
+    <table class="compare-table">
+      <tr><th>検証項目</th><th>英語名</th><th>内容</th></tr>
+      <tr><td><strong>事実の正確性</strong></td><td>Factual Accuracy</td><td>主張が引用元の情報と一致しているか</td></tr>
+      <tr><td><strong>引用の正確性</strong></td><td>Citation Accuracy</td><td>引用元が実際に主張を裏付けているか（出典の付け間違いがないか）</td></tr>
+      <tr><td><strong>網羅性</strong></td><td>Completeness</td><td>リクエストで求められた全ての側面がカバーされているか</td></tr>
+      <tr><td><strong>情報源の品質</strong></td><td>Source Quality</td><td>信頼できる情報源が使われているか</td></tr>
+    </table>
+
+    <h3>ソース品質ヒューリスティクス</h3>
+    <p>サブエージェントが情報を収集する際に、<strong>どの情報源を優先するか</strong>のルールをシステムプロンプトに明記します。</p>
+
+    <div class="concept-box">
+      <div class="label">Anthropic推奨のソース品質基準</div>
+      <p><strong>優先すべき情報源：</strong></p>
+      <p>1. 公式ドキュメント（Official Documentation） — 最も信頼性が高い</p>
+      <p>2. 学術論文・ホワイトペーパー（Academic Papers） — 査読済みの知見</p>
+      <p>3. 専門家のブログ・技術記事 — 実践的な知見</p>
+      <p><strong>避けるべき情報源：</strong></p>
+      <p>SEO最適化されたコンテンツファーム（内容の薄い量産型サイト）</p>
+    </div>
+
+    <h3>なぜProvenance追跡が不可欠なのか</h3>
+    <table class="compare-table">
+      <tr><th>目的</th><th>英語名</th><th>Provenance追跡なしの場合</th><th>Provenance追跡ありの場合</th></tr>
+      <tr><td><strong>ハルシネーション検出</strong></td><td>Hallucination Detection</td><td>事実無根の主張を見抜けない</td><td>情報源のない主張を自動フラグ</td></tr>
+      <tr><td><strong>品質評価</strong></td><td>Quality Assessment</td><td>レポート全体の信頼度が不明</td><td>情報源の信頼度に基づく定量評価</td></tr>
+      <tr><td><strong>デバッグ</strong></td><td>Debugging</td><td>誤情報の原因エージェントが不明</td><td>エラーの出所を即座に特定</td></tr>
+      <tr><td><strong>法令遵守</strong></td><td>Compliance</td><td>情報の出所を証明できない</td><td>監査対応が可能</td></tr>
+    </table>
+
+    <h3>評価フレームワーク</h3>
+    <p>Anthropicはマルチエージェントシステムの品質を<strong>LLM-as-Judge（LLMを審査員として使う）</strong>方式で評価しています。まず20件のテストクエリで自動評価（0.0〜1.0スコア）を行い、その後人間による評価でエッジケースを補完します。</p>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">CCA-F試験のシナリオ3（マルチエージェントリサーチ）では、Provenance追跡が重要テーマです。<strong>Citation Accuracy（引用の正確性）</strong>という概念を覚えましょう。「引用が正しい = 情報源が主張を実際に裏付けている」であり、「URLが存在する」だけでは不十分です。英語: "citation accuracy means the cited sources actually support the claims, not just that the URLs exist."</p>
+    </div>
+  </div>
+
+  <!-- Section 12: フォールバックループ詳細（拡充コンテンツ） -->
+  <div id="m10-s12" class="card" style="display:none">
+    <h2>フォールバックループの設計</h2>
+    <p>マルチエージェントシステムでは、サブエージェントの失敗、ツールのエラー、タイムアウトなど、多くの障害が発生し得ます。Anthropicは<strong>「エージェントに障害を伝え、エージェント自身に適応させる」</strong>アプローチが驚くほど有効だと報告しています。ここでは、そのフォールバック（代替手段への切り替え）設計を体系的に学びます。</p>
+
+    <h3>フォールバックの4層モデル</h3>
+    <p>障害発生時の対応を4つの層で整理します。建物の防火設計に例えると、スプリンクラー → 防火扉 → 避難経路 → 消防隊出動の順に対応が段階的に上がっていくイメージです。</p>
+
+    <table class="compare-table">
+      <tr><th>層</th><th>戦略</th><th>英語名</th><th>内容</th><th>比喩</th></tr>
+      <tr><td><strong>L1</strong></td><td>リトライ</td><td>Retry with Backoff</td><td>一時的エラーに対して、間隔を空けて再試行</td><td>電話がつながらない → 少し待ってかけ直す</td></tr>
+      <tr><td><strong>L2</strong></td><td>エージェント適応</td><td>Agent Adaptation</td><td>ツール失敗をエージェントに伝え、別の手段を自律的に選択させる</td><td>道が通行止め → 運転手が迂回路を判断</td></tr>
+      <tr><td><strong>L3</strong></td><td>段階的品質低下</td><td>Graceful Degradation</td><td>最高品質の処理が不可能な場合、品質を落としてでも結果を返す</td><td>特急が運休 → 各駅停車で目的地へ</td></tr>
+      <tr><td><strong>L4</strong></td><td>人間エスカレーション</td><td>Human Escalation</td><td>自動対応が不可能な場合、人間に判断を委ねる</td><td>消防隊に通報する</td></tr>
+    </table>
+
+    <div class="concept-box">
+      <div class="label">Anthropicの核心的推奨</div>
+      <p><strong>"Let the agent know when a tool is failing and let it adapt"</strong>（ツールの失敗をエージェントに伝え、適応させよ）。</p>
+      <p>多くの開発者はツールエラーを「隠す」か「即座にリトライ」しますが、Anthropicはエラー情報を構造化してエージェントに渡すことで、エージェント自身が代替手段を選ぶ方が効果的だと報告しています。</p>
+    </div>
+
+    <h3>構造化エラーフィードバック</h3>
+    <p>ツールが失敗した場合、エラー情報を構造化してエージェントに返すことで、適切な適応行動を促します。</p>
+
+    <table class="compare-table">
+      <tr><th>フィードバック要素</th><th>英語名</th><th>内容</th><th>例</th></tr>
+      <tr><td><strong>エラー種別</strong></td><td>Error Type</td><td>一時的か永続的か</td><td>rate_limit / not_found / timeout</td></tr>
+      <tr><td><strong>リトライ可否</strong></td><td>Is Retryable</td><td>再試行で解決する可能性</td><td>true / false</td></tr>
+      <tr><td><strong>推奨アクション</strong></td><td>Suggested Action</td><td>次に取るべきステップのヒント</td><td>「別のURLを試してください」</td></tr>
+      <tr><td><strong>残りリソース</strong></td><td>Remaining Budget</td><td>リトライ回数やトークン予算の残り</td><td>「残り2回リトライ可能」</td></tr>
+    </table>
+
+    <h3>デッドロック検出と防止</h3>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>デッドロック（Deadlock）：</strong>複数のエージェントが互いの完了を待ち合い、どれも先に進めなくなる状態。交差点で4台の車が「お先にどうぞ」と譲り合って全員が動けなくなる状況に似ています。</p>
+    </div>
+
+    <p>マルチエージェントでデッドロックが起きる典型パターンと対策:</p>
+    <table class="compare-table">
+      <tr><th>パターン</th><th>原因</th><th>対策</th></tr>
+      <tr><td><strong>循環依存</strong></td><td>エージェントAがBの結果を待ち、BがAの結果を待つ</td><td>依存関係をDAG（有向非巡回グラフ）に制限。循環を設計段階で排除</td></tr>
+      <tr><td><strong>リソース競合</strong></td><td>複数エージェントが同じツール/APIを同時に呼び出し、レート制限に達する</td><td>ツールレベルのキューイング、バックオフ戦略の実装</td></tr>
+      <tr><td><strong>無限リトライ</strong></td><td>失敗したツール呼び出しを無限にリトライし続ける</td><td><code>max_turns</code> でエージェントループ回数を制限</td></tr>
+    </table>
+
+    <h3>タイムアウト設計</h3>
+    <p>マルチエージェントシステムでは、<strong>3つのレベル</strong>でタイムアウトを設計します。</p>
+
+    <table class="compare-table">
+      <tr><th>レベル</th><th>英語名</th><th>対象</th><th>設計ポイント</th></tr>
+      <tr><td><strong>ツールレベル</strong></td><td>Tool Timeout</td><td>個別のツール呼び出し</td><td>API呼び出しごとにタイムアウトを設定。失敗時はエラー情報をエージェントに返す</td></tr>
+      <tr><td><strong>エージェントレベル</strong></td><td>Agent Timeout / max_turns</td><td>各エージェントのループ全体</td><td><code>max_turns</code>で最大ループ回数を制限。超過時はフォールバック動作</td></tr>
+      <tr><td><strong>システムレベル</strong></td><td>System Timeout</td><td>マルチエージェント全体の処理</td><td>全体のウォールクロック時間に上限を設定。超過時は中間結果を返す</td></tr>
+    </table>
+
+    <h3>状態保存付き再開（Stateful Resumption）</h3>
+    <p>Anthropicは「エラー発生時にエージェントの状態を保存し、最初からではなくその地点から再開する」アプローチを採用しています。ゲームのセーブポイントと同じ発想です。</p>
+
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Stateful Resumption（状態保存付き再開）：</strong>エラーや中断が発生した時点のエージェントの状態（進捗、収集済みデータ、中間成果）を保存し、復旧時にその地点から処理を再開する仕組み。Anthropicの公式実装では「AI エージェントの適応性と、リトライロジック・定期チェックポイントなどの決定論的なセーフガードを組み合わせる」ことで実現しています。</p>
+    </div>
+
+    <h3>環境フィードバックの原則</h3>
+    <p>Anthropicの "Building Effective Agents" では、エージェントが各ステップで環境からの<strong>グラウンドトゥルース（Ground Truth / 事実情報）</strong>を取得することが極めて重要だと強調されています。</p>
+
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">エージェントの自律性が高いほど、<strong>エラーの複合リスク（Compounding Error Risk）</strong>が増大します。各ステップでエラーが1%でも、10ステップ連鎖すると約10%のエラー率になります。Anthropicは「各ステップでツール実行結果やコード実行結果などのグラウンドトゥルースを取得せよ」と推奨しています。</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">フォールバック設計で最も問われるのは<strong>「max_turnsによるループ制限」</strong>と<strong>「エージェントに障害を伝えて適応させる」</strong>の2点です。「エラーを隠す」「無限リトライする」「即座にシステム停止する」は全て不正解になるパターンです。英語: "Inform the agent of failures with structured error data and let it adapt, while enforcing max_turns to prevent infinite loops."</p>
+    </div>
+  </div>
+
   <!-- Section 5: 用語集 -->
   <div id="m10-s5" class="card" style="display:none">
     <h2>Module 10 用語集</h2>
@@ -5808,12 +7394,82 @@
       <div class="glossary-en">Effort Scaling</div>
       <div class="glossary-def">リクエストの複雑さに応じてエージェントの投入量（数、ツール呼び出し回数等）を調整するルール。過剰なリソース投入を防ぎコスト効率を高める。</div>
     </div>
+    <div class="glossary-item">
+      <div class="glossary-term">拡張思考</div>
+      <div class="glossary-en">Extended Thinking</div>
+      <div class="glossary-def">Claudeが回答生成前に内部で長い思考プロセスを行う機能。リードエージェントの戦略立案フェーズで使用され、より深い分析と計画を可能にする。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">交互思考</div>
+      <div class="glossary-en">Interleaved Thinking</div>
+      <div class="glossary-def">ツール呼び出しの結果を受け取るたびに、次のアクションを決める前に内部で思考するステップを挟む手法。サブエージェントの情報収集品質を向上させる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">引用マッピング</div>
+      <div class="glossary-en">Citation Mapping</div>
+      <div class="glossary-def">レポート内の各主張（claim）と、それを裏付ける情報源を1対多で紐づける処理。Provenance追跡のLayer 2で実行される。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">事実の正確性</div>
+      <div class="glossary-en">Factual Accuracy</div>
+      <div class="glossary-def">レポート内の主張が引用元の情報と一致しているかの評価指標。「情報源にそう書いてあるか？」を問う。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">引用の正確性</div>
+      <div class="glossary-en">Citation Accuracy</div>
+      <div class="glossary-def">引用された情報源が実際に主張を裏付けているかの評価指標。URLの存在確認ではなく、内容の一致を問う。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">ソース品質ヒューリスティクス</div>
+      <div class="glossary-en">Source Quality Heuristics</div>
+      <div class="glossary-def">情報源の信頼性を評価するための経験則。公式ドキュメントや学術論文を優先し、SEO最適化されたコンテンツファームを避ける基準。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">LLMを審査員として使う</div>
+      <div class="glossary-en">LLM-as-Judge</div>
+      <div class="glossary-def">別のLLMを使ってエージェントの出力品質を自動評価する手法。0.0〜1.0のスコアリングで定量的に品質を測定する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">構造化エラーフィードバック</div>
+      <div class="glossary-en">Structured Error Feedback</div>
+      <div class="glossary-def">ツール失敗時にエラー種別・リトライ可否・推奨アクション等を構造化してエージェントに返す手法。エージェント自身の適応行動を促す。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">デッドロック</div>
+      <div class="glossary-en">Deadlock</div>
+      <div class="glossary-def">複数のエージェントが互いの完了を待ち合い、どれも先に進めなくなる状態。依存関係のDAG制約やタイムアウトで防止する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">状態保存付き再開</div>
+      <div class="glossary-en">Stateful Resumption</div>
+      <div class="glossary-def">エラー発生時のエージェント状態を保存し、最初からではなくその地点から処理を再開する仕組み。リトライロジック+定期チェックポイントで実現する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">レインボーデプロイ</div>
+      <div class="glossary-en">Rainbow Deployment</div>
+      <div class="glossary-def">実行中のエージェントを中断せずにシステムを更新する手法。新バージョンへのトラフィックを段階的に移行し、既存セッションは旧バージョンで完了させる。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">エラーの複合リスク</div>
+      <div class="glossary-en">Compounding Error Risk</div>
+      <div class="glossary-def">エージェントの各ステップで小さなエラーが蓄積し、全体として大きなエラーになるリスク。各ステップでグラウンドトゥルースを取得することで軽減する。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">グラウンドトゥルース</div>
+      <div class="glossary-en">Ground Truth</div>
+      <div class="glossary-def">エージェントが各ステップで環境から取得する事実情報（ツール実行結果、コード実行結果等）。エージェントの判断を実世界の事実で裏付ける。</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">有向非巡回グラフ</div>
+      <div class="glossary-en">DAG (Directed Acyclic Graph)</div>
+      <div class="glossary-def">循環を含まない方向付きグラフ。エージェント間の依存関係をDAGに制限することで、デッドロックを設計段階で排除できる。</div>
+    </div>
   </div>
 
   <!-- Section 6: クイズ -->
   <div id="m10-s6" class="card" style="display:none">
     <h2>確認クイズ</h2>
-    <p>Module 10の内容を確認しましょう。全10問、すべて4択です。</p>
+    <p>Module 10の内容を確認しましょう。全16問、すべて4択です。</p>
 
     <div class="quiz-section" id="m10-quiz">
       <div class="quiz-question" id="m10-q1">
@@ -5904,6 +7560,60 @@
         <div class="quiz-option" onclick="selectAnswer('m10',9,2)">最終出力のみを検査し、途中経過は一切監視しない</div>
         <div class="quiz-option" onclick="selectAnswer('m10',9,3)">外部の監視AIが全エージェントをリアルタイムで評価する</div>
         <div class="quiz-explanation" id="m10-q10-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q11">
+        <div class="q-text">Q11. Anthropicの公式マルチエージェントリサーチシステムにおいて、リードエージェントがコンテキストウィンドウの上限に近づいた場合の推奨対応はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',10,0)">コンテキストウィンドウのサイズを動的に拡張する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',10,1)">調査戦略と中間成果を外部メモリに保存し、新しいサブエージェントにクリーンなコンテキストで継続させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',10,2)">全てのサブエージェントを停止し、ユーザーに「コンテキスト不足」エラーを返す</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',10,3)">古い会話履歴を自動的に削除してコンテキストを確保する</div>
+        <div class="quiz-explanation" id="m10-q11-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q12">
+        <div class="q-text">Q12. Hub-and-Spokeパターンの労力スケーリング（Effort Scaling）において、「APIの料金はいくら？」のような単純な事実確認クエリに対する適切なリソース配分はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',11,0)">5つのサブエージェントで並行調査し、多数決で回答する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',11,1)">0〜1のサブエージェントで、3〜10回のツール呼び出しで完了させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',11,2)">リードエージェントのみで回答し、サブエージェントは一切使わない</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',11,3)">常に最大リソースを投入して品質を担保する</div>
+        <div class="quiz-explanation" id="m10-q12-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q13">
+        <div class="q-text">Q13. AnthropicのマルチエージェントリサーチシステムにおけるProvenance追跡の3層アーキテクチャで、Layer 3（最終層）の役割はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',12,0)">サブエージェントが情報源のURLを記録する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',12,1)">リードエージェントが各主張に情報源を紐づける</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',12,2)">専用のCitation Agentがレポート内の全主張と引用元の整合性を検証する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',12,3)">ユーザーが手動で引用元を確認する</div>
+        <div class="quiz-explanation" id="m10-q13-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q14">
+        <div class="q-text">Q14. マルチエージェントリサーチにおいて、Anthropicが推奨するソース品質ヒューリスティクスとして正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',13,0)">検索結果の上位に表示されるサイトほど信頼性が高い</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',13,1)">公式ドキュメントや学術論文を優先し、SEO最適化されたコンテンツファームを避ける</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',13,2)">最新の日付の記事を常に優先する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',13,3)">ドメインの知名度（.com > .org > .edu）で判断する</div>
+        <div class="quiz-explanation" id="m10-q14-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q15">
+        <div class="q-text">Q15. マルチエージェントシステムでツールが失敗した場合、Anthropicが最も効果的だと報告しているアプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',14,0)">エラーを無視して次のステップに進む</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',14,1)">即座に最大回数までリトライし、それでも失敗なら停止する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',14,2)">ツール失敗の情報を構造化してエージェントに伝え、エージェント自身に代替手段を選択させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',14,3)">失敗したツールをシステムから除外し、残りのツールだけで処理を続行する</div>
+        <div class="quiz-explanation" id="m10-q15-exp"></div>
+      </div>
+
+      <div class="quiz-question" id="m10-q16">
+        <div class="q-text">Q16. マルチエージェントシステムのデッドロック防止策として、最も根本的な設計アプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',15,0)">全エージェントにグローバルタイムアウトを設定し、超過時は強制終了する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',15,1)">エージェント間の依存関係をDAG（有向非巡回グラフ）に制限し、循環依存を設計段階で排除する</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',15,2)">1つのエージェントだけが他のエージェントにアクセスできるようにする</div>
+        <div class="quiz-option" onclick="selectAnswer('m10',15,3)">デッドロック検出AIを別途配置し、リアルタイムに監視させる</div>
+        <div class="quiz-explanation" id="m10-q16-exp"></div>
       </div>
 
       <button class="btn btn-accent" onclick="submitQuiz('m10')" id="m10-submit-btn">回答を確定する</button>
@@ -7686,7 +9396,7 @@ const QUIZ_DATA = {
     ]
   },
   m5: {
-    answers: [1, 1, 2, 2, 1, 1, 2, 2, 1, 2],
+    answers: [1, 1, 2, 2, 1, 1, 2, 2, 1, 2, 1, 1, 1, 2, 2, 1],
     explanations: [
       'Claude自身はツールを実行しません。Claudeの役割は「どのツールを、どのパラメータで呼ぶべきか」を判断してJSON形式で返すことです。実際のツール実行は開発者のクライアントコード（アプリケーション）が担当します。この責任分離はTool Useの基本設計です。',
       'Claudeがツール呼び出しを要求した場合、stop_reasonは"tool_use"に設定されます。"end_turn"はClaudeが最終回答を返した場合に設定されます。"tool_call"や"function_call"はClaude APIでは使用されません。',
@@ -7697,11 +9407,17 @@ const QUIZ_DATA = {
       '構造化エラーレスポンスのベストプラクティスは、is_error: trueに加えて、エラータイプ・リトライ可否・具体的な状況説明を含めることです。レート制限は一時的なエラーなのでisRetryable: trueとし、Claudeが適切な対応を判断できるようにします。',
       'LLM最適化されたdescriptionの核心は、使用条件（いつ使うか）と非使用条件（いつ使わないか）の明示です。特に似た機能のツールが複数ある場合、使い分けの基準を記載することでClaudeの選択精度が大幅に向上します。内部実装の詳細はClaudeの判断に不要です。',
       'tool_choiceで特定ツールを指定すると、Claudeは必ずそのツールを呼び出します（プログラム的エンフォースメント）。テキストのみの応答は返せません。これはプロンプトでの「お願い」とは異なり、APIレベルで100%確実に動作します。',
-      'プロンプトキャッシングはコストとレイテンシの削減には有効ですが、Claudeのツール選択精度の改善には直接寄与しません。キャッシュしてもClaudeに渡されるツール数は変わらないため、選択の「迷い」は解消されません。推論オーバーロード対策の本質はツール数の削減と動的フィルタリングです。'
+      'プロンプトキャッシングはコストとレイテンシの削減には有効ですが、Claudeのツール選択精度の改善には直接寄与しません。キャッシュしてもClaudeに渡されるツール数は変わらないため、選択の「迷い」は解消されません。推論オーバーロード対策の本質はツール数の削減と動的フィルタリングです。',
+      '公式ドキュメント（Define tools > Best practices）では「Aim for at least 3-4 sentences per tool description, more if the tool is complex」と明記されています。1文の簡潔な説明はアンチパターンであり、「何をするか」「いつ使うか」「いつ使わないか」「パラメータの意味」「制約」を含める必要があります。',
+      'input_examplesの各exampleはinput_schemaに対してバリデーションされ、不正な例を含むと400エラーが返されます。サーバーサイドツール（web_search等）では使用不可、descriptionが最重要でexamplesは補助手段、トークンコストは発生します（単純な例で20-50トークン、複雑な例で100-200トークン）。',
+      '公式ドキュメントによると、パラメータ不正でis_error: trueが返された場合、Claudeは2-3回まで修正を試みて再試行します。それでも失敗した場合はユーザーに謝罪メッセージを返します。即座の会話終了、エラー無視、モデルフォールバックは正しくありません。',
+      '公式ドキュメントでは「tool_result blocks must come FIRST in the content array. Any text must come AFTER all tool results」と明記されています。テキストをtool_resultの前に置くと400エラーになります。これは2025年以降に明確化された重要な仕様です。',
+      '50個以上のツールがある場合、ルーティングツール（classify_request等）で意図を分類し、tool_choiceで強制呼び出しした上で、分類結果に応じた専門ツールセットに切り替えるのが推奨パターンです。全ツール渡しはオーバーロード、機能削除は本末転倒、Extended Thinkingはtool_choice制限があり併用できません。',
+      'Extended Thinkingモードでは、tool_choiceのauto（デフォルト）とnoneのみが使用可能です。any（いずれかを強制）とtool（特定ツール指定）を使うとエラーになります。これは、Extended Thinkingの内部処理とProgrammatic Enforcementの互換性の問題によるものです。'
     ]
   },
   m6: {
-    answers: [1, 2, 1, 1, 2, 1, 1, 1, 1, 1],
+    answers: [1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
     explanations: [
       'MCPはM×N問題を解消するために設計されたオープンプロトコルです。AIアプリごと・サービスごとに個別の接続コードを書く必要をなくし、M+N個の実装で済むようにします。MCPはTool Useを置き換えるものではなく補完するものであり、MCPサーバーにLLMは内蔵されていません。',
       'MCPクライアントとMCPサーバーは1:1の関係です。複数のサーバーに接続したい場合は、ホストが複数のクライアントを持つことで実現します。1つのクライアントが複数のサーバーに接続することはできません。',
@@ -7712,7 +9428,13 @@ const QUIZ_DATA = {
       'Rootsは、ホスト（Claude Desktopなど）がMCPサーバーに対して「アクセスしてよいファイルパスの範囲」を指定する仕組みです。最小権限の原則に基づき、サーバーが不必要な範囲にアクセスすることを防ぎます。',
       'サンプリングは、MCPサーバーがクライアント経由でホスト内のLLMに推論を依頼する「逆方向通信」の仕組みです。セキュリティのため、サンプリングリクエストは必ずホスト（ユーザー側）の承認を経てからLLMに送信されます。サーバーがLLMに直接アクセスすることはできません。',
       'MCPの通知は、サーバーからクライアントへの一方通行のメッセージです。進捗通知（処理の何%が完了したか）やログ通知（処理の途中経過）があり、クライアントからの返事は不要です。通常の処理中にも随時送信できます。',
-      'ステートレスHTTPは状態を保持しないため、ロードバランサーで複数サーバーに振り分ける水平スケーリングが容易です。一方、状態を持たないためストリーミングができず、サンプリング（逆方向通信）や進捗通知が使えなくなるトレードオフがあります。'
+      'ステートレスHTTPは状態を保持しないため、ロードバランサーで複数サーバーに振り分ける水平スケーリングが容易です。一方、状態を持たないためストリーミングができず、サンプリング（逆方向通信）や進捗通知が使えなくなるトレードオフがあります。',
+      '.mcp.jsonはGitにコミットされるため、認証情報を直接書くと漏洩リスクがあります。envフィールドで${GITHUB_TOKEN}のように環境変数を参照し、トークンの実体は各メンバーの環境変数に保管するのが安全なパターンです。これにより、チーム全員が同じ設定ファイルを共有しつつ、認証情報はGitに入りません。',
+      'MCP仕様では、Streamable HTTPトランスポートの実装時に(1)Originヘッダーの検証（DNS Rebinding攻撃対策）、(2)ローカル実行時はlocalhost（127.0.0.1）にのみバインド、(3)適切な認証の実装の3点を必須としています。特にDNS Rebinding攻撃は、悪意あるWebサイトがローカルのMCPサーバーにアクセスを試みる攻撃です。',
+      'MCPのサンプリングでは、サーバーはモデルのヒント（hints）と3つの優先度（intelligencePriority/speedPriority/costPriority）を0〜1の値で指定します。最終的なモデル選択はクライアント側が行います。これにより、サーバーは特定のAIプロバイダーに依存せず、クライアントが利用可能なモデルから最適なものを選べます。',
+      'Elicitation（引き出し）は、MCPサーバーがクライアントを通じてユーザーから追加情報を直接取得する機能です。サンプリング（サーバー→LLM）とは異なり、Elicitationはサーバー→ユーザーの通信です。操作の確認や、処理に必要な追加情報の取得に使います。',
+      'stdioはローカル専用のトランスポートで、サブプロセスとして起動するため最もシンプルです。リモート環境ではネットワーク経由の通信が必要なため、Streamable HTTPを使用します。Streamable HTTPはセッション管理、サンプリング、通知に対応し、再接続・再配信の仕組みも備えています。stdioはネットワーク経由の通信には対応していません。',
+      'Streamable HTTPでは、サーバーが初期化レスポンスのMcp-Session-Idヘッダーでセッションを発行できます（オプション）。発行された場合、クライアントは以降のHTTPリクエストにこのIDを含める必要があります。サーバーがHTTP 404を返した場合、セッションが終了したことを意味し、クライアントは新しい初期化から再開します。'
     ]
   },
   m7: {
@@ -7752,7 +9474,7 @@ const QUIZ_DATA = {
 };
 
 QUIZ_DATA['m9'] = {
-  answers: [1, 2, 2, 2, 2, 1, 2, 1, 2, 1],
+  answers: [1, 2, 2, 2, 2, 1, 2, 1, 2, 1, 1, 2, 3, 1, 2, 2, 1, 1],
   explanations: [
     'Anthropicが提唱するAugmented LLMの3つの構成要素は、検索（Retrieval）、ツール統合（Tool Integration）、メモリ（Memory）です。「脳（LLM）に目（検索）・手（ツール）・メモ帳（メモリ）を与えた作業者」と理解しましょう。この概念はエージェントの基本構成要素（building block）として公式ブログ「Building effective agents」で定義されています。',
     'エージェントループの終了判定は、APIレスポンスのstop_reasonフィールドが"end_turn"かどうかを検査するのが正しい方法です。応答テキストの内容を自然言語パースして判定するのはアンチパターンです。stop_reasonが"tool_use"ならループ継続、"end_turn"ならループ終了と判断します。',
@@ -7763,12 +9485,20 @@ QUIZ_DATA['m9'] = {
     '金額制限のようなビジネスルールの100%遵守が必要な場面では、プロンプト指示（選択肢A・B）だけでは不十分です。LLMは確率的であり、指示を無視する可能性がゼロではありません。PreToolCall Hookならコードで決定論的にチェックでき、500ドル以上の返金を確実にブロックできます。これがプログラム的エンフォースメントの典型例です。',
     'Agent SDKにおいて、サブエージェントは親エージェントのコンテキストを自動的には継承しません。これはコンテキストウィンドウの節約、タスクへの集中、セキュリティ（不要な機密情報を渡さない）のための設計です。必要な情報は、コーディネーターがサブエージェントを呼び出す際のプロンプトに明示的に含めます。',
     'Anthropicが提唱するSecure Deploymentの3原則は、隔離（Isolation）＝実行環境を他のシステムから分離、最小権限（Least Privilege）＝必要最小限の権限だけを付与、多層防御（Defense in Depth）＝プロンプト・Hook・権限制限・監査ログなど複数の防御層を重ねることです。選択肢Aは一般的なセキュリティ概念、Bはデプロイプラクティス、DはCAP定理関連です。',
-    'ツール実行でエラーが発生した場合、is_error: true を設定してLLMに「この操作は失敗した」と明確に伝える必要があります。is_errorを設定しないと、LLMはエラーメッセージを通常の結果と誤解する可能性があります。さらにisRetryableフラグでリトライ可能かどうかを示すと、エージェントは「リトライするか、別のアプローチを取るか」を適切に判断できます。'
+    'ツール実行でエラーが発生した場合、is_error: true を設定してLLMに「この操作は失敗した」と明確に伝える必要があります。is_errorを設定しないと、LLMはエラーメッセージを通常の結果と誤解する可能性があります。さらにisRetryableフラグでリトライ可能かどうかを示すと、エージェントは「リトライするか、別のアプローチを取るか」を適切に判断できます。',
+    'Agent SDKとClient SDKの最大の違いは「エージェントループの管理」です。Client SDKでは開発者がwhile response.stop_reason == "tool_use"のようなループを自前で実装しますが、Agent SDKではquery()を呼ぶだけでSDKがループを自動管理します。どちらもPython/TypeScript対応で、ストリーミングにも対応しています。',
+    'max_turnsは異常時の暴走防止用の安全装置（ハードリミット）です。正常な終了条件はstop_reason="end_turn"による自然な終了であり、max_turnsに頼る設計は避けるべきです。また、max_turnsに到達した場合、Hooksが実行されないことがある点にも注意が必要です。設定しないと無限ループのリスクがあるため、設定は推奨されます。',
+    'Hookの権限判定はdeny > ask > allowの優先順位で処理されます。いずれかのHookがdenyを返せば、他のHookの結果に関係なく操作はブロックされます。これは「安全側に倒す（Fail-safe）」の原則に基づいた設計で、1つでも「危険」と判断する検査があれば全体を止めます。',
+    '監査ログの記録は、エージェントの処理をブロックすべきではない「副作用」です。PostToolUse Hookでasync: trueを使うことで、ログ送信の完了を待たずにエージェントが次の処理に進めます。プロンプトでの指示はLLMが忘れる可能性があり、監査要件には不十分です。セッション終了時のまとめ記録では途中でクラッシュした場合にログが失われます。',
+    'グレースフルデグラデーション（Graceful Degradation）が正しいアプローチです。成功したサブエージェントの部分的な結果を活用し、欠落情報を明記した報告書を作成します。全体を失敗にするより有用で、無限リトライはコスト膨大、ダミーデータは誤情報のリスクがあります。Anthropicは「部分的な結果の有用性」を重視しています。',
+    'Anthropicが推奨する認証情報管理は「プロキシパターン」です。エージェントのセキュリティ境界の外でプロキシサーバーを実行し、エージェントからのリクエストに認証情報を注入します。エージェント自体はAPIキーを知らないため、プロンプトインジェクションやモデルエラーによる認証情報の漏洩を防げます。環境変数やプロンプトへのキー記載はアンチパターンです。',
+    '最も安全なネットワーク分離は、--network noneで全ネットワークインターフェースを削除し、マウントされたUnixソケット経由でプロキシのみと通信する構成です。プロキシがドメイン許可リスト、認証情報注入、トラフィックログを管理します。ポート単位やドメイン単位のブロックは抜け道がありえますが、全遮断+許可リストは原理的に安全です。',
+    'Sandbox Runtimeはパフォーマンスへの影響が非常に小さい（very low overhead）のが最大の利点ですが、ホストカーネルを共有するため、カーネルの脆弱性に対する分離は限定的です。LinuxではbubblewrapをmacOSではsandbox-execを使用するため、両OSで動作します。最高レベルの分離が必要な場合はgVisorやVMを検討します。'
   ]
 };
 
 QUIZ_DATA['m10'] = {
-  answers: [1, 1, 1, 1, 1, 1, 2, 2, 1, 1],
+  answers: [1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 2, 1],
   explanations: [
     'Routing（ルーティング）は入力を分類し、適切な専門処理に振り分けるパターンです。カスタマーサポートでの問い合わせ振り分けは、Routingの代表的なユースケースです。Prompt Chainingは順次処理、Evaluator-Optimizerは生成→評価ループ、Voting は同じタスクの多数決であり、この場面には適しません。',
     'Agent-as-ToolとHandoffの最大の違いは「制御権」です。Agent-as-Toolは呼び出し元が制御権を保持したまま専門処理を委任し、Handoffは制御権が移譲先に完全に移ります。Agent-as-Toolは「電話で専門家に相談」、Handoffは「電話を専門部署に転送」と覚えましょう。',
@@ -7779,7 +9509,13 @@ QUIZ_DATA['m10'] = {
     'Anthropicの公式マルチエージェントリサーチシステムでは、専用のCitation Agent（引用エージェント）がレポートと情報源を照合し、各主張に適切な引用が付けられているかを検証します。評価基準として「引用の正確性（citation accuracy）— 引用元と主張が一致しているか」が使われます。',
     'Anthropicは「ツールが失敗していることをエージェントに伝え、エージェント自身に適応させる（Let the agent know when a tool is failing and let it adapt）」アプローチが驚くほどうまく機能すると報告しています。構造化されたエラー情報（is_error、エラー種類、推奨アクション）を渡すことで、エージェントが最適な代替手段を自ら選択できます。',
     'Hub-and-Spokeパターンでは、サブエージェント（兄弟サブエージェント）同士は直接通信できません（sibling subagents cannot communicate directly）。全ての通信はリードエージェント（ハブ）を経由します。空港のハブ空港のように、各都市間の直行便はなく、必ずハブを経由する構造です。',
-    'Anthropicは「エージェントの判断パターンとやり取りの構造を監視する — ただし個々の会話の内容は監視しない（Monitor agent decision patterns and interaction structures — without monitoring the contents of individual conversations）」というプライバシーに配慮した観測アプローチを推奨しています。これにより、システムの健全性を保ちつつ、ユーザープライバシーを尊重できます。'
+    'Anthropicは「エージェントの判断パターンとやり取りの構造を監視する — ただし個々の会話の内容は監視しない（Monitor agent decision patterns and interaction structures — without monitoring the contents of individual conversations）」というプライバシーに配慮した観測アプローチを推奨しています。これにより、システムの健全性を保ちつつ、ユーザープライバシーを尊重できます。',
+    'Anthropicの公式実装では、リードエージェントはコンテキスト上限に近づく前に調査戦略や中間成果を外部メモリに保存し、フレッシュなサブエージェントにクリーンなコンテキストで作業を継続させます。英語: "save strategy to external memory before context limits are reached, then spawn fresh subagents with clean contexts."',
+    '労力スケーリングでは、リクエストの複雑さに応じてリソースを調整します。単純な事実確認は0〜1サブエージェント、3〜10回のツール呼び出しが適切です。複雑な調査には3〜5+サブエージェントを投入します。英語: "scale effort to match task complexity — simple queries need minimal resources."',
+    'Provenance追跡の3層目は、専用のCitation Agent（引用エージェント）がレポート内の全主張と引用元の整合性を検証するステップです。Layer 1は収集時のメタデータ付与、Layer 2はリードエージェントによる引用紐づけです。英語: "the Citation Agent processes documents and the research report to identify specific locations for citations."',
+    'Anthropicは公式ドキュメントや学術論文（academic PDFs）を優先し、SEO最適化されたコンテンツファーム（content farms）を避けることを推奨しています。検索順位や日付だけでは情報源の品質は判断できません。英語: "prefer academic PDFs or personal blogs over SEO-optimized content farms."',
+    'Anthropicは「ツールの失敗をエージェントに構造化して伝え、エージェント自身に適応させる」アプローチが最も効果的だと報告しています。エラー種別・リトライ可否・推奨アクション等を含む構造化フィードバックを返します。英語: "Let the agent know when a tool is failing and let it adapt."',
+    'デッドロックの最も根本的な防止策は、エージェント間の依存関係をDAG（有向非巡回グラフ）に制限し、循環依存を設計段階で排除することです。タイムアウトは対症療法であり、根本解決ではありません。英語: "restrict agent dependencies to a DAG to eliminate circular dependencies at design time."'
   ]
 };
 
