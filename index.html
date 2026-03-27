@@ -40,6 +40,22 @@
   .sidebar-header p { font-size: .75rem; color: #9CA3AF; margin-top: .25rem; }
   .nav-section { padding: .75rem 0; }
   .nav-section-title { padding: .5rem 1.5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: #6B7280; font-weight: 600; }
+
+  /* Accordion sidebar */
+  .accordion-group { border-bottom: 1px solid #374151; }
+  .accordion-header { display: flex; align-items: center; padding: .7rem 1.5rem; cursor: pointer; transition: background .15s; user-select: none; }
+  .accordion-header:hover { background: #374151; }
+  .accordion-header .accordion-arrow { font-size: .6rem; color: #6B7280; margin-right: .6rem; transition: transform .2s; flex-shrink: 0; }
+  .accordion-header.open .accordion-arrow { transform: rotate(90deg); }
+  .accordion-header .accordion-title { flex: 1; font-size: .8rem; font-weight: 600; color: #D1D5DB; }
+  .accordion-header .sidebar-domain-badge { font-size: .6rem; font-weight: 700; padding: .1rem .4rem; border-radius: 4px; color: #F9FAFB; flex-shrink: 0; }
+  .sidebar-domain-badge.d1 { background: #7C3AED; }
+  .sidebar-domain-badge.d2 { background: #2563EB; }
+  .sidebar-domain-badge.d3 { background: #059669; }
+  .sidebar-domain-badge.d4 { background: #D97706; }
+  .sidebar-domain-badge.d5 { background: #DC2626; }
+  .accordion-body { max-height: 0; overflow: hidden; transition: max-height .25s ease; }
+  .accordion-body.open { max-height: 500px; }
   .nav-item { display: flex; align-items: center; padding: .6rem 1.5rem; cursor: pointer; transition: background .15s; font-size: .9rem; gap: .6rem; }
   .nav-item:hover { background: #374151; }
   .nav-item.active { background: #374151; border-left: 3px solid #F59E0B; }
@@ -184,105 +200,156 @@
   </div>
 
   <div class="nav-section">
-    <div class="nav-section-title">ダッシュボード</div>
     <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
       <span>&#128200;</span>
       <span class="module-label">学習ダッシュボード</span>
     </div>
   </div>
 
-  <div class="nav-section">
-    <div class="nav-section-title">Week 1-2：基礎</div>
-    <div class="nav-item" onclick="showPage('m0')" id="nav-m0">
-      <span class="status-dot" id="dot-m0"></span>
-      <span class="module-label">M0: 導入 — 全体像と資格</span>
-      <span class="module-pct" id="pct-m0"></span>
+  <!-- 基礎編 (M0-M1) -->
+  <div class="accordion-group" id="ag-basics">
+    <div class="accordion-header open" onclick="toggleAccordion('basics')">
+      <span class="accordion-arrow">&#9654;</span>
+      <span class="accordion-title">基礎編（M0-M1）</span>
     </div>
-    <div class="nav-item" onclick="showPage('m1')" id="nav-m1">
-      <span class="status-dot" id="dot-m1"></span>
-      <span class="module-label">M1: Claude製品群を理解する</span>
-      <span class="module-pct" id="pct-m1"></span>
-    </div>
-    <div class="nav-item" onclick="showPage('m2')" id="nav-m2">
-      <span class="status-dot" id="dot-m2"></span>
-      <span class="module-label">M2: プロンプトの基本</span>
-      <span class="module-pct" id="pct-m2"></span>
-    </div>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-section-title">Week 3-4：プロンプト工学</div>
-    <div class="nav-item" onclick="showPage('m3')" id="nav-m3">
-      <span class="status-dot" id="dot-m3"></span>
-      <span class="module-label">M3: システムプロンプト設計</span>
-      <span class="module-pct" id="pct-m3"></span>
-    </div>
-    <div class="nav-item" onclick="showPage('m4')" id="nav-m4">
-      <span class="status-dot" id="dot-m4"></span>
-      <span class="module-label">M4: 構造化出力とJSON</span>
-      <span class="module-pct" id="pct-m4"></span>
+    <div class="accordion-body open" id="ab-basics">
+      <div class="nav-item" onclick="showPage('m0')" id="nav-m0">
+        <span class="status-dot" id="dot-m0"></span>
+        <span class="module-label">M0: 導入 — 全体像と資格</span>
+        <span class="module-pct" id="pct-m0"></span>
+      </div>
+      <div class="nav-item" onclick="showPage('m1')" id="nav-m1">
+        <span class="status-dot" id="dot-m1"></span>
+        <span class="module-label">M1: Claude製品群を理解する</span>
+        <span class="module-pct" id="pct-m1"></span>
+      </div>
     </div>
   </div>
 
-  <div class="nav-section">
-    <div class="nav-section-title">Week 5：ツールとMCP</div>
-    <div class="nav-item" onclick="showPage('m5')" id="nav-m5">
-      <span class="status-dot" id="dot-m5"></span>
-      <span class="module-label">M5: ツール設計の基礎</span>
-      <span class="module-pct" id="pct-m5"></span>
+  <!-- プロンプト編 (M2-M4) [D3] -->
+  <div class="accordion-group" id="ag-prompt">
+    <div class="accordion-header" onclick="toggleAccordion('prompt')">
+      <span class="accordion-arrow">&#9654;</span>
+      <span class="accordion-title">プロンプト編（M2-M4）</span>
+      <span class="sidebar-domain-badge d3">D3</span>
     </div>
-    <div class="nav-item" onclick="showPage('m6')" id="nav-m6">
-      <span class="status-dot" id="dot-m6"></span>
-      <span class="module-label">M6: MCP統合</span>
-      <span class="module-pct" id="pct-m6"></span>
-    </div>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-section-title">Week 6：Claude Code</div>
-    <div class="nav-item" onclick="showPage('m7')" id="nav-m7">
-      <span class="status-dot" id="dot-m7"></span>
-      <span class="module-label">M7: Claude Code入門</span>
-      <span class="module-pct" id="pct-m7"></span>
-    </div>
-    <div class="nav-item" onclick="showPage('m8')" id="nav-m8">
-      <span class="status-dot" id="dot-m8"></span>
-      <span class="module-label">M8: CLAUDE.mdとワークフロー</span>
-      <span class="module-pct" id="pct-m8"></span>
+    <div class="accordion-body" id="ab-prompt">
+      <div class="nav-item" onclick="showPage('m2')" id="nav-m2">
+        <span class="status-dot" id="dot-m2"></span>
+        <span class="module-label">M2: プロンプトの基本</span>
+        <span class="module-pct" id="pct-m2"></span>
+      </div>
+      <div class="nav-item" onclick="showPage('m3')" id="nav-m3">
+        <span class="status-dot" id="dot-m3"></span>
+        <span class="module-label">M3: システムプロンプト設計</span>
+        <span class="module-pct" id="pct-m3"></span>
+      </div>
+      <div class="nav-item" onclick="showPage('m4')" id="nav-m4">
+        <span class="status-dot" id="dot-m4"></span>
+        <span class="module-label">M4: 構造化出力とJSON</span>
+        <span class="module-pct" id="pct-m4"></span>
+      </div>
     </div>
   </div>
 
-  <div class="nav-section">
-    <div class="nav-section-title">Week 7：エージェント設計</div>
-    <div class="nav-item" onclick="showPage('m9')" id="nav-m9">
-      <span class="status-dot" id="dot-m9"></span>
-      <span class="module-label">M9: エージェントアーキテクチャ</span>
-      <span class="module-pct" id="pct-m9"></span>
+  <!-- ツール&MCP編 (M5-M6) [D4] -->
+  <div class="accordion-group" id="ag-tools">
+    <div class="accordion-header" onclick="toggleAccordion('tools')">
+      <span class="accordion-arrow">&#9654;</span>
+      <span class="accordion-title">ツール&MCP編（M5-M6）</span>
+      <span class="sidebar-domain-badge d4">D4</span>
     </div>
-    <div class="nav-item" onclick="showPage('m10')" id="nav-m10">
-      <span class="status-dot" id="dot-m10"></span>
-      <span class="module-label">M10: マルチエージェント</span>
-      <span class="module-pct" id="pct-m10"></span>
+    <div class="accordion-body" id="ab-tools">
+      <div class="nav-item" onclick="showPage('m5')" id="nav-m5">
+        <span class="status-dot" id="dot-m5"></span>
+        <span class="module-label">M5: ツール設計の基礎</span>
+        <span class="module-pct" id="pct-m5"></span>
+      </div>
+      <div class="nav-item" onclick="showPage('m6')" id="nav-m6">
+        <span class="status-dot" id="dot-m6"></span>
+        <span class="module-label">M6: MCP統合</span>
+        <span class="module-pct" id="pct-m6"></span>
+      </div>
     </div>
   </div>
 
-  <div class="nav-section">
-    <div class="nav-section-title">Week 8：総仕上げ</div>
-    <div class="nav-item" onclick="showPage('m11')" id="nav-m11">
-      <span class="status-dot" id="dot-m11"></span>
-      <span class="module-label">M11: コンテキスト管理</span>
-      <span class="module-pct" id="pct-m11"></span>
+  <!-- Claude Code編 (M7-M8) [D2] -->
+  <div class="accordion-group" id="ag-code">
+    <div class="accordion-header" onclick="toggleAccordion('code')">
+      <span class="accordion-arrow">&#9654;</span>
+      <span class="accordion-title">Claude Code編（M7-M8）</span>
+      <span class="sidebar-domain-badge d2">D2</span>
     </div>
-    <div class="nav-item" onclick="showPage('m12')" id="nav-m12">
-      <span class="status-dot" id="dot-m12"></span>
-      <span class="module-label">M12: 総復習と模擬試験</span>
-      <span class="module-pct" id="pct-m12"></span>
+    <div class="accordion-body" id="ab-code">
+      <div class="nav-item" onclick="showPage('m7')" id="nav-m7">
+        <span class="status-dot" id="dot-m7"></span>
+        <span class="module-label">M7: Claude Code入門</span>
+        <span class="module-pct" id="pct-m7"></span>
+      </div>
+      <div class="nav-item" onclick="showPage('m8')" id="nav-m8">
+        <span class="status-dot" id="dot-m8"></span>
+        <span class="module-label">M8: CLAUDE.mdとワークフロー</span>
+        <span class="module-pct" id="pct-m8"></span>
+      </div>
     </div>
-    <div class="nav-item" onclick="window.open('scenario-guide.html','_blank')" id="nav-scenario" style="border-top:1px solid #374151;margin-top:.5rem;padding-top:.75rem;">
-      <span class="status-dot" style="background:#7C3AED;"></span>
-      <span class="module-label">シナリオ別対策ガイド</span>
-      <span class="module-pct" style="font-size:.7rem;">外部</span>
+  </div>
+
+  <!-- エージェント編 (M9-M10) [D1] -->
+  <div class="accordion-group" id="ag-agent">
+    <div class="accordion-header" onclick="toggleAccordion('agent')">
+      <span class="accordion-arrow">&#9654;</span>
+      <span class="accordion-title">エージェント編（M9-M10）</span>
+      <span class="sidebar-domain-badge d1">D1</span>
     </div>
+    <div class="accordion-body" id="ab-agent">
+      <div class="nav-item" onclick="showPage('m9')" id="nav-m9">
+        <span class="status-dot" id="dot-m9"></span>
+        <span class="module-label">M9: エージェントアーキテクチャ</span>
+        <span class="module-pct" id="pct-m9"></span>
+      </div>
+      <div class="nav-item" onclick="showPage('m10')" id="nav-m10">
+        <span class="status-dot" id="dot-m10"></span>
+        <span class="module-label">M10: マルチエージェント</span>
+        <span class="module-pct" id="pct-m10"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 信頼性編 (M11) [D5] -->
+  <div class="accordion-group" id="ag-trust">
+    <div class="accordion-header" onclick="toggleAccordion('trust')">
+      <span class="accordion-arrow">&#9654;</span>
+      <span class="accordion-title">信頼性編（M11）</span>
+      <span class="sidebar-domain-badge d5">D5</span>
+    </div>
+    <div class="accordion-body" id="ab-trust">
+      <div class="nav-item" onclick="showPage('m11')" id="nav-m11">
+        <span class="status-dot" id="dot-m11"></span>
+        <span class="module-label">M11: コンテキスト管理</span>
+        <span class="module-pct" id="pct-m11"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 総復習 (M12) -->
+  <div class="accordion-group" id="ag-review">
+    <div class="accordion-header" onclick="toggleAccordion('review')">
+      <span class="accordion-arrow">&#9654;</span>
+      <span class="accordion-title">総復習（M12）</span>
+    </div>
+    <div class="accordion-body" id="ab-review">
+      <div class="nav-item" onclick="showPage('m12')" id="nav-m12">
+        <span class="status-dot" id="dot-m12"></span>
+        <span class="module-label">M12: 総復習と模擬試験</span>
+        <span class="module-pct" id="pct-m12"></span>
+      </div>
+      <div class="nav-item" onclick="window.open('scenario-guide.html','_blank')" id="nav-scenario" style="border-top:1px solid #374151;margin-top:.5rem;padding-top:.75rem;">
+        <span class="status-dot" style="background:#7C3AED;"></span>
+        <span class="module-label">シナリオ別対策ガイド</span>
+        <span class="module-pct" style="font-size:.7rem;">外部</span>
+      </div>
+    </div>
+  </div>
     <div class="nav-item" onclick="showPage('drill')" id="nav-drill">
       <span class="status-dot" style="background:#DC2626;"></span>
       <span class="module-label">弱点克服ドリル</span>
@@ -9779,6 +9846,37 @@ function saveState() {
 }
 
 // ===================== NAVIGATION =====================
+// Module-to-accordion-group mapping
+const MODULE_GROUP = {
+  m0:'basics', m1:'basics',
+  m2:'prompt', m3:'prompt', m4:'prompt',
+  m5:'tools', m6:'tools',
+  m7:'code', m8:'code',
+  m9:'agent', m10:'agent',
+  m11:'trust',
+  m12:'review'
+};
+
+function toggleAccordion(groupId) {
+  const header = document.querySelector('#ag-' + groupId + ' .accordion-header');
+  const body = document.getElementById('ab-' + groupId);
+  if (header && body) {
+    header.classList.toggle('open');
+    body.classList.toggle('open');
+  }
+}
+
+function expandAccordionFor(pageId) {
+  const groupId = MODULE_GROUP[pageId];
+  if (!groupId) return;
+  const header = document.querySelector('#ag-' + groupId + ' .accordion-header');
+  const body = document.getElementById('ab-' + groupId);
+  if (header && body && !body.classList.contains('open')) {
+    header.classList.add('open');
+    body.classList.add('open');
+  }
+}
+
 function showPage(pageId) {
   // Hide all pages
   document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
@@ -9789,6 +9887,9 @@ function showPage(pageId) {
   const navId = pageId === 'dashboard' ? 'nav-dashboard' : 'nav-' + pageId;
   const navEl = document.getElementById(navId);
   if (navEl) navEl.classList.add('active');
+
+  // Auto-expand accordion group for current page
+  expandAccordionFor(pageId);
 
   state.currentPage = pageId;
   saveState();
