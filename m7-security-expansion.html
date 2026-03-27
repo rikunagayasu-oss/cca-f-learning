@@ -1,0 +1,134 @@
+<!-- M7拡充: Claude Code Securityセクション -->
+<!-- index.htmlへの統合時、M7のセクションタブに追加し、このコンテンツを挿入する -->
+
+<!-- セクションタブに追加するボタン -->
+<!-- <button class="section-tab" onclick="showSection('m7','s8',this)">セキュリティ</button> -->
+
+<!-- セクション本体 -->
+<div id="m7-s8" class="card" style="display:none">
+  <h2>Claude Codeのセキュリティ</h2>
+  <p>Claude Codeは強力なツールですが、ファイルの読み書きやコマンド実行ができるため、<strong>セキュリティ（安全対策）</strong>が非常に重要です。Anthropicはこの点を重視し、多層的な安全設計を採用しています。</p>
+  <p>たとえるなら、Claude Codeのセキュリティは「金庫室」のような仕組みです。入室する人（ツール操作）ごとに身分証（権限承認）をチェックし、持ち出せるもの（データ送信範囲）を制限し、監視カメラ（ログ記録）で記録を残します。</p>
+
+  <h3>セキュリティアーキテクチャ概要</h3>
+  <p>Claude Codeのセキュリティは<strong>3つの層</strong>で構成されています。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>ローカル実行モデル（Local Execution Model）：</strong>Claude Codeはユーザーのマシン上で直接実行される。コードや操作結果がクラウドに永続的に保存されることはない。APIとの通信はプロンプトと応答のやり取りのみで、作業ファイル全体がアップロードされるわけではない。</p>
+  </div>
+
+  <table class="compare-table">
+    <tr><th>層</th><th>仕組み</th><th>役割</th></tr>
+    <tr><td><strong>第1層: 権限モデル</strong></td><td>5つの権限モード + deny/ask/allow評価</td><td>ツール実行の承認・拒否を制御</td></tr>
+    <tr><td><strong>第2層: データ制御</strong></td><td>ローカル実行 + 送信データ範囲の制限</td><td>不要なデータがクラウドに送られることを防止</td></tr>
+    <tr><td><strong>第3層: 環境隔離</strong></td><td>コンテナ / git worktree / サンドボックス</td><td>操作の影響範囲を限定</td></tr>
+  </table>
+
+  <h3>データ取扱い</h3>
+  <p>Claude Codeを使う際、「自分のコードはどこに送られるのか？」は多くの人が気になるポイントです。</p>
+
+  <table class="compare-table">
+    <tr><th>項目</th><th>説明</th></tr>
+    <tr><td><strong>実行場所</strong></td><td>ユーザーのローカルマシン上。クラウドサーバーで動作するわけではない</td></tr>
+    <tr><td><strong>APIに送信されるデータ</strong></td><td>会話のプロンプト、ツール実行の結果（ファイル内容の一部やコマンド出力）</td></tr>
+    <tr><td><strong>送信されないデータ</strong></td><td>プロジェクト全体のファイル、Git履歴全体、環境変数の値</td></tr>
+    <tr><td><strong>データの保持</strong></td><td>APIへの入出力はAnthropicの利用規約に基づく。商用契約ではゼロ保持（Zero Retention）オプションが利用可能</td></tr>
+    <tr><td><strong>モデル学習への利用</strong></td><td>APIを通じて送信されたデータは、デフォルトではモデルの学習に使用されない</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">Claude Codeは<strong>ローカル実行</strong>であり、プロジェクト全体がクラウドにアップロードされるわけではありません。APIに送信されるのは会話に必要なプロンプトとツール実行結果のみです。この区別は試験で問われやすいポイントです。</p>
+  </div>
+
+  <h3>権限モデル（サンドボックスとツール承認フロー）</h3>
+  <p>Claude Codeの権限モデルは、<strong>「まず拒否（deny）を確認し、次に確認（ask）が必要か判断し、最後に許可（allow）を適用する」</strong>という順序で動作します。</p>
+
+  <table class="compare-table">
+    <tr><th>安全機能</th><th>仕組み</th><th>効果</th></tr>
+    <tr><td><strong>deny優先原則</strong></td><td>denyルールは他のどの設定よりも優先される</td><td>明示的に禁止した操作は絶対に実行されない</td></tr>
+    <tr><td><strong>Managed Settings</strong></td><td>IT管理者が配布する上書き不可の設定</td><td>組織全体のセキュリティポリシーを強制適用</td></tr>
+    <tr><td><strong>ツール承認フロー</strong></td><td>defaultモードでは変更操作ごとにユーザー確認</td><td>意図しない変更を事前にブロック</td></tr>
+    <tr><td><strong>.gitディレクトリ保護</strong></td><td>bypassPermissionsモードでも.git等への書き込みは確認あり</td><td>Git履歴の意図しない改変を防止</td></tr>
+    <tr><td><strong>PreToolUseフック</strong></td><td>ツール実行前にカスタムスクリプトでチェック可能</td><td>組織独自のセキュリティルールを適用</td></tr>
+  </table>
+
+  <div class="concept-box">
+    <div class="label">覚え方のコツ</div>
+    <p>権限の優先順位は「<strong>否定は肯定に勝つ</strong>」と覚えましょう。denyがallowに常に優先するのは、セキュリティの世界では「明示的な禁止は暗黙の許可より強い」という原則に基づいています。設定ファイルの優先順位も「<strong>組織 &gt; セッション &gt; プロジェクト &gt; ユーザー</strong>」と、より広い範囲の設定が強い構造になっています。</p>
+  </div>
+
+  <h3>セキュリティベストプラクティス</h3>
+  <p>Claude Codeを安全に運用するための推奨事項をまとめます。</p>
+
+  <table class="compare-table">
+    <tr><th>カテゴリ</th><th>推奨事項</th><th>理由</th></tr>
+    <tr><td><strong>権限設定</strong></td><td>必要最小限の権限モードを選択する（最小権限の原則）</td><td>不要な操作リスクを排除</td></tr>
+    <tr><td><strong>CI/CD環境</strong></td><td>コンテナなどの隔離環境で実行する</td><td>操作の影響範囲を限定</td></tr>
+    <tr><td><strong>コスト管理</strong></td><td><code>--max-budget-usd</code>で費用上限を設定</td><td>予期しないコスト発生を防止</td></tr>
+    <tr><td><strong>暴走防止</strong></td><td><code>--max-turns</code>でターン数を制限</td><td>無限ループの防止</td></tr>
+    <tr><td><strong>組織管理</strong></td><td>Managed Settingsで組織ポリシーを配布</td><td>個人設定では上書きできないルールを強制</td></tr>
+    <tr><td><strong>監査</strong></td><td>PreToolUseフックでツール使用をログ記録</td><td>操作履歴の追跡と異常検知</td></tr>
+  </table>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;"><code>.env</code>ファイルや認証情報（APIキー、パスワード等）を含むファイルには特に注意が必要です。Claude Codeがこれらのファイルを読み取ると、会話コンテキストの一部としてAPIに送信される可能性があります。機密ファイルは<code>.claudeignore</code>でアクセス対象から除外することを推奨します。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">セキュリティの問題では「<strong>最小権限の原則（Principle of Least Privilege）</strong>」と「<strong>多層防御（Defense in Depth）</strong>」がキーワードです。権限モード選択（最小権限）、コンテナ隔離（環境分離）、Managed Settings（組織管理）、PreToolUseフック（カスタム制御）の4つを組み合わせた多層的な安全設計を理解しましょう。</p>
+  </div>
+</div>
+
+<!-- 用語集に追加する項目 -->
+<!--
+<div class="glossary-item"><div class="glossary-term">ローカル実行モデル</div><div class="glossary-en">Local Execution Model</div><div class="glossary-def">Claude Codeがユーザーのマシン上で直接実行される方式。コードや操作結果がクラウドに永続保存されない。</div></div>
+<div class="glossary-item"><div class="glossary-term">最小権限の原則</div><div class="glossary-en">Principle of Least Privilege</div><div class="glossary-def">必要最小限の権限のみを付与するセキュリティ原則。Claude Codeでは適切な権限モードの選択がこれに該当する。</div></div>
+<div class="glossary-item"><div class="glossary-term">多層防御</div><div class="glossary-en">Defense in Depth</div><div class="glossary-def">複数のセキュリティ層を重ねて防御する設計思想。権限モデル・データ制御・環境隔離の3層で構成される。</div></div>
+<div class="glossary-item"><div class="glossary-term">ゼロ保持</div><div class="glossary-en">Zero Retention</div><div class="glossary-def">APIへの入出力データをAnthropic側で一切保持しないオプション。商用契約で利用可能。</div></div>
+-->
+
+<!-- クイズデータ（JSON形式） -->
+<!--
+{
+  "section": "m7_security",
+  "questions": [
+    {
+      "question": "あなたの会社では、Claude Codeを開発チーム全体に導入する計画があります。IT管理者として、特定のシェルコマンド（rm -rf等）の実行を全社的に禁止したい場合、最も適切な方法はどれですか？",
+      "options": [
+        "各開発者のホームディレクトリの~/.claude/settings.jsonにdenyルールを追加するよう全員に依頼する",
+        "プロジェクトの.claude/settings.jsonにdenyルールを追加する",
+        "Managed Settingsでdenyルールを配布し、個人設定で上書きできないようにする",
+        "CLAUDE.mdに「rm -rfを使わないでください」と記述する"
+      ],
+      "answer": 2,
+      "explanation": "Managed Settings（管理設定）はIT管理者が配布する上書き不可の設定で、権限設定の優先順位で最も強い位置にあります。個人の設定ファイルやプロジェクト設定では上書きできないため、組織全体のセキュリティポリシーを確実に強制できます。denyルールは他のどの設定（allowを含む）よりも常に優先されます。"
+    },
+    {
+      "question": "Claude Codeのデータ取扱いについて、正しい説明はどれですか？",
+      "options": [
+        "プロジェクト全体のファイルが自動的にAnthropicのクラウドにアップロードされる",
+        "Claude Codeはローカルで実行され、APIに送信されるのは会話のプロンプトとツール実行結果のみである",
+        "APIに送信されたデータはデフォルトでモデルの学習に使用される",
+        "Git履歴全体が常にAPIに送信される"
+      ],
+      "answer": 1,
+      "explanation": "Claude Codeはユーザーのローカルマシンで実行されます。APIに送信されるのは会話に必要なプロンプトとツール実行結果（ファイル内容の一部やコマンド出力）のみです。プロジェクト全体やGit履歴全体がアップロードされるわけではありません。また、APIを通じて送信されたデータはデフォルトではモデル学習に使用されません。"
+    },
+    {
+      "question": "Claude Codeのセキュリティ設計における「多層防御（Defense in Depth）」のアプローチとして、正しい組み合わせはどれですか？",
+      "options": [
+        "bypassPermissionsモード + ローカル環境 + 無制限のターン数",
+        "権限モデル（deny/ask/allow） + データ送信制御 + 環境隔離（コンテナ等）",
+        "CLAUDE.mdの記述のみで全セキュリティを管理する",
+        "全ツールをallowに設定し、PostToolUseフックで事後チェックする"
+      ],
+      "answer": 1,
+      "explanation": "Claude Codeの多層防御は、第1層の権限モデル（deny/ask/allowの評価順序）、第2層のデータ制御（ローカル実行・送信データ範囲の制限）、第3層の環境隔離（コンテナ/git worktree/サンドボックス）で構成されます。これら3つの層を組み合わせることで、1つの層が突破されても他の層で防御できる設計になっています。"
+    }
+  ]
+}
+-->

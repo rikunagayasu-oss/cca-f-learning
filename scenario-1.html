@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>シナリオ1: 社内チャットボット導入 — CCA-F 学習サイト</title>
+<style>
+  :root {
+    --primary: #D97706;
+    --primary-light: #FEF3C7;
+    --primary-dark: #92400E;
+    --accent: #7C3AED;
+    --accent-light: #EDE9FE;
+    --bg: #F9FAFB;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --success: #059669;
+    --success-light: #D1FAE5;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --info: #2563EB;
+    --info-light: #DBEAFE;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  .main { max-width: 900px; margin: 0 auto; padding: 2rem 3rem; }
+  .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  .card h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); }
+  .card h3 { font-size: 1.1rem; margin: 1.5rem 0 .75rem; color: var(--primary-dark); }
+  .card p { margin-bottom: .75rem; }
+  .card ul { padding-left: 1.25rem; margin-bottom: .75rem; }
+  .card li { margin-bottom: .3rem; font-size: .9rem; }
+  .module-header { margin-bottom: 2rem; }
+  .module-header .week-badge { display: inline-block; background: var(--primary-light); color: var(--primary-dark); font-size: .8rem; font-weight: 600; padding: .25rem .75rem; border-radius: 999px; margin-bottom: .5rem; }
+  .module-header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: .25rem; }
+  .module-header .subtitle { color: var(--text-light); font-size: 1rem; }
+  .module-header .domain-tag { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: .75rem; font-weight: 600; padding: .2rem .6rem; border-radius: 999px; margin-top: .5rem; margin-right: .25rem; }
+  .concept-box { border-left: 4px solid var(--primary); background: var(--primary-light); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .concept-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+  .tip-box { background: #ECFDF5; border-left: 4px solid var(--success); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .tip-box .label { font-size: .75rem; font-weight: 700; color: var(--success); text-transform: uppercase; }
+  .warn-box { background: #FEF3C7; border-left: 4px solid var(--primary); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .warn-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; }
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9rem; }
+  .compare-table th { background: #F3F4F6; text-align: left; padding: .6rem .8rem; border-bottom: 2px solid var(--border); font-weight: 600; }
+  .compare-table td { padding: .6rem .8rem; border-bottom: 1px solid var(--border); }
+  .compare-table tr:hover td { background: #F9FAFB; }
+  .quiz-section { border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; background: #FAFAFF; }
+  .quiz-section h3 { color: var(--accent); margin-bottom: 1rem; font-size: 1.1rem; }
+  .quiz-question { margin-bottom: 1.5rem; }
+  .quiz-question .q-text { font-weight: 600; margin-bottom: .75rem; font-size: .95rem; }
+  .quiz-option { display: block; padding: .6rem 1rem; margin: .3rem 0; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .9rem; background: white; }
+  .quiz-option:hover { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.correct { border-color: var(--success); background: var(--success-light); }
+  .quiz-option.incorrect { border-color: var(--danger); background: var(--danger-light); }
+  .quiz-option.disabled { pointer-events: none; opacity: .8; }
+  .quiz-explanation { margin-top: .5rem; padding: .75rem 1rem; border-radius: 8px; font-size: .85rem; display: none; }
+  .quiz-explanation.show { display: block; }
+  .quiz-explanation.correct-exp { background: var(--success-light); color: #065F46; }
+  .quiz-explanation.incorrect-exp { background: var(--danger-light); color: #991B1B; }
+  .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: .9rem; cursor: pointer; border: none; transition: all .15s; text-decoration: none; }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-group { display: flex; gap: .75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  @media (max-width: 768px) { .main { padding: 1rem 1.25rem; } }
+</style>
+</head>
+<body>
+<div class="main">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 1</span>
+  <h1>社内チャットボット導入</h1>
+  <p class="subtitle">エージェント設計とツール連携で実現する社内AI活用</p>
+  <span class="domain-tag">D1 エージェント設計 (27%)</span>
+  <span class="domain-tag">D4 ツール&MCP (18%)</span>
+</div>
+
+<!-- シナリオ概要 -->
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p>このシナリオでは、<strong>社内向けのAIチャットボットを導入するプロジェクト</strong>が舞台です。たとえば、社内の就業規則や福利厚生に関する問い合わせに自動で回答するシステムを構築する場面を想像してください。</p>
+  <p>具体的には、以下のような業務場面が設定されます。</p>
+  <ul>
+    <li>社内ナレッジベース（社内Wiki、規程集など）を参照して回答するチャットボットの設計</li>
+    <li>人事部門や総務部門の問い合わせ対応を効率化する仕組みづくり</li>
+    <li>機密情報を含む質問への対応ルール整備</li>
+    <li>チャットボットの回答品質を維持・改善する運用体制</li>
+  </ul>
+
+  <div class="concept-box">
+    <div class="label">シナリオの背景</div>
+    <p>社内チャットボットは、AIエージェントの最も典型的なユースケースの一つです。「知識の検索」「回答の生成」「人間への引き継ぎ」という3つの機能を組み合わせたシステム設計が求められます。</p>
+  </div>
+</div>
+
+<!-- 関連ドメイン -->
+<div class="card">
+  <h2>関連ドメインと出題傾向</h2>
+
+  <h3>D1: エージェント型アーキテクチャとオーケストレーション（Agent Architecture）</h3>
+  <p>試験配点の<strong>27%</strong>を占める最大のドメインです。このシナリオでは、チャットボットをどのようなアーキテクチャで設計するかが問われます。</p>
+  <ul>
+    <li>エージェントループ（Agentic Loop）の設計 ― 質問受付から回答生成までの処理フロー</li>
+    <li>ワークフロー vs エージェント ― 固定フローか、AIが判断するかの選択</li>
+    <li>HITL（Human-in-the-Loop）― 人間の承認が必要なケースの設計</li>
+    <li>フォールバック戦略 ― AIが回答できない場合の人間への引き継ぎ</li>
+  </ul>
+
+  <h3>D4: ツール設計とMCP統合（Tool Design & MCP）</h3>
+  <p>試験配点の<strong>18%</strong>を占めるドメインです。チャットボットが社内システムと連携するためのツール設計が中心です。</p>
+  <ul>
+    <li>ツール定義の設計 ― 社内検索ツール、FAQ検索ツールなどの設計方法</li>
+    <li>MCP（Model Context Protocol）統合 ― 社内データベースやドキュメント管理システムとの接続</li>
+    <li>ツール分配（Tool Distribution）― 状況に応じて適切なツールセットを渡す</li>
+    <li>エラーハンドリング ― ツール実行失敗時の対応設計</li>
+  </ul>
+</div>
+
+<!-- 重要概念 -->
+<div class="card">
+  <h2>重要概念リスト</h2>
+  <p>このシナリオで特に問われやすい技術概念を整理します。</p>
+
+  <table class="compare-table">
+    <tr><th>概念</th><th>英語名</th><th>ポイント</th></tr>
+    <tr>
+      <td>エージェントループ</td>
+      <td>Agentic Loop</td>
+      <td>LLMがツールを呼び→結果を受け→次の判断をする繰り返し。チャットボットの中核</td>
+    </tr>
+    <tr>
+      <td>HITL</td>
+      <td>Human-in-the-Loop</td>
+      <td>重要な判断や機密情報へのアクセス時に人間の承認を挟む仕組み</td>
+    </tr>
+    <tr>
+      <td>ガードレール</td>
+      <td>Guardrails</td>
+      <td>AIの回答が不適切にならないよう制限をかける仕組み。入力・出力の両方に設定</td>
+    </tr>
+    <tr>
+      <td>ツール定義</td>
+      <td>Tool Definition</td>
+      <td>AIが使えるツールの名前・説明・パラメータをJSON形式で定義すること</td>
+    </tr>
+    <tr>
+      <td>MCP</td>
+      <td>Model Context Protocol</td>
+      <td>AIと外部データソースを標準的に接続するプロトコル。「USBのような共通の差し込み口」</td>
+    </tr>
+    <tr>
+      <td>プロンプトキャッシング</td>
+      <td>Prompt Caching</td>
+      <td>同じシステムプロンプトを繰り返し使う場合にコスト・速度を最適化する機能</td>
+    </tr>
+    <tr>
+      <td>承認フロー</td>
+      <td>Approval Flow</td>
+      <td>チャットボットが実行前に人間の承認を求める処理パターン</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 対策ポイント -->
+<div class="card">
+  <h2>対策ポイント</h2>
+
+  <div class="tip-box">
+    <div class="label">対策1: ワークフローとエージェントの使い分けを理解する</div>
+    <p>「FAQ回答」のように手順が決まっている処理は<strong>ワークフロー（Workflow）</strong>が適切です。一方、「ユーザーの質問内容に応じて検索先を変える」ような柔軟な対応には<strong>エージェント（Agent）</strong>が向いています。試験では「この場面ではどちらを選ぶべきか」が問われます。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策2: HITLの導入判断基準を覚える</div>
+    <p>すべてのやり取りに人間の承認を入れると効率が悪くなります。<strong>「影響度が高い操作」「機密情報へのアクセス」「不可逆な処理」</strong>の3つの基準で、HITLを入れるべき箇所を判断できるようにしましょう。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策3: ツール定義のベストプラクティスを押さえる</div>
+    <p>ツールのdescriptionには<strong>「いつ使うか」と「いつ使わないか」</strong>の両方を書くことがポイントです。特に似た機能のツールが複数ある場合、使い分けの基準を明記するとAIの選択精度が上がります。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策4: エラー時のフォールバック設計を意識する</div>
+    <p>チャットボットが回答できない場合の対応策（人間への引き継ぎ、「わかりません」と正直に伝える、など）を設計しておくことが重要です。<strong>ハルシネーション（事実と異なる回答の生成）を防ぐ仕組み</strong>もセットで理解しましょう。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="label">よくある誤解</div>
+    <p>「AIは全自動で動かすべき」と考えがちですが、実務では<strong>適切な人間の介入が品質と信頼性を保つカギ</strong>です。試験でも「完全自動化」を選択肢に含む引っかけ問題があるので注意しましょう。</p>
+  </div>
+</div>
+
+<!-- 練習問題 -->
+<div class="quiz-section" id="quiz-s1">
+  <h3>練習問題</h3>
+
+  <div class="quiz-question" id="s1-q1">
+    <div class="q-text">Q1. 社内チャットボットで、就業規則の内容を回答させる機能を設計しています。チャットボットがナレッジベースから情報を検索し、回答を生成する処理を最も適切に設計するアプローチはどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q1', 0, 1)">A) すべてのナレッジベースの内容をシステムプロンプトに含めて、ツールを使わずに回答させる</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q1', 1, 1)">B) 検索ツールを定義してエージェントループで動作させ、質問に関連する情報を検索してから回答を生成させる</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q1', 2, 1)">C) ユーザーの質問をそのまま社内検索エンジンに転送し、検索結果をそのまま表示する</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q1', 3, 1)">D) 想定される質問と回答のペアをすべて事前に用意し、完全一致で回答を返す</div>
+    <div class="quiz-explanation" id="exp-s1-q1">検索ツールを使ったエージェントループが最適です。ナレッジベースの全内容をプロンプトに含めるとコンテキストウィンドウ（Context Window）を圧迫し、コストも増大します。検索ツールで関連情報だけを取得し、それに基づいて自然言語で回答を生成するのがベストプラクティスです。</div>
+  </div>
+
+  <div class="quiz-question" id="s1-q2">
+    <div class="q-text">Q2. 社内チャットボットが「あなたの有給休暇残日数は15日です」と回答しました。しかし、この情報は人事システムの古いデータに基づいており、実際には12日でした。この問題を防ぐために最も効果的な対策はどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q2', 0, 0)">A) システムプロンプトに「正確な情報のみ回答すること」と指示を追加する</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q2', 1, 0)">B) チャットボットの回答にすべて「※この情報は参考値です」と免責表示を付ける</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q2', 2, 0)">C) 個人データに関する質問には回答せず、人事部への問い合わせを案内する設計にする</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q2', 3, 0)">D) ツールが最新のリアルタイムデータを取得する設計にし、回答時にデータ取得日時も表示する</div>
+    <div class="quiz-explanation" id="exp-s1-q2">根本的な対策は、ツールが常に最新のデータを取得できる設計にすることです（D）。加えて、データ取得日時を明示することで、ユーザー自身が情報の鮮度を判断できます。プロンプトでの指示（A）だけではデータの鮮度問題は解決できません。免責表示（B）は信頼性を損ないます。完全に回答拒否（C）はユーザー体験を大きく低下させます。</div>
+  </div>
+
+  <div class="quiz-question" id="s1-q3">
+    <div class="q-text">Q3. 社内チャットボットに「社内検索ツール」と「FAQ検索ツール」の2つを持たせる設計にしました。しかし、AIがどちらのツールを使うべきか迷い、誤ったツールを選択することが頻発しています。最も効果的な改善策はどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q3', 0, 2)">A) 2つのツールを1つに統合して、内部で自動振り分けする設計に変更する</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q3', 1, 2)">B) tool_choiceパラメータで常に社内検索ツールを強制的に指定する</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q3', 2, 2)">C) 各ツールのdescriptionに「いつ使うか」「いつ使わないか」の使い分け基準を明記する</div>
+    <div class="quiz-option" onclick="checkAnswer('s1-q3', 3, 2)">D) プロンプトキャッシングを有効にして、ツール定義の処理速度を上げる</div>
+    <div class="quiz-explanation" id="exp-s1-q3">ツール選択精度の改善には、各ツールのdescriptionに使い分けの基準を明記するのが最も効果的です（C）。たとえば「社内検索ツール: 社内規程・マニュアルなど公式文書を検索する際に使用。よくある質問にはFAQ検索ツールを使うこと」のように記載します。ツール統合（A）は柔軟性が低下し、強制指定（B）は状況適応ができなくなります。キャッシング（D）は速度の問題であり、選択精度には関係しません。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a href="scenario-guide.html" class="btn btn-outline">&larr; シナリオ一覧に戻る</a>
+  <a href="scenario-2.html" class="btn btn-primary">シナリオ2: コード自動レビュー &rarr;</a>
+</div>
+
+</div>
+
+<script>
+function checkAnswer(qId, selected, correct) {
+  const question = document.getElementById(qId);
+  const options = question.querySelectorAll('.quiz-option');
+  const explanation = document.getElementById('exp-' + qId);
+
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if (i === correct) opt.classList.add('correct');
+    if (i === selected && selected !== correct) opt.classList.add('incorrect');
+  });
+
+  explanation.classList.add('show');
+  explanation.classList.add(selected === correct ? 'correct-exp' : 'incorrect-exp');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>シナリオ3: カスタマーサポート自動化 — CCA-F 学習サイト</title>
+<style>
+  :root {
+    --primary: #D97706;
+    --primary-light: #FEF3C7;
+    --primary-dark: #92400E;
+    --accent: #7C3AED;
+    --accent-light: #EDE9FE;
+    --bg: #F9FAFB;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --success: #059669;
+    --success-light: #D1FAE5;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --info: #2563EB;
+    --info-light: #DBEAFE;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  .main { max-width: 900px; margin: 0 auto; padding: 2rem 3rem; }
+  .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  .card h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); }
+  .card h3 { font-size: 1.1rem; margin: 1.5rem 0 .75rem; color: var(--primary-dark); }
+  .card p { margin-bottom: .75rem; }
+  .card ul { padding-left: 1.25rem; margin-bottom: .75rem; }
+  .card li { margin-bottom: .3rem; font-size: .9rem; }
+  .module-header { margin-bottom: 2rem; }
+  .module-header .week-badge { display: inline-block; background: var(--primary-light); color: var(--primary-dark); font-size: .8rem; font-weight: 600; padding: .25rem .75rem; border-radius: 999px; margin-bottom: .5rem; }
+  .module-header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: .25rem; }
+  .module-header .subtitle { color: var(--text-light); font-size: 1rem; }
+  .module-header .domain-tag { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: .75rem; font-weight: 600; padding: .2rem .6rem; border-radius: 999px; margin-top: .5rem; margin-right: .25rem; }
+  .concept-box { border-left: 4px solid var(--primary); background: var(--primary-light); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .concept-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+  .tip-box { background: #ECFDF5; border-left: 4px solid var(--success); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .tip-box .label { font-size: .75rem; font-weight: 700; color: var(--success); text-transform: uppercase; }
+  .warn-box { background: #FEF3C7; border-left: 4px solid var(--primary); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .warn-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; }
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9rem; }
+  .compare-table th { background: #F3F4F6; text-align: left; padding: .6rem .8rem; border-bottom: 2px solid var(--border); font-weight: 600; }
+  .compare-table td { padding: .6rem .8rem; border-bottom: 1px solid var(--border); }
+  .compare-table tr:hover td { background: #F9FAFB; }
+  .quiz-section { border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; background: #FAFAFF; }
+  .quiz-section h3 { color: var(--accent); margin-bottom: 1rem; font-size: 1.1rem; }
+  .quiz-question { margin-bottom: 1.5rem; }
+  .quiz-question .q-text { font-weight: 600; margin-bottom: .75rem; font-size: .95rem; }
+  .quiz-option { display: block; padding: .6rem 1rem; margin: .3rem 0; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .9rem; background: white; }
+  .quiz-option:hover { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.correct { border-color: var(--success); background: var(--success-light); }
+  .quiz-option.incorrect { border-color: var(--danger); background: var(--danger-light); }
+  .quiz-option.disabled { pointer-events: none; opacity: .8; }
+  .quiz-explanation { margin-top: .5rem; padding: .75rem 1rem; border-radius: 8px; font-size: .85rem; display: none; }
+  .quiz-explanation.show { display: block; }
+  .quiz-explanation.correct-exp { background: var(--success-light); color: #065F46; }
+  .quiz-explanation.incorrect-exp { background: var(--danger-light); color: #991B1B; }
+  .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: .9rem; cursor: pointer; border: none; transition: all .15s; text-decoration: none; }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-group { display: flex; gap: .75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  @media (max-width: 768px) { .main { padding: 1rem 1.25rem; } }
+</style>
+</head>
+<body>
+<div class="main">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 3</span>
+  <h1>カスタマーサポート自動化</h1>
+  <p class="subtitle">AIエージェントによる顧客対応の効率化とガードレール設計</p>
+  <span class="domain-tag">D2 ツール設計 (18%)</span>
+  <span class="domain-tag">D5 コンテキスト管理 (15%)</span>
+</div>
+
+<!-- シナリオ概要 -->
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p>このシナリオでは、<strong>企業のカスタマーサポート部門にAIエージェントを導入するプロジェクト</strong>が舞台です。顧客からの問い合わせを受け付け、FAQからの回答検索、注文状況の確認、返品手続きの案内などを自動で行うシステムを構築します。</p>
+  <p>具体的には、以下のような業務場面が設定されます。</p>
+  <ul>
+    <li>顧客の問い合わせ内容を理解し、適切な対応方法を判断するAIエージェント</li>
+    <li>FAQ検索、注文管理システム連携、在庫確認などの複数ツールの統合</li>
+    <li>不適切な回答や個人情報漏洩を防ぐガードレール（Guardrails）の設計</li>
+    <li>会話の文脈（コンテキスト）を適切に管理する仕組み</li>
+  </ul>
+
+  <div class="concept-box">
+    <div class="label">シナリオの背景</div>
+    <p>カスタマーサポートは、「多様なツールとの連携」と「顧客との長い会話の文脈管理」の両方が求められる複合的なシナリオです。ツール設計の品質がサービス品質に直結し、ガードレールの設計が企業の信頼を守ります。</p>
+  </div>
+</div>
+
+<!-- 関連ドメイン -->
+<div class="card">
+  <h2>関連ドメインと出題傾向</h2>
+
+  <h3>D2: ツール設計とMCP統合（Tool Design & MCP Integration）</h3>
+  <p>試験配点の<strong>18%</strong>を占めるドメインです。顧客対応に必要な複数ツールの設計が中心です。</p>
+  <ul>
+    <li>ツール定義（Tool Definition）― FAQ検索、注文確認、返品処理などの各ツール設計</li>
+    <li>ツール分配（Tool Distribution）― 会話の状況に応じて必要なツールだけを渡す</li>
+    <li>構造化エラーレスポンス ― ツール実行失敗時のis_error, isRetryableフィールド</li>
+    <li>tool_choice ― ツール選択を自律判断（auto）にするか強制指定するか</li>
+  </ul>
+
+  <h3>D5: コンテキスト管理と信頼性（Context Management & Reliability）</h3>
+  <p>試験配点の<strong>15%</strong>のドメインです。会話の文脈管理と回答品質の維持が問われます。</p>
+  <ul>
+    <li>コンテキストウィンドウ管理 ― 長い会話でのトークン消費の最適化</li>
+    <li>ガードレール（Guardrails）― 不適切回答防止、個人情報保護</li>
+    <li>ハルシネーション対策 ― 事実に基づかない回答の防止（グラウンディング）</li>
+    <li>プロンプトキャッシング ― 繰り返しのシステムプロンプトのコスト最適化</li>
+  </ul>
+</div>
+
+<!-- 重要概念 -->
+<div class="card">
+  <h2>重要概念リスト</h2>
+
+  <table class="compare-table">
+    <tr><th>概念</th><th>英語名</th><th>ポイント</th></tr>
+    <tr>
+      <td>ツール分配</td>
+      <td>Tool Distribution</td>
+      <td>全ツールを常に渡すと推論が遅くなる。カテゴリ別に分けて必要なものだけ渡す</td>
+    </tr>
+    <tr>
+      <td>構造化エラー</td>
+      <td>Structured Error Response</td>
+      <td>is_error: trueに加え、エラータイプ・リトライ可否を含める設計</td>
+    </tr>
+    <tr>
+      <td>ガードレール</td>
+      <td>Guardrails</td>
+      <td>入力と出力の両方でチェック。プロンプト+プログラムの多層防御が最善</td>
+    </tr>
+    <tr>
+      <td>グラウンディング</td>
+      <td>Grounding</td>
+      <td>回答の根拠をデータソースから引用させる。ハルシネーション防止の最重要手法</td>
+    </tr>
+    <tr>
+      <td>コンテキストウィンドウ</td>
+      <td>Context Window</td>
+      <td>AIが一度に処理できるテキスト量の上限。長い会話では要約が必要</td>
+    </tr>
+    <tr>
+      <td>プロンプトキャッシング</td>
+      <td>Prompt Caching</td>
+      <td>システムプロンプトをキャッシュしてコスト最大90%削減、遅延最大80%削減</td>
+    </tr>
+    <tr>
+      <td>マルチパスレビュー</td>
+      <td>Multi-pass Review</td>
+      <td>AIの出力を別のセッションで検証する品質保証手法</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 対策ポイント -->
+<div class="card">
+  <h2>対策ポイント</h2>
+
+  <div class="tip-box">
+    <div class="label">対策1: ツール設計の「記述」が品質を決める</div>
+    <p>ツールのdescriptionに<strong>「いつ使うか」「いつ使わないか」「パラメータの制約」</strong>を明記することが最も重要です。たとえば注文確認ツールには「顧客が注文番号を提示した場合に使用。注文番号がない場合は先に顧客に確認すること」と書きます。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策2: ガードレールは「多層防御」で設計する</div>
+    <p>プロンプトだけでは回答品質を100%保証できません。<strong>プロンプトでの指示 + プログラムによる出力検証</strong>の組み合わせが試験で推奨されるアプローチです。特に、個人情報を含む回答のフィルタリングはプログラム側で行うべきです。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策3: コンテキストウィンドウの消費を意識する</div>
+    <p>カスタマーサポートの会話は長くなりがちです。<strong>プログレッシブ要約（Progressive Summarization）</strong>を使って古い会話を要約し、コンテキストウィンドウを節約する手法を理解しましょう。重要な情報（顧客名、注文番号など）は要約後も保持する設計が必要です。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策4: エラー発生時のリカバリー設計を覚える</div>
+    <p>ツール実行エラー時にis_error: trueと具体的なエラーメッセージを返すと、AIが自律的にリカバリーを試みます。<strong>レート制限エラーにはisRetryable: true</strong>を付けて再試行を促し、認証エラーにはisRetryable: falseで別のアプローチを取らせます。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="label">よくある誤解</div>
+    <p>「ツール数が多いほど便利」と思いがちですが、ツールが多すぎるとAIの推論が遅くなり、誤ったツールを選ぶリスクも増えます。これを<strong>推論オーバーロード（Inference Overload）</strong>と呼び、プロンプトキャッシングでは解決できません。ツール数の絞り込みが本質的な対策です。</p>
+  </div>
+</div>
+
+<!-- 練習問題 -->
+<div class="quiz-section" id="quiz-s3">
+  <h3>練習問題</h3>
+
+  <div class="quiz-question" id="s3-q1">
+    <div class="q-text">Q1. カスタマーサポートのAIエージェントが「FAQ検索」「注文確認」「在庫照会」「返品処理」の4つのツールを持っています。顧客が「注文した商品がまだ届きません」と問い合わせてきた場合、エージェントの最初のアクションとして最も適切なのはどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q1', 0, 2)">A) FAQ検索ツールで「配送遅延」に関するFAQを検索する</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q1', 1, 2)">B) 在庫照会ツールで商品の在庫状況を確認する</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q1', 2, 2)">C) 注文確認ツールで顧客の注文番号を使って配送状況を確認する</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q1', 3, 2)">D) 返品処理ツールで返品手続きを開始する</div>
+    <div class="quiz-explanation" id="exp-s3-q1">「商品が届かない」という問い合わせには、まず注文確認ツールで具体的な配送状況を確認するのが最適です（C）。FAQ検索（A）は一般的な情報しか返せず、個別の配送状況は確認できません。在庫照会（B）は発送前の話であり、既に注文済みの問い合わせには不適切です。返品処理（D）はまだ届いていないだけなので時期尚早です。</div>
+  </div>
+
+  <div class="quiz-question" id="s3-q2">
+    <div class="q-text">Q2. カスタマーサポートのAIエージェントが外部の注文管理APIを呼び出した際、レート制限（Rate Limit）エラーが返されました。tool_resultとしてAIに返すエラー情報のベストプラクティスはどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q2', 0, 1)">A) tool_resultを返さずにエラーを無視し、一般的な回答を生成させる</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q2', 1, 1)">B) is_error: true、エラータイプ「rate_limit」、isRetryable: trueを含む構造化エラーを返す</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q2', 2, 1)">C) 「エラーが発生しました」というテキストのみをtool_resultとして返す</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q2', 3, 1)">D) is_error: trueのみを設定し、詳細情報は省略する</div>
+    <div class="quiz-explanation" id="exp-s3-q2">構造化エラーレスポンスのベストプラクティスは、is_error: true に加えてエラータイプとisRetryableフラグを含めることです（B）。レート制限は一時的なエラーなのでisRetryable: trueとすることで、AIが適切な間隔を空けて再試行できます。tool_resultを返さない（A）とAPIエラーになり、テキストのみ（C）や詳細省略（D）ではAIが最適な対応を判断できません。</div>
+  </div>
+
+  <div class="quiz-question" id="s3-q3">
+    <div class="q-text">Q3. カスタマーサポートのAIが、顧客に対して実際には存在しないキャンペーン割引について回答してしまいました（ハルシネーション）。このような問題を最も効果的に防止する設計はどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q3', 0, 0)">A) グラウンディング手法を使い、FAQや公式情報から関連箇所を引用させてから回答を生成させる</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q3', 1, 0)">B) システムプロンプトに「嘘をつかないこと」と強調して記載する</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q3', 2, 0)">C) AIの回答をすべて人間が確認してから顧客に送信する</div>
+    <div class="quiz-option" onclick="checkAnswer('s3-q3', 3, 0)">D) temperature（出力のランダム性）を0に設定する</div>
+    <div class="quiz-explanation" id="exp-s3-q3">グラウンディング（Grounding）が最も効果的です（A）。AIにまず公式情報やFAQから関連箇所を引用（Quote）させ、その引用に基づいて回答させることで、事実に基づかない情報の生成を大幅に抑制できます。「嘘をつかない」という指示（B）はプロンプトレベルの対策で確実ではありません。全件人間確認（C）は自動化のメリットを損ないます。temperature=0（D）はランダム性を減らすだけでハルシネーション防止には不十分です。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a href="scenario-2.html" class="btn btn-outline">&larr; シナリオ2: コード自動レビュー</a>
+  <a href="scenario-guide.html" class="btn btn-outline">シナリオ一覧</a>
+  <a href="scenario-4.html" class="btn btn-primary">シナリオ4: マルチエージェント文書処理 &rarr;</a>
+</div>
+
+</div>
+
+<script>
+function checkAnswer(qId, selected, correct) {
+  const question = document.getElementById(qId);
+  const options = question.querySelectorAll('.quiz-option');
+  const explanation = document.getElementById('exp-' + qId);
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if (i === correct) opt.classList.add('correct');
+    if (i === selected && selected !== correct) opt.classList.add('incorrect');
+  });
+  explanation.classList.add('show');
+  explanation.classList.add(selected === correct ? 'correct-exp' : 'incorrect-exp');
+}
+</script>
+</body>
+</html>

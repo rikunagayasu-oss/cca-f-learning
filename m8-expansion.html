@@ -1,0 +1,383 @@
+<!--
+  M8拡充コンテンツ（4セクション + 用語集追加 + クイズ追加）
+  index.htmlへの統合は参謀の指示を待つこと。
+  統合先: <div id="page-m8"> 内、既存s6（クイズ）の前にs7-s10を挿入。
+  セクションタブも追加が必要。
+-->
+
+<!-- ===== セクションタブ（既存タブの後に追加） ===== -->
+<!--
+  既存タブ: s1〜s6
+  追加タブ（s5の前、s6の前に挿入）:
+-->
+<button class="section-tab" onclick="showSection('m8','s7',this)">@importモジュール化</button>
+<button class="section-tab" onclick="showSection('m8','s8',this)">.claude/rules/</button>
+<button class="section-tab" onclick="showSection('m8','s9',this)">Plan mode</button>
+<button class="section-tab" onclick="showSection('m8','s10',this)">Agent Skills</button>
+
+
+<!-- ===== セクション7: @importモジュール化 ===== -->
+<div id="m8-s7" class="card" style="display:none">
+  <h2>@importモジュール化 &mdash; CLAUDE.mdを分割管理する</h2>
+  <p>プロジェクトが大きくなると、1つのCLAUDE.mdにすべてのルールを書くのは大変です。<strong>@importディレクティブ</strong>を使えば、CLAUDE.mdを複数ファイルに分割して管理できます。会社の就業規則が1冊ではなく「総則」「経理規程」「開発規程」と分冊されているのと同じ考え方です。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>@import（アットインポート）ディレクティブ：</strong>CLAUDE.md内で別のMarkdownファイルを読み込む構文。<code>@import ./docs/coding-rules.md</code> のように相対パスで記述する。読み込まれたファイルの内容は、その位置に展開される。</p>
+  </div>
+
+  <h3>基本構文</h3>
+  <p>CLAUDE.mdの中で、読み込みたいファイルのパスを<code>@import</code>に続けて書くだけです。</p>
+  <pre style="background:var(--bg-alt);padding:1rem;border-radius:8px;font-size:.85rem;overflow-x:auto;"><code># CLAUDE.md（プロジェクトルート）
+
+## 基本方針
+このプロジェクトはTypeScriptで開発しています。
+
+@import ./docs/coding-standards.md
+@import ./docs/testing-guidelines.md
+@import ./docs/api-conventions.md</code></pre>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">@importは<strong>相対パス</strong>で指定します。読み込み先のファイルもMarkdown形式で、さらに@importをネスト（入れ子）にすることも可能です。ただし、ネストが深すぎるとコンテキストウィンドウを圧迫するため注意が必要です。</p>
+  </div>
+
+  <h3>いつ分割すべきか？</h3>
+  <table class="compare-table">
+    <tr><th>状況</th><th>推奨アプローチ</th><th>理由</th></tr>
+    <tr><td>小規模プロジェクト（1チーム）</td><td>CLAUDE.md 1ファイルで十分</td><td>分割のオーバーヘッドが利点を上回る</td></tr>
+    <tr><td>中規模プロジェクト（複数モジュール）</td><td>モジュール別に分割</td><td>各モジュールの担当者が独立して編集できる</td></tr>
+    <tr><td>monorepo（複数サービス）</td><td>サービス別 + 共通ルールに分割</td><td>共通ルールを1か所で管理しつつ、各サービス固有のルールを分離</td></tr>
+    <tr><td>マルチチーム開発</td><td>チーム別 + 共通ルールに分割</td><td>各チームが自分の領域のルールを独立管理できる</td></tr>
+  </table>
+
+  <h3>monorepoでの構成例</h3>
+  <p>複数のサービスが1つのリポジトリに入っている場合、共通ルールと個別ルールを分けて管理します。</p>
+  <pre style="background:var(--bg-alt);padding:1rem;border-radius:8px;font-size:.85rem;overflow-x:auto;"><code># ルートの CLAUDE.md
+@import ./docs/shared-rules.md        # 全サービス共通のルール
+
+# 各サービスの CLAUDE.md（サブディレクトリ）
+# services/api/CLAUDE.md
+@import ../../docs/shared-rules.md     # 共通ルールを読み込み
+@import ./api-specific-rules.md        # API固有のルール
+
+# services/web/CLAUDE.md
+@import ../../docs/shared-rules.md     # 共通ルールを読み込み
+@import ./frontend-rules.md            # フロントエンド固有のルール</code></pre>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>分割管理の原則：</strong>@importで分割しても、最終的にClaude Codeが読み込む内容の総量は変わりません。分割はあくまで<strong>人間の管理のしやすさ</strong>のためです。コンテキストウィンドウの節約にはなりません。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">@importで読み込むファイルにも秘密情報（APIキー等）を含めてはいけません。git管理されるCLAUDE.mdと同じルールが適用されます。また、循環参照（AがBを読み込み、BがAを読み込む）は避けてください。</p>
+  </div>
+</div>
+
+
+<!-- ===== セクション8: .claude/rules/ ===== -->
+<div id="m8-s8" class="card" style="display:none">
+  <h2>.claude/rules/ &mdash; 条件付きルールファイル</h2>
+  <p>CLAUDE.mdに書いたルールは<strong>常に</strong>読み込まれますが、「特定の状況でだけ適用したいルール」もあります。たとえば「Pythonファイルを編集するときだけPEP 8を守る」「テストファイルでは必ずモックを使わない」といったケースです。<strong>.claude/rules/</strong> ディレクトリに置くルールファイルは、こうした条件付きの指示を実現します。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>ルールファイル（Rule File）：</strong><code>.claude/rules/</code> ディレクトリに配置するMarkdownファイル。ファイル冒頭のフロントマター（YAML形式のメタデータ）で適用条件を指定できる。CLAUDE.mdが「常に適用される社内規程」なら、ルールファイルは「特定の部署や業務にだけ適用される業務マニュアル」のようなものです。</p>
+  </div>
+
+  <h3>ルールの種類</h3>
+  <table class="compare-table">
+    <tr><th>種類</th><th>英語名</th><th>適用タイミング</th><th>例</th></tr>
+    <tr><td><strong>常時適用</strong></td><td>Always</td><td>常にコンテキストに含まれる</td><td>セキュリティポリシー、コード品質基準</td></tr>
+    <tr><td><strong>自動添付</strong></td><td>Auto Attached</td><td>指定したglobパターンに一致するファイル編集時</td><td>*.py 編集時のPython規約</td></tr>
+    <tr><td><strong>手動呼出</strong></td><td>Manual</td><td>ユーザーが明示的に参照した時のみ</td><td>リリース手順書、特殊な移行ガイド</td></tr>
+  </table>
+
+  <h3>ルールファイルの書き方</h3>
+  <p>ファイルの先頭にYAML形式のフロントマターを書いて、適用条件を指定します。</p>
+  <pre style="background:var(--bg-alt);padding:1rem;border-radius:8px;font-size:.85rem;overflow-x:auto;"><code># .claude/rules/python-style.md
+---
+description: "Python コードスタイルのルール"
+globs: "**/*.py"
+---
+
+# Pythonスタイルガイド
+- PEP 8に従うこと
+- 型ヒント（type hints）を必ず付ける
+- docstringはGoogle形式で書く</code></pre>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;"><code>globs</code> を指定すると<strong>Auto Attached（自動添付）</strong>ルールになります。globsを省略すると<strong>Always（常時適用）</strong>ルールになります。「いつ適用されるか」の区別は試験で問われやすいポイントです。</p>
+  </div>
+
+  <h3>CLAUDE.md と .claude/rules/ の使い分け</h3>
+  <table class="compare-table">
+    <tr><th>観点</th><th>CLAUDE.md</th><th>.claude/rules/</th></tr>
+    <tr><td><strong>適用範囲</strong></td><td>常に全体に適用</td><td>条件付き（ファイル種別等）で適用可能</td></tr>
+    <tr><td><strong>記述形式</strong></td><td>自由なMarkdown</td><td>フロントマター + Markdown</td></tr>
+    <tr><td><strong>管理単位</strong></td><td>1ファイル（@importで分割可）</td><td>ルールごとに独立ファイル</td></tr>
+    <tr><td><strong>向いている用途</strong></td><td>プロジェクト全体の方針・規約</td><td>言語別・フレームワーク別の細かいルール</td></tr>
+    <tr><td><strong>コンテキスト消費</strong></td><td>常に消費</td><td>条件一致時のみ消費（Auto Attached）</td></tr>
+  </table>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>コンテキスト効率：</strong>Auto Attachedルールは必要なときだけ読み込まれるため、CLAUDE.mdに全ルールを書くよりもコンテキストウィンドウを効率的に使えます。大規模プロジェクトでは、共通ルールはCLAUDE.mdに、言語・フレームワーク固有のルールは.claude/rules/に分けるのがベストプラクティスです。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">.claude/rules/ のルールファイルもCLAUDE.mdと同様に<strong>git管理</strong>してチームで共有できます。ただし、個人的なルールは<code>.claude/settings.local.json</code>や個人用CLAUDE.mdに書きましょう。</p>
+  </div>
+</div>
+
+
+<!-- ===== セクション9: Plan mode ===== -->
+<div id="m8-s9" class="card" style="display:none">
+  <h2>Plan mode &mdash; まず計画、それから実装</h2>
+  <p>コードを書く前に「何をどう変更するか」を整理したい場面があります。<strong>Plan mode（計画モード）</strong>は、Claude Codeにファイル変更を行わせず、<strong>設計・方針の検討だけ</strong>をさせるモードです。建築で言えば「設計図を描く段階」であり、いきなり壁を立て始めるのではなく、まず図面で確認するようなものです。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>Plan mode（計画モード）：</strong>Claude Codeの動作モードの一つ。コードの読み取りや検索は行えるが、ファイルの作成・編集・削除は行わない。設計方針の検討、影響範囲の調査、実装計画の策定に使う。</p>
+  </div>
+
+  <h3>Plan modeの起動方法</h3>
+  <table class="compare-table">
+    <tr><th>方法</th><th>操作</th><th>説明</th></tr>
+    <tr><td><strong>キーボードショートカット</strong></td><td><code>Shift+Tab</code></td><td>入力中にモードを切り替え。もう一度押すと通常モードに戻る</td></tr>
+    <tr><td><strong>CLI起動オプション</strong></td><td><code>claude --plan</code></td><td>起動時からPlan modeで開始する</td></tr>
+  </table>
+
+  <h3>Plan modeでできること・できないこと</h3>
+  <table class="compare-table">
+    <tr><th>できること</th><th>できないこと</th></tr>
+    <tr><td>ファイルの読み取り・検索</td><td>ファイルの作成・編集・削除</td></tr>
+    <tr><td>コードベースの調査・分析</td><td>コマンドの実行（ビルド・テスト等）</td></tr>
+    <tr><td>実装計画・設計方針の策定</td><td>git操作（commit、push等）</td></tr>
+    <tr><td>影響範囲の洗い出し</td><td>外部ツールの操作</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">Plan modeは<strong>「読み取り専用」</strong>モードと覚えましょう。コードベースを調べることはできますが、変更は一切加えません。大規模な変更やリファクタリングの前に、まずPlan modeで影響範囲を把握してから通常モードで実装する、という流れがベストプラクティスです。</p>
+  </div>
+
+  <h3>Plan modeの活用パターン</h3>
+  <table class="compare-table">
+    <tr><th>場面</th><th>Plan modeの使い方</th><th>効果</th></tr>
+    <tr><td><strong>大規模リファクタリング</strong></td><td>変更対象のファイル・関数を洗い出し、順序と方針を整理</td><td>手戻りの防止、影響範囲の事前把握</td></tr>
+    <tr><td><strong>新機能の設計</strong></td><td>既存コードを調査し、実装方針を複数案比較</td><td>最適なアプローチの選択</td></tr>
+    <tr><td><strong>バグの原因調査</strong></td><td>コードを追いかけて原因を特定（修正はまだしない）</td><td>正確な原因把握、誤った修正の防止</td></tr>
+    <tr><td><strong>コードレビューの準備</strong></td><td>変更差分を分析し、レビューコメントの下書き</td><td>効率的なレビュー</td></tr>
+  </table>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>Plan mode と通常モードの切り替え：</strong>Plan modeで計画を立てたら、<code>Shift+Tab</code>で通常モードに戻して実装に移ります。計画の内容は会話コンテキストに残っているので、「さっきの計画に従って実装して」と指示すればスムーズに作業が進みます。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">Plan modeはあくまで<strong>Claude Code内の機能</strong>です。API経由でClaude（LLM）を利用する場合のPlan modeとは異なります。試験では「Claude Codeの機能」として問われる点に注意してください。</p>
+  </div>
+</div>
+
+
+<!-- ===== セクション10: Agent Skills概要 ===== -->
+<div id="m8-s10" class="card" style="display:none">
+  <h2>Agent Skills &mdash; 専門知識をパッケージにする</h2>
+  <p>Claude Codeで繰り返し使う「特定分野の専門知識」をまとめたものが<strong>Agent Skills（エージェントスキル）</strong>です。料理に例えると、レシピ本をまるごと覚えさせるのではなく、「和食のスキル」「洋食のスキル」と分けて、必要なときだけ参照するイメージです。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>Agent Skills（エージェントスキル）：</strong>再利用可能な専門知識をMarkdownファイルにまとめたもの。CLAUDE.mdからの参照指示や、スラッシュコマンドから呼び出して使う。常に読み込むのではなく、<strong>必要なタスクの時だけ</strong>読み込むことでコンテキストウィンドウを効率的に使える。</p>
+  </div>
+
+  <h3>スキルの構成</h3>
+  <p>スキルファイルは通常のMarkdownファイルで、以下のような構成で書きます。</p>
+  <pre style="background:var(--bg-alt);padding:1rem;border-radius:8px;font-size:.85rem;overflow-x:auto;"><code># スキル名: フロントエンドテスト
+
+## 概要
+React コンポーネントのテスト手法と規約
+
+## ルール
+- Testing Library を使用すること
+- ユーザー操作に基づくテストを優先
+- スナップショットテストは最小限に
+
+## テンプレート
+describe('コンポーネント名', () =&gt; {
+  it('期待する動作', () =&gt; {
+    render(&lt;Component /&gt;);
+    expect(...).toBe(...);
+  });
+});</code></pre>
+
+  <h3>スキルの呼び出し方</h3>
+  <table class="compare-table">
+    <tr><th>方法</th><th>説明</th><th>例</th></tr>
+    <tr><td><strong>CLAUDE.mdからの参照</strong></td><td>特定のタスク時にスキルファイルを読むよう指示</td><td>「UIタスク時は skills/frontend.md を参照せよ」</td></tr>
+    <tr><td><strong>スラッシュコマンド</strong></td><td>ユーザーがコマンドで明示的に呼び出す</td><td><code>/skill-name</code> で実行</td></tr>
+    <tr><td><strong>ルールファイルから</strong></td><td>.claude/rules/ のAuto Attachedルールで自動参照</td><td>*.test.tsx 編集時にテストスキルを自動読み込み</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">スキル、カスタムコマンド、CLAUDE.mdの3つは混同しやすいポイントです。<strong>CLAUDE.md</strong> = 常に読み込まれるプロジェクト全体のルール / <strong>カスタムコマンド</strong> = ユーザーの操作で起動するワークフロー / <strong>スキル</strong> = 必要なときだけ読み込む専門知識パック、と整理しましょう。</p>
+  </div>
+
+  <h3>CLAUDE.md・カスタムコマンド・スキルの比較</h3>
+  <table class="compare-table">
+    <tr><th>観点</th><th>CLAUDE.md</th><th>カスタムコマンド</th><th>スキル</th></tr>
+    <tr><td><strong>読み込み</strong></td><td>常に自動</td><td>ユーザーが <code>/名前</code> で実行</td><td>必要時に参照</td></tr>
+    <tr><td><strong>主な内容</strong></td><td>プロジェクト方針・規約</td><td>ワークフロー・手順</td><td>専門知識・ベストプラクティス</td></tr>
+    <tr><td><strong>配置場所</strong></td><td>プロジェクトルート等</td><td><code>.claude/commands/</code></td><td>任意（スキル用ディレクトリ推奨）</td></tr>
+    <tr><td><strong>コンテキスト消費</strong></td><td>常に消費</td><td>実行時のみ</td><td>参照時のみ</td></tr>
+    <tr><td><strong>向いている用途</strong></td><td>全員が常に従うべきルール</td><td>繰り返す定型作業</td><td>特定分野の深い知識</td></tr>
+  </table>
+
+  <h3>エンタープライズでのスキル配布</h3>
+  <p>組織全体で品質を標準化するために、スキルファイルを<strong>中央管理して全チームに配布</strong>する運用ができます。</p>
+  <table class="compare-table">
+    <tr><th>配布方法</th><th>説明</th><th>メリット</th></tr>
+    <tr><td><strong>共有リポジトリ</strong></td><td>スキルファイルを専用リポジトリで管理し、各PJから参照</td><td>バージョン管理・変更履歴の一元管理</td></tr>
+    <tr><td><strong>組織テンプレート</strong></td><td>新規PJ作成時にスキルファイルを自動配置</td><td>新プロジェクトへの即時適用</td></tr>
+    <tr><td><strong>パッケージ配布</strong></td><td>npmパッケージ等で配布し、PJに組み込む</td><td>依存関係管理・自動更新</td></tr>
+  </table>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>エンタープライズ配布の目的：</strong>スキルの中央管理により、組織全体でコーディング規約、セキュリティポリシー、テスト方針などを統一できます。各チームが独自にルールを作るのではなく、組織の標準スキルセットを全員が使うことで、品質のばらつきを防ぎます。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">スキルファイルを大量に読み込むとコンテキストウィンドウを圧迫します。<strong>「必要なスキルだけを、必要なときに」</strong>が鉄則です。CLAUDE.mdに「常にすべてのスキルを読め」と書くのは逆効果です。</p>
+  </div>
+</div>
+
+
+<!-- ===== 用語集に追加する項目 ===== -->
+<!--
+  以下を既存の m8-s5（用語集セクション）の末尾に追加:
+-->
+<div class="glossary-item"><div class="glossary-term">@importディレクティブ</div><div class="glossary-en">@import Directive</div><div class="glossary-def">CLAUDE.md内で別のMarkdownファイルを読み込む構文。大規模プロジェクトでの設定分割管理に使う。</div></div>
+<div class="glossary-item"><div class="glossary-term">ルールファイル</div><div class="glossary-en">Rule File</div><div class="glossary-def">.claude/rules/ に配置するMarkdownファイル。フロントマターで適用条件（globs等）を指定し、条件付きで自動適用される指示。</div></div>
+<div class="glossary-item"><div class="glossary-term">自動添付ルール</div><div class="glossary-en">Auto Attached Rule</div><div class="glossary-def">globパターンで指定したファイル編集時に自動的にコンテキストに含まれるルール。コンテキスト効率が良い。</div></div>
+<div class="glossary-item"><div class="glossary-term">計画モード</div><div class="glossary-en">Plan Mode</div><div class="glossary-def">Claude Codeの読み取り専用モード。ファイル変更を行わず、設計・調査・計画策定に使う。Shift+Tabで切り替え。</div></div>
+<div class="glossary-item"><div class="glossary-term">エージェントスキル</div><div class="glossary-en">Agent Skill</div><div class="glossary-def">再利用可能な専門知識をMarkdownファイルにパッケージ化したもの。必要なときだけ読み込んでコンテキストを節約する。</div></div>
+<div class="glossary-item"><div class="glossary-term">フロントマター</div><div class="glossary-en">Frontmatter</div><div class="glossary-def">Markdownファイル冒頭の---で囲まれたYAML形式のメタデータ領域。ルールファイルでは適用条件の指定に使う。</div></div>
+
+
+<!-- ===== クイズ追加分（既存m8クイズの後に追加） ===== -->
+<!--
+  以下のクイズデータを index.html統合時に QUIZ_DATA['m8'] に追記する。
+  既存: answers: [1, 1, 1, 1, 2]（5問）
+  追加: 8問（Q6〜Q13）
+  統合後: answers: [1, 1, 1, 1, 2, ...追加分...]
+
+  クイズHTML（既存m8-s6のm8-q5の後に追加）:
+-->
+
+<div class="quiz-question" id="m8-q6">
+  <div class="q-text">Q6. CLAUDE.mdの@importディレクティブについて正しい説明はどれですか？</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',5,0)">@importで読み込んだファイルはコンテキストウィンドウを消費しない</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',5,1)">@importは相対パスで指定し、読み込んだ内容はその位置に展開される</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',5,2)">@importはsettings.json内でのみ使用できる構文である</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',5,3)">@importで読み込んだファイルは元のCLAUDE.mdより常に優先される</div>
+  <div class="quiz-explanation" id="m8-q6-exp"></div>
+</div>
+
+<div class="quiz-question" id="m8-q7">
+  <div class="q-text">Q7. monorepoで複数サービスのClaude Code設定を管理する場合、最も適切なアプローチはどれですか？</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',6,0)">すべてのルールをルートのCLAUDE.md 1ファイルに書く</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',6,1)">各サービスのディレクトリにCLAUDE.mdを置き、共通ルールは@importで共有する</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',6,2)">settings.jsonにすべてのルールをJSON形式で書く</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',6,3)">各サービスごとに独立したCLAUDE.mdを作り、共通ルールは各ファイルにコピーする</div>
+  <div class="quiz-explanation" id="m8-q7-exp"></div>
+</div>
+
+<div class="quiz-question" id="m8-q8">
+  <div class="q-text">Q8. .claude/rules/ のルールファイルで、globs フィールドに "**/*.py" と指定した場合、そのルールはいつ適用されますか？</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',7,0)">Claude Code起動時に常に読み込まれる</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',7,1)">Pythonファイルを編集する時に自動的に読み込まれる</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',7,2)">ユーザーが /python-rules コマンドで呼び出した時のみ</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',7,3)">Pythonファイルがリポジトリに存在する場合に常に読み込まれる</div>
+  <div class="quiz-explanation" id="m8-q8-exp"></div>
+</div>
+
+<div class="quiz-question" id="m8-q9">
+  <div class="q-text">Q9. コンテキストウィンドウの効率を最大化するために、プロジェクト固有のルールをどう管理すべきですか？</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',8,0)">すべてのルールをCLAUDE.mdに書いて常に読み込ませる</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',8,1)">すべてのルールを.claude/rules/ にManualルールとして配置する</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',8,2)">共通ルールはCLAUDE.mdに、言語・フレームワーク固有のルールは.claude/rules/ のAuto Attachedルールに分ける</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',8,3)">settings.jsonのpermissionsにすべてのルールを記述する</div>
+  <div class="quiz-explanation" id="m8-q9-exp"></div>
+</div>
+
+<div class="quiz-question" id="m8-q10">
+  <div class="q-text">Q10. 大規模なリファクタリングを行う前に、影響範囲を調査して実装計画を立てたい場合、Claude Codeの最も適切な使い方はどれですか？</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',9,0)">通常モードで「変更しないで調査だけして」と指示する</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',9,1)">Plan modeで影響範囲を調査・計画策定し、通常モードに切り替えて実装する</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',9,2)">--print モードでリファクタリング計画を出力する</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',9,3)">MCPサーバー経由でコード解析ツールに接続する</div>
+  <div class="quiz-explanation" id="m8-q10-exp"></div>
+</div>
+
+<div class="quiz-question" id="m8-q11">
+  <div class="q-text">Q11. Plan modeについて正しい説明はどれですか？</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',10,0)">Plan modeではファイルの読み取りもできない</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',10,1)">Plan modeではファイルの読み取りと検索はできるが、変更はできない</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',10,2)">Plan modeでは軽微な変更（コメント追加等）のみ許可される</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',10,3)">Plan modeはCI/CD環境でのみ使用できる</div>
+  <div class="quiz-explanation" id="m8-q11-exp"></div>
+</div>
+
+<div class="quiz-question" id="m8-q12">
+  <div class="q-text">Q12. Agent Skillsの主な目的として最も適切なものはどれですか？</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',11,0)">Claude Codeの実行速度を向上させる</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',11,1)">再利用可能な専門知識をパッケージ化し、必要なときだけ読み込むことでコンテキストを効率的に使う</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',11,2)">Claude Codeに新しいプログラミング言語のサポートを追加する</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',11,3)">settings.jsonの権限設定を自動化する</div>
+  <div class="quiz-explanation" id="m8-q12-exp"></div>
+</div>
+
+<div class="quiz-question" id="m8-q13">
+  <div class="q-text">Q13. 組織全体でClaude Codeの利用品質を標準化するために、スキルファイルを中央管理して各チームに配布しています。この運用の主なメリットはどれですか？</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',12,0)">各チームのClaude Codeの実行コストが削減される</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',12,1)">コーディング規約やセキュリティポリシーを全チームで統一し、品質のばらつきを防げる</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',12,2)">Claude Codeのレスポンス速度が向上する</div>
+  <div class="quiz-option" onclick="selectAnswer('m8',12,3)">各チームが独自のCLAUDE.mdを作成する必要がなくなる</div>
+  <div class="quiz-explanation" id="m8-q13-exp"></div>
+</div>
+
+
+<!--
+  ===== QUIZ_DATA 追記用 =====
+  index.html統合時、QUIZ_DATA['m8'] を以下に更新:
+
+  QUIZ_DATA['m8'] = {
+    answers: [1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1],
+    explanations: [
+      // 既存Q1-Q5（変更なし）
+      'チーム全員に共通のルールを適用するには、プロジェクトルートのCLAUDE.md（git管理）に記述します。グローバル（~/.claude/CLAUDE.md）は個人の全PJ共通設定用、ユーザーローカル（.claude/CLAUDE.md）は個人メモ用です。settings.jsonは機械的な設定（権限等）用であり、自然言語の規約には向きません。',
+      'permissions.denyは常にpermissions.allowより優先されます。これは「ブラックリスト方式」で、明示的に禁止されたコマンドは、allowに含まれていても実行できません。セキュリティの観点から、禁止事項が許可事項を上回る設計になっています。',
+      'PreToolUseフックでコマンドをブロックするには、stderrにフィードバックメッセージを出力し、非ゼロの終了コードで終了します。非ゼロ終了コードがブロックのシグナルとなり、stderrの内容がClaudeへのフィードバックとして渡されます。stdoutはツール結果の変更に使われるため、フィードバック用にはstderrを使います。',
+      'CI/CDでClaude Codeを使うには、--print（または -p）モードで非対話実行し、ANTHROPIC_API_KEYを環境変数に設定する必要があります。CLAUDE.mdはあくまで指示書であり、CI実行を自動トリガーする機能はありません。対話モードはCI/CDには不向きです。',
+      'CLAUDE.mdは「後から読まれたものが先のものを上書き（override）」します。読み込み順序はグローバル→リポジトリルート→ユーザーローカル→サブディレクトリの順で、後に読まれるサブディレクトリが最も優先度が高くなります。つまり「最も近いCLAUDE.mdが最優先」です。',
+      // 追加Q6-Q13
+      '@importディレクティブは相対パスでファイルを指定し、読み込んだ内容はCLAUDE.md内のその記述位置に展開されます。ただし、読み込んだ内容もコンテキストウィンドウを消費します。@importはあくまで人間の管理のしやすさのための機能であり、コンテキスト節約にはなりません。settings.json内では使用できません。',
+      'monorepoでは各サービスのディレクトリにCLAUDE.mdを配置し、共通ルールは@importで共有するのがベストプラクティスです。共通ルールを1か所で管理しつつ、各サービス固有のルールを分離できます。ルールのコピーは変更時の同期漏れを招くため避けましょう。',
+      'globsフィールドに "**/*.py" を指定したルールはAuto Attached（自動添付）ルールとなり、Pythonファイルを編集する時に自動的にコンテキストに含まれます。常時読み込み（Always）ではなく、該当ファイルの編集時のみ適用される点がポイントです。',
+      '共通ルール（全員が常に従うべきもの）はCLAUDE.mdに、言語やフレームワーク固有のルールは.claude/rules/のAuto Attachedルールに分けるのがベストプラクティスです。Auto Attachedルールは該当ファイル編集時のみ読み込まれるため、コンテキストウィンドウを効率的に使えます。',
+      'Plan modeは設計・調査に特化した読み取り専用モードです。大規模な変更の前にPlan modeで影響範囲を調査し、計画を立ててから通常モードに切り替えて実装するのがベストプラクティスです。通常モードで「変更しないで」と指示するよりも、Plan modeを使う方が安全で確実です。',
+      'Plan modeは「読み取り専用」モードです。ファイルの読み取りやコードベースの検索・分析はできますが、ファイルの作成・編集・削除やコマンド実行は行いません。Shift+Tabで通常モードとPlan modeを切り替えられます。',
+      'Agent Skillsの主な目的は、再利用可能な専門知識をMarkdownファイルにパッケージ化し、必要なタスクの時だけ読み込むことです。CLAUDE.mdに全知識を書くと常にコンテキストを消費しますが、スキルとして分離すれば必要時のみ消費するため、コンテキストウィンドウを効率的に使えます。',
+      'スキルの中央管理・配布により、コーディング規約やセキュリティポリシーなどの組織標準を全チームに統一適用できます。各チームが独自にルールを作ると品質にばらつきが出ますが、中央管理された標準スキルセットを使うことでこれを防ぎます。実行コストやレスポンス速度とは直接関係ありません。'
+    ]
+  };
+-->

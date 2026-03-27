@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>シナリオ5: API統合データパイプライン — CCA-F 学習サイト</title>
+<style>
+  :root {
+    --primary: #D97706;
+    --primary-light: #FEF3C7;
+    --primary-dark: #92400E;
+    --accent: #7C3AED;
+    --accent-light: #EDE9FE;
+    --bg: #F9FAFB;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --success: #059669;
+    --success-light: #D1FAE5;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --info: #2563EB;
+    --info-light: #DBEAFE;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  .main { max-width: 900px; margin: 0 auto; padding: 2rem 3rem; }
+  .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  .card h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); }
+  .card h3 { font-size: 1.1rem; margin: 1.5rem 0 .75rem; color: var(--primary-dark); }
+  .card p { margin-bottom: .75rem; }
+  .card ul { padding-left: 1.25rem; margin-bottom: .75rem; }
+  .card li { margin-bottom: .3rem; font-size: .9rem; }
+  .module-header { margin-bottom: 2rem; }
+  .module-header .week-badge { display: inline-block; background: var(--primary-light); color: var(--primary-dark); font-size: .8rem; font-weight: 600; padding: .25rem .75rem; border-radius: 999px; margin-bottom: .5rem; }
+  .module-header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: .25rem; }
+  .module-header .subtitle { color: var(--text-light); font-size: 1rem; }
+  .module-header .domain-tag { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: .75rem; font-weight: 600; padding: .2rem .6rem; border-radius: 999px; margin-top: .5rem; margin-right: .25rem; }
+  .concept-box { border-left: 4px solid var(--primary); background: var(--primary-light); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .concept-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+  .tip-box { background: #ECFDF5; border-left: 4px solid var(--success); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .tip-box .label { font-size: .75rem; font-weight: 700; color: var(--success); text-transform: uppercase; }
+  .warn-box { background: #FEF3C7; border-left: 4px solid var(--primary); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .warn-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; }
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9rem; }
+  .compare-table th { background: #F3F4F6; text-align: left; padding: .6rem .8rem; border-bottom: 2px solid var(--border); font-weight: 600; }
+  .compare-table td { padding: .6rem .8rem; border-bottom: 1px solid var(--border); }
+  .compare-table tr:hover td { background: #F9FAFB; }
+  .quiz-section { border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; background: #FAFAFF; }
+  .quiz-section h3 { color: var(--accent); margin-bottom: 1rem; font-size: 1.1rem; }
+  .quiz-question { margin-bottom: 1.5rem; }
+  .quiz-question .q-text { font-weight: 600; margin-bottom: .75rem; font-size: .95rem; }
+  .quiz-option { display: block; padding: .6rem 1rem; margin: .3rem 0; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .9rem; background: white; }
+  .quiz-option:hover { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.correct { border-color: var(--success); background: var(--success-light); }
+  .quiz-option.incorrect { border-color: var(--danger); background: var(--danger-light); }
+  .quiz-option.disabled { pointer-events: none; opacity: .8; }
+  .quiz-explanation { margin-top: .5rem; padding: .75rem 1rem; border-radius: 8px; font-size: .85rem; display: none; }
+  .quiz-explanation.show { display: block; }
+  .quiz-explanation.correct-exp { background: var(--success-light); color: #065F46; }
+  .quiz-explanation.incorrect-exp { background: var(--danger-light); color: #991B1B; }
+  .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: .9rem; cursor: pointer; border: none; transition: all .15s; text-decoration: none; }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-group { display: flex; gap: .75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  @media (max-width: 768px) { .main { padding: 1rem 1.25rem; } }
+</style>
+</head>
+<body>
+<div class="main">
+
+<div class="module-header">
+  <span class="week-badge">シナリオ 5</span>
+  <h1>API統合データパイプライン</h1>
+  <p class="subtitle">外部API連携の大規模データ処理とレート制限対策</p>
+  <span class="domain-tag">D2 ツール設計 (18%)</span>
+  <span class="domain-tag">D5 コンテキスト管理 (15%)</span>
+</div>
+
+<!-- シナリオ概要 -->
+<div class="card">
+  <h2>シナリオ概要</h2>
+  <p>このシナリオでは、<strong>外部APIと連携して大量のデータを処理するパイプライン</strong>を構築するプロジェクトが舞台です。たとえば、顧客データベースから数千件のレコードを取得し、Claude APIを使って分類・要約・分析する処理を自動化するシステムを設計します。</p>
+  <p>具体的には、以下のような業務場面が設定されます。</p>
+  <ul>
+    <li>大量のデータを Claude API で処理する際のレート制限（Rate Limits）対策</li>
+    <li>Message Batches API を使ったコスト効率の良い一括処理</li>
+    <li>外部APIとの連携時のエラーハンドリングとリトライ戦略</li>
+    <li>処理進捗のモニタリングとアラート設計</li>
+  </ul>
+
+  <div class="concept-box">
+    <div class="label">シナリオの背景</div>
+    <p>APIを使った大規模データ処理では、「一度にどれだけ送れるか」「エラーが起きたらどうするか」「コストをどう最適化するか」という<strong>運用面の設計力</strong>が問われます。技術的な知識だけでなく、現実のシステム制約（レート制限やコスト）を考慮した設計ができるかが鍵です。</p>
+  </div>
+</div>
+
+<!-- 関連ドメイン -->
+<div class="card">
+  <h2>関連ドメインと出題傾向</h2>
+
+  <h3>D2: ツール設計とMCP統合</h3>
+  <p>試験配点<strong>18%</strong>。外部APIをツールとして組み込む設計が問われます。</p>
+  <ul>
+    <li>外部APIのツール定義 ― パラメータ設計、レスポンス処理</li>
+    <li>Message Batches API ― 大量リクエストの非同期一括処理（通常の50%のコスト）</li>
+    <li>サービスティア（Service Tiers）― Standard / Priority / Batch の3段階</li>
+    <li>エラーハンドリング ― HTTP 429（レート制限）、5xx（サーバーエラー）への対応</li>
+  </ul>
+
+  <h3>D5: コンテキスト管理と信頼性</h3>
+  <p>試験配点<strong>15%</strong>。大規模処理の信頼性とモニタリングが問われます。</p>
+  <ul>
+    <li>レート制限（Rate Limits）― Token Bucket方式、キャッシュ非カウント、ティア別制限</li>
+    <li>トークン管理 ― 入力・出力のトークン消費最適化</li>
+    <li>データプライバシー ― Consumer / Commercial / ゼロ保持の3区分</li>
+    <li>モニタリング ― 処理成功率、エラー率、コストの追跡</li>
+  </ul>
+</div>
+
+<!-- 重要概念 -->
+<div class="card">
+  <h2>重要概念リスト</h2>
+
+  <table class="compare-table">
+    <tr><th>概念</th><th>英語名</th><th>ポイント</th></tr>
+    <tr>
+      <td>レート制限</td>
+      <td>Rate Limits</td>
+      <td>API呼び出し回数・トークン数の上限。Token Bucket方式で管理される</td>
+    </tr>
+    <tr>
+      <td>Token Bucket</td>
+      <td>Token Bucket Algorithm</td>
+      <td>バケツに一定速度でトークンが補充され、リクエストごとに消費する仕組み</td>
+    </tr>
+    <tr>
+      <td>サービスティア</td>
+      <td>Service Tiers</td>
+      <td>Standard（通常）/ Priority（優先）/ Batch（一括・50%割引）の3段階</td>
+    </tr>
+    <tr>
+      <td>Batches API</td>
+      <td>Message Batches API</td>
+      <td>非同期一括処理。通常の50%のコスト。リアルタイム応答不要な処理に最適</td>
+    </tr>
+    <tr>
+      <td>キャッシュ非カウント</td>
+      <td>Cache Hit Non-counting</td>
+      <td>プロンプトキャッシュのヒット分はレート制限にカウントされない</td>
+    </tr>
+    <tr>
+      <td>指数バックオフ</td>
+      <td>Exponential Backoff</td>
+      <td>リトライ間隔を1秒→2秒→4秒と倍増させる戦略。レート制限エラー対策の基本</td>
+    </tr>
+    <tr>
+      <td>データ保持ポリシー</td>
+      <td>Data Retention Policy</td>
+      <td>APIデータの保持期間。Commercialは30日保持、ゼロ保持オプションもあり</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 対策ポイント -->
+<div class="card">
+  <h2>対策ポイント</h2>
+
+  <div class="tip-box">
+    <div class="label">対策1: 3つのサービスティアを区別する</div>
+    <p><strong>Standard</strong>は通常のAPI呼び出し。<strong>Priority</strong>は高優先度（追加料金）。<strong>Batch</strong>は非同期一括処理で50%コスト削減。試験では「数千件のデータ分類を最もコスト効率よく処理するにはどのティアを使うか？」のような問題が出ます。答えは<strong>Batch</strong>です。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策2: レート制限対策のベストプラクティスを覚える</div>
+    <p>HTTP 429エラー（レート制限）への対策は<strong>指数バックオフ（Exponential Backoff）</strong>が基本です。さらに、プロンプトキャッシングを活用すると<strong>キャッシュヒット分はレート制限にカウントされない</strong>ため、実質的な処理能力を向上できます。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策3: Batches APIの特性を理解する</div>
+    <p>Batches APIは<strong>リアルタイム応答が不要な大量処理</strong>に使います。50%のコスト削減は大きなメリットですが、処理完了まで最大24時間かかる可能性があります。「即座に結果が必要」な場面には使えません。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">対策4: モデル選択とコスト最適化を考える</div>
+    <p>大量の単純な分類タスクには<strong>Claude Haiku（高速・低コスト）</strong>が最適です。すべてのタスクに最高性能のOpusを使うのはコスト的に非効率です。<strong>タスクの複雑さに応じてモデルを選択する</strong>考え方が試験で問われます。</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="label">よくある誤解</div>
+    <p>「レート制限に引っかかったら待てばいい」と単純に考えがちですが、<strong>Token Bucket方式</strong>ではバケツのサイズ（上限）と補充レート（回復速度）の両方を理解する必要があります。大量リクエストを一気に送ると、バケツが空になって長時間待つことになります。</p>
+  </div>
+</div>
+
+<!-- 練習問題 -->
+<div class="quiz-section" id="quiz-s5">
+  <h3>練習問題</h3>
+
+  <div class="quiz-question" id="s5-q1">
+    <div class="q-text">Q1. ECサイトのカスタマーレビュー5,000件を「ポジティブ」「ネガティブ」「ニュートラル」に分類するプロジェクトがあります。即時の結果は不要で、翌日までに完了すればよいとします。最もコスト効率の良いアプローチはどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q1', 0, 1)">A) Claude Opusを使ってStandard APIで1件ずつ処理する</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q1', 1, 1)">B) Claude Haikuを使ってMessage Batches APIで一括処理する</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q1', 2, 1)">C) Claude Sonnetを使ってPriority APIで高速処理する</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q1', 3, 1)">D) Claude Haikuを使ってStandard APIで並列処理する</div>
+    <div class="quiz-explanation" id="exp-s5-q1">最もコスト効率が良いのは、最も安価なモデル（Haiku）と最も安いティア（Batches API: 50%割引）の組み合わせです（B）。単純な分類タスクにOpus（A）はオーバースペック、Priority（C）は追加料金がかかり不要、Standard並列（D）はBatchesより高コストです。翌日でよいという条件がBatches APIの利用を可能にしています。</div>
+  </div>
+
+  <div class="quiz-question" id="s5-q2">
+    <div class="q-text">Q2. Claude APIのレート制限について、正しい説明はどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q2', 0, 2)">A) レート制限は1日あたりのリクエスト数のみで管理される</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q2', 1, 2)">B) 一度レート制限に達すると、翌日までAPIを利用できない</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q2', 2, 2)">C) Token Bucket方式で管理され、プロンプトキャッシュのヒット分はカウントされない</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q2', 3, 2)">D) Batches APIにはレート制限が適用されない</div>
+    <div class="quiz-explanation" id="exp-s5-q2">Claude APIのレート制限はToken Bucket方式で管理されます（C）。バケツにトークンが一定速度で補充され、リクエストごとに消費します。重要なポイントとして、プロンプトキャッシュがヒットした場合、そのトークン分はレート制限のカウントから除外されます。1日単位（A）ではなく分単位で管理され、一時的な制限（B: 翌日まで使えないわけではない）であり、Batches APIにもレート制限は存在します（D）。</div>
+  </div>
+
+  <div class="quiz-question" id="s5-q3">
+    <div class="q-text">Q3. データパイプラインでClaude APIを呼び出した際にHTTP 429（Too Many Requests）エラーが返されました。リトライ戦略として最も適切なのはどれですか？</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q3', 0, 0)">A) 指数バックオフ（Exponential Backoff）でリトライ間隔を1秒→2秒→4秒と増やしながら再試行する</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q3', 1, 0)">B) 即座に同じリクエストを再送する</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q3', 2, 0)">C) 10分間固定で待機してから再試行する</div>
+    <div class="quiz-option" onclick="checkAnswer('s5-q3', 3, 0)">D) リクエストを破棄し、処理をスキップする</div>
+    <div class="quiz-explanation" id="exp-s5-q3">HTTP 429（レート制限）には指数バックオフが最適です（A）。リトライ間隔を徐々に増やすことで、レート制限の回復を待ちながら効率的にリクエストを再送できます。即座再送（B）は制限をさらに悪化させ、固定10分待機（C）は非効率、処理スキップ（D）はデータ欠損を招きます。</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <a href="scenario-4.html" class="btn btn-outline">&larr; シナリオ4: マルチエージェント文書処理</a>
+  <a href="scenario-guide.html" class="btn btn-outline">シナリオ一覧</a>
+  <a href="scenario-6.html" class="btn btn-primary">シナリオ6: エンタープライズAIガバナンス &rarr;</a>
+</div>
+
+</div>
+
+<script>
+function checkAnswer(qId, selected, correct) {
+  const question = document.getElementById(qId);
+  const options = question.querySelectorAll('.quiz-option');
+  const explanation = document.getElementById('exp-' + qId);
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if (i === correct) opt.classList.add('correct');
+    if (i === selected && selected !== correct) opt.classList.add('incorrect');
+  });
+  explanation.classList.add('show');
+  explanation.classList.add(selected === correct ? 'correct-exp' : 'incorrect-exp');
+}
+</script>
+</body>
+</html>

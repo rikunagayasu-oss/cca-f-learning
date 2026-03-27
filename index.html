@@ -278,6 +278,11 @@
       <span class="module-label">M12: 総復習と模擬試験</span>
       <span class="module-pct" id="pct-m12"></span>
     </div>
+    <div class="nav-item" onclick="window.open('scenario-guide.html','_blank')" id="nav-scenario" style="border-top:1px solid #374151;margin-top:.5rem;padding-top:.75rem;">
+      <span class="status-dot" style="background:#7C3AED;"></span>
+      <span class="module-label">シナリオ別対策ガイド</span>
+      <span class="module-pct" style="font-size:.7rem;">外部</span>
+    </div>
   </div>
 
   <div class="sidebar-progress">
@@ -1686,6 +1691,9 @@
     <button class="section-tab" onclick="showSection('m4','s2',this)">2つのアプローチ</button>
     <button class="section-tab" onclick="showSection('m4','s3',this)">スキーマ設計</button>
     <button class="section-tab" onclick="showSection('m4','s4',this)">実践パターン</button>
+    <button class="section-tab" onclick="showSection('m4','s7',this)">マルチパスレビュー</button>
+    <button class="section-tab" onclick="showSection('m4','s8',this)">Batches API</button>
+    <button class="section-tab" onclick="showSection('m4','s9',this)">Pydantic実践</button>
     <button class="section-tab" onclick="showSection('m4','s5',this)">用語集</button>
     <button class="section-tab" onclick="showSection('m4','s6',this)">クイズ</button>
   </div>
@@ -1892,6 +1900,250 @@
     </div>
   </div>
 
+  <!-- Section 7: マルチパスレビュー -->
+<div id="m4-s7" class="card" style="display:none">
+  <h2>マルチパスレビュー（Multi-pass Review）</h2>
+  <p>構造化出力の品質をさらに高めるために、<strong>マルチパスレビュー</strong>という手法があります。これは「1回のAI呼び出しで終わり」ではなく、<strong>複数回のパス（処理）を通して出力を検証・改善する</strong>アプローチです。</p>
+  <p>身近な例で言えば、レポートを書いた後に「自分で読み返す」→「同僚にチェックしてもらう」→「上司の最終確認」という多段階の確認プロセスに似ています。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>マルチパスレビュー（Multi-pass Review）：</strong>AIの出力を1回で信頼するのではなく、複数のステップ（パス）を通じて検証・修正するアーキテクチャパターン。「生成→検証→修正」のループを回すことで、出力の正確性と信頼性を高めます。</p>
+  </div>
+
+  <h3>なぜマルチパスレビューが必要なのか</h3>
+  <p>AIは非常に優秀ですが、1回の出力で常に完璧な結果を返すとは限りません。特に以下のような場面では、マルチパスレビューが効果的です。</p>
+  <ul>
+    <li><strong>高精度が求められる場面</strong> &mdash; 医療データの抽出、法務文書の分析など、ミスが許されない場面</li>
+    <li><strong>複雑な構造化出力</strong> &mdash; 多くのフィールドを持つJSONで、すべてが正確であることを確認したい場面</li>
+    <li><strong>ビジネスルールの遵守</strong> &mdash; 特定の制約条件を確実に満たす必要がある場面</li>
+  </ul>
+
+  <h3>3つの実装パターン</h3>
+  <p>マルチパスレビューには、主に3つの実装パターンがあります。場面に応じて使い分けましょう。</p>
+
+  <h4>パターン1: 自己評価（Self-Evaluation）</h4>
+  <p>AIが自分の出力を「もう一度見直す」パターンです。同じAIに「この出力は正しいですか？問題があれば修正してください」と依頼します。</p>
+  <p>手軽に導入できますが、<strong>同じモデルが同じバイアスを持つ可能性がある</strong>ため、完全な検証には限界があります。「自分で自分の宿題を採点する」ようなものです。</p>
+
+  <div class="tip-box">
+    <div class="label">ポイント</div>
+    <p style="margin-top:.25rem;">自己評価を効果的にするには、生成時と検証時で<strong>異なるプロンプト（視点）</strong>を使うことが大切です。たとえば、生成時は「データを抽出してください」、検証時は「この抽出結果に漏れや誤りがないか確認してください」と、別の角度から確認させます。</p>
+  </div>
+
+  <h4>パターン2: クロスチェック（Cross-Check）</h4>
+  <p>出力を生成したインスタンスとは<strong>別の独立したAIインスタンス</strong>で検証するパターンです。Module 4の「検証-再試行ループ」で紹介した方法がこれにあたります。</p>
+  <p>「別の担当者にダブルチェックしてもらう」イメージで、生成者と検証者を分離することで、同じバイアスに陥るリスクを軽減します。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>クロスチェックの仕組み：</strong>インスタンスA（生成者）がJSONを出力 → インスタンスB（検証者）がそのJSONを受け取り、元のソースデータと照合して正確性を検証 → 問題があれば修正指示を返し、インスタンスAが再生成します。</p>
+  </div>
+
+  <h4>パターン3: 段階的精査（Progressive Refinement）</h4>
+  <p>最初は大まかな構造を生成し、パスを重ねるごとに<strong>詳細を追加・精査していく</strong>パターンです。</p>
+  <p>たとえば、長い契約書からデータを抽出する場合：</p>
+  <ul>
+    <li><strong>第1パス</strong>: 主要項目（契約者名、金額、期間）を抽出</li>
+    <li><strong>第2パス</strong>: 条件・例外事項を補完</li>
+    <li><strong>第3パス</strong>: 全体の整合性と漏れを最終確認</li>
+  </ul>
+  <p>一度にすべてを完璧に処理しようとするより、段階を分けることで各パスの精度が上がります。</p>
+
+  <h3>3パターンの比較</h3>
+  <table class="compare-table">
+    <tr><th>パターン</th><th>検証者</th><th>メリット</th><th>デメリット</th><th>適した場面</th></tr>
+    <tr>
+      <td><strong>自己評価</strong></td>
+      <td>同一インスタンス</td>
+      <td>コスト低・導入簡単</td>
+      <td>同じバイアスのリスク</td>
+      <td>軽微な修正、形式チェック</td>
+    </tr>
+    <tr>
+      <td><strong>クロスチェック</strong></td>
+      <td>別インスタンス</td>
+      <td>バイアス軽減・高信頼</td>
+      <td>コスト2倍・レイテンシ増</td>
+      <td>高精度が必須の場面</td>
+    </tr>
+    <tr>
+      <td><strong>段階的精査</strong></td>
+      <td>複数パスで順次</td>
+      <td>複雑なタスクを分解</td>
+      <td>パス数に比例してコスト増</td>
+      <td>大量データ・複雑な構造</td>
+    </tr>
+  </table>
+
+  <h3>品質向上のベストプラクティス</h3>
+  <table class="compare-table">
+    <tr><th>プラクティス</th><th>説明</th></tr>
+    <tr><td><strong>明確な評価基準を設定</strong></td><td>検証者に「何をチェックすべきか」を具体的に指示する。「正しいか確認して」ではなく「金額が元データと一致するか」など</td></tr>
+    <tr><td><strong>生成と検証でプロンプトを分離</strong></td><td>同じプロンプトを使い回さず、検証用には別の視点・基準を与える</td></tr>
+    <tr><td><strong>元ソースデータを検証者にも渡す</strong></td><td>検証者が出力だけでなく「元のデータ」と照合できるようにする</td></tr>
+    <tr><td><strong>ループ回数に上限を設ける</strong></td><td>無限ループを防ぐため、最大リトライ回数（通常2〜3回）を設定する</td></tr>
+  </table>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">マルチパスレビューはコスト（API呼び出し回数）とレイテンシ（応答時間）が増加します。<strong>すべての場面で使う必要はありません</strong>。「ミスのコスト」と「追加の検証コスト」を天秤にかけ、高リスクな場面に絞って導入しましょう。</p>
+  </div>
+</div>
+
+  <!-- Section 8: Batches APIコスト最適化 -->
+<div id="m4-s8" class="card" style="display:none">
+  <h2>Batches APIによるコスト最適化</h2>
+  <p>構造化出力を大量に処理したい場合、1件ずつリアルタイムでAPI呼び出しをするのはコストがかかります。そこで活用したいのが<strong>Message Batches API（メッセージバッチAPI）</strong>です。</p>
+  <p>たとえば、1万件の商品レビューを分類したい場合、通常のAPIで1件ずつ処理するよりも、まとめて一括処理する方が<strong>コストが半分</strong>になります。「宅配便を1個ずつ送る」のではなく「まとめてトラック1台で運ぶ」イメージです。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>Message Batches API（メッセージバッチAPI）：</strong>大量のAPIリクエストを非同期で一括処理するサービス。通常のAPIと<strong>同じ品質の出力</strong>を、<strong>50%の割引価格</strong>（半額）で利用できます。ただしリアルタイムではなく、結果の返却まで最大24時間かかります。</p>
+  </div>
+
+  <h3>Batches APIの仕組み</h3>
+  <p>Batches APIの処理フローは以下の通りです。</p>
+  <ul>
+    <li><strong>ステップ1: バッチ作成</strong> &mdash; 処理したいリクエスト（最大10万件）をまとめて送信</li>
+    <li><strong>ステップ2: 非同期処理</strong> &mdash; Anthropicのサーバーが順次処理（この間、待つ必要なし）</li>
+    <li><strong>ステップ3: 結果取得</strong> &mdash; 処理完了後に結果を一括取得（通常数分〜数時間、最大24時間）</li>
+  </ul>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">Batches APIの最大の特徴は<strong>「50%割引」</strong>と<strong>「非同期処理」</strong>です。試験では「大量処理でコストを最小化するには？」という問いに対して、Batches API + 適切なモデル選定（Haikuなど）の組み合わせが正解になることが多いです。</p>
+  </div>
+
+  <h3>料金体系</h3>
+  <table class="compare-table">
+    <tr><th>項目</th><th>通常API（同期）</th><th>Batches API（非同期）</th></tr>
+    <tr><td><strong>入力トークン単価</strong></td><td>モデルごとの標準価格</td><td>標準価格の <strong>50%</strong></td></tr>
+    <tr><td><strong>出力トークン単価</strong></td><td>モデルごとの標準価格</td><td>標準価格の <strong>50%</strong></td></tr>
+    <tr><td><strong>応答速度</strong></td><td>リアルタイム（数秒）</td><td>非同期（最大24時間）</td></tr>
+    <tr><td><strong>最大リクエスト数</strong></td><td>1件ずつ</td><td>1バッチあたり最大10万件</td></tr>
+  </table>
+
+  <h3>バッチ処理に適したユースケース</h3>
+  <p>Batches APIは「すぐに結果が必要ない」大量処理に最適です。</p>
+
+  <table class="compare-table">
+    <tr><th>ユースケース</th><th>説明</th><th>構造化出力との組合せ</th></tr>
+    <tr><td><strong>大量データ分類</strong></td><td>数千〜数万件のレビュー・メール・文書の感情分析やカテゴリ分類</td><td>enum指定のJSON Outputsで分類結果を構造化</td></tr>
+    <tr><td><strong>バッチデータ抽出</strong></td><td>請求書・履歴書など定型ドキュメントから情報を一括抽出</td><td>スキーマ定義で抽出項目を統一</td></tr>
+    <tr><td><strong>コンテンツ生成</strong></td><td>商品説明文・FAQ・翻訳の一括生成</td><td>出力フォーマットをスキーマで統一</td></tr>
+    <tr><td><strong>品質評価</strong></td><td>AI出力のバッチ評価・採点（マルチパスレビューの検証パス）</td><td>評価結果をスコア付きJSONで構造化</td></tr>
+  </table>
+
+  <h3>同期APIとの使い分け判断基準</h3>
+  <table class="compare-table">
+    <tr><th>判断基準</th><th>同期API（通常）</th><th>Batches API</th></tr>
+    <tr><td><strong>応答速度の要件</strong></td><td>リアルタイム応答が必要（チャット、対話型UI）</td><td>数時間の遅延が許容できる</td></tr>
+    <tr><td><strong>処理件数</strong></td><td>少量（1件〜数十件）</td><td>大量（数百件〜数万件）</td></tr>
+    <tr><td><strong>コスト感度</strong></td><td>速度を優先、コストは二の次</td><td>コスト削減が重要</td></tr>
+    <tr><td><strong>ユーザー体験</strong></td><td>ユーザーが画面の前で待っている</td><td>バックグラウンド処理（結果は後で確認）</td></tr>
+  </table>
+
+  <div class="concept-box">
+    <div class="label">判断フローチャート</div>
+    <p>1. ユーザーが即座に結果を必要としている？ → <strong>Yes</strong>: 同期API / <strong>No</strong>: 次へ</p>
+    <p>2. 処理件数が100件以上？ → <strong>Yes</strong>: Batches API推奨 / <strong>No</strong>: コスト感度による</p>
+    <p>3. コスト削減が重要？ → <strong>Yes</strong>: Batches API / <strong>No</strong>: 同期APIでもOK</p>
+  </div>
+
+  <h3>コスト最適化の実践パターン</h3>
+  <table class="compare-table">
+    <tr><th>戦略</th><th>説明</th><th>コスト削減効果</th></tr>
+    <tr><td><strong>モデル選定の最適化</strong></td><td>単純な分類タスクにはClaude Haiku（最安モデル）を使い、Batches APIと組み合わせる</td><td>Haiku + Batch = 最安構成</td></tr>
+    <tr><td><strong>プロンプトキャッシュとの併用</strong></td><td>同じシステムプロンプトを使う場合、キャッシュされた入力トークンはBatchでも割引対象</td><td>入力コストをさらに削減</td></tr>
+    <tr><td><strong>適切なバッチサイズ</strong></td><td>小さすぎるバッチは管理オーバーヘッドが増える。まとまった量でバッチを構成する</td><td>管理コスト削減</td></tr>
+    <tr><td><strong>夜間・オフピーク処理</strong></td><td>緊急でない処理は営業時間外にバッチ実行し、翌朝結果を確認</td><td>業務フローの最適化</td></tr>
+  </table>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">Batches APIの結果は<strong>最大24時間</strong>で期限切れになります。処理完了後は速やかに結果を取得してください。また、バッチ内の各リクエストは独立して処理されるため、1件が失敗しても他のリクエストには影響しません。失敗したリクエストは個別に確認・再処理します。</p>
+  </div>
+</div>
+
+  <!-- Section 9: Pydantic実践 -->
+<div id="m4-s9" class="card" style="display:none">
+  <h2>Pydantic実践 — 型安全な構造化出力</h2>
+  <p>Module 4のスキーマ設計セクションで、PydanticがPythonクラスからJSON Schemaを自動生成できることを紹介しました。ここでは、実際にPydanticをClaude APIと連携させて<strong>型安全な構造化出力</strong>を得る方法を詳しく見ていきましょう。</p>
+  <p>Pydanticを使うと、「JSON Schemaを手書きする」手間がなくなり、さらに<strong>Pythonの型システムで出力データを安全に扱える</strong>ようになります。「手書きの伝票」から「入力フォーム付きの業務システム」にアップグレードするイメージです。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>Pydantic（パイダンティック）</strong>は、Pythonでデータの「型」と「制約」をクラスとして定義できるライブラリです。Claude SDKと連携すると、以下が自動で行われます。</p>
+    <ul>
+      <li>Pythonクラス → JSON Schemaへの自動変換</li>
+      <li>APIレスポンス → Pythonオブジェクトへの自動変換</li>
+      <li>制約の自動バリデーション（検証）</li>
+    </ul>
+  </div>
+
+  <h3>基本的な使い方: messages.parse()</h3>
+  <p>Anthropic Python SDKには<code>messages.parse()</code>という専用メソッドがあります。通常の<code>messages.create()</code>と異なり、<strong>レスポンスを自動的にPydanticモデルに変換</strong>してくれます。</p>
+
+  <div class="concept-box">
+    <div class="label">仕組みの流れ</div>
+    <p>1. Pydanticクラスでデータ構造を定義（例: 顧客情報クラス）</p>
+    <p>2. <code>messages.parse()</code>に <code>output_schema=顧客情報クラス</code> を指定</p>
+    <p>3. SDKがPydanticクラスからJSON Schemaを自動生成し、APIに送信</p>
+    <p>4. Claudeがスキーマ準拠のJSONを返す</p>
+    <p>5. SDKがJSONをPydanticオブジェクトに自動変換して返す</p>
+    <p>結果として、<code>response.name</code> のようにPythonの属性アクセスでデータを取得できます。</p>
+  </div>
+
+  <h3>tool_use + Pydanticの組み合わせ</h3>
+  <p>Pydanticは<strong>JSON Outputs（output_config方式）</strong>だけでなく、<strong>Strict Tool Use</strong>とも組み合わせられます。ツールの入力スキーマをPydanticクラスで定義することで、ツール呼び出しのパラメータも型安全に扱えます。</p>
+
+  <table class="compare-table">
+    <tr><th>方式</th><th>Pydanticの使い方</th><th>適した場面</th></tr>
+    <tr><td><strong>output_schema方式</strong></td><td><code>messages.parse(output_schema=MyModel)</code> で応答テキストを構造化</td><td>データ抽出・分類・レポート生成</td></tr>
+    <tr><td><strong>tool_use方式</strong></td><td>ツール定義の <code>input_schema</code> にPydanticモデルを使用</td><td>エージェントのツール呼び出し</td></tr>
+  </table>
+
+  <h3>Field制約とdescription自動変換</h3>
+  <p>Pydanticの<code>Field()</code>で設定した制約（最小値、最大値など）は、Claude APIのJSON Schemaではサポートされていません。しかし、SDKが自動的に<strong>description（説明文）に変換</strong>してくれます。</p>
+
+  <div class="concept-box">
+    <div class="label">変換の仕組み</div>
+    <p><strong>Pydantic側:</strong> <code>age: int = Field(ge=18, le=120, description="ユーザーの年齢")</code></p>
+    <p><strong>↓ SDKが自動変換 ↓</strong></p>
+    <p><strong>JSON Schema側:</strong> <code>"age": {"type": "integer", "description": "ユーザーの年齢（18以上120以下）"}</code></p>
+    <p>Claudeはdescriptionの指示に従ってJSON生成 → SDKがレスポンス受信後にPydanticの元の制約（ge=18, le=120）で<strong>再バリデーション</strong>を実行します。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">試験では「PydanticのField制約はどう処理されるか？」が問われることがあります。答えは<strong>「SDKがdescriptionに変換 → Claudeが従う → SDKが元の制約で再バリデーション」</strong>という2段階の仕組みです。スキーマレベルでの強制ではなく、「お願い＋事後チェック」のアプローチです。</p>
+  </div>
+
+  <h3>バリデーションとエラーハンドリング</h3>
+  <p>Pydanticの大きなメリットは、自動バリデーション（検証）です。Claudeの出力がPydanticの制約に違反した場合、<code>ValidationError</code>（バリデーションエラー）が発生します。</p>
+
+  <table class="compare-table">
+    <tr><th>エラーの種類</th><th>原因</th><th>対処法</th></tr>
+    <tr><td><strong>型の不一致</strong></td><td>文字列が期待される場所に数値が入っている等</td><td>スキーマのdescriptionをより明確にする</td></tr>
+    <tr><td><strong>制約違反</strong></td><td>Field(ge=18)で17が返された等</td><td>リトライ、またはdescriptionで制約を強調する</td></tr>
+    <tr><td><strong>必須フィールドの欠落</strong></td><td>requiredフィールドがnullまたは欠損</td><td>制約付きデコーディングを利用すれば発生しない（JSON Outputs / strict: true使用時）</td></tr>
+  </table>
+
+  <div class="concept-box">
+    <div class="label">エラーハンドリングのベストプラクティス</div>
+    <p>1. <strong>try-except で ValidationError をキャッチ</strong>: エラー発生時にログ記録＋リトライ</p>
+    <p>2. <strong>リトライ時にエラー内容をプロンプトに含める</strong>: 「前回の出力でage=15が返されましたが、18以上を指定してください」と具体的にフィードバック</p>
+    <p>3. <strong>最大リトライ回数を設定</strong>: 無限ループ防止（通常2〜3回）</p>
+    <p>4. <strong>制約付きデコーディングとの併用</strong>: JSON構造の保証はAPIに任せ、Pydanticはビジネスロジックの検証に集中</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">制約付きデコーディング（Constrained Decoding）はJSONの<strong>構造（型・必須フィールド）</strong>を保証しますが、<strong>値の制約（最小値・最大値・パターン）</strong>は保証しません。値の制約はPydanticの事後バリデーションで確認する必要があります。この「構造はAPI保証、値はアプリ検証」という役割分担を理解しておきましょう。</p>
+  </div>
+</div>
+
   <!-- Section 5: 用語集 -->
   <div id="m4-s5" class="card" style="display:none">
     <h2>Module 4 用語集</h2>
@@ -1942,6 +2194,11 @@
       <div class="glossary-en">Stop Reason</div>
       <div class="glossary-def">APIレスポンスの停止理由。end_turn（正常完了）、tool_use（ツール呼び出し）、max_tokens（トークン上限到達）などがある。</div>
     </div>
+    <div class="glossary-item"><div class="glossary-term">マルチパスレビュー</div><div class="glossary-en">Multi-pass Review</div><div class="glossary-def">AIの出力を1回で信頼せず、複数のステップ（パス）を通じて検証・修正するアーキテクチャパターン。自己評価、クロスチェック、段階的精査の3パターンがある。</div></div>
+    <div class="glossary-item"><div class="glossary-term">メッセージバッチAPI</div><div class="glossary-en">Message Batches API</div><div class="glossary-def">大量のAPIリクエストを非同期で一括処理するサービス。通常のAPIと同じ品質の出力を50%割引で利用できる。結果の返却まで最大24時間。</div></div>
+    <div class="glossary-item"><div class="glossary-term">messages.parse()</div><div class="glossary-en">messages.parse()</div><div class="glossary-def">Anthropic Python SDKのメソッド。PydanticモデルをJSON Schemaに自動変換してAPIに送信し、レスポンスをPydanticオブジェクトに自動変換して返す。</div></div>
+    <div class="glossary-item"><div class="glossary-term">バリデーションエラー</div><div class="glossary-en">ValidationError</div><div class="glossary-def">Pydanticで定義した型や制約にデータが違反した場合に発生するエラー。どのフィールドがどの制約に違反したかの詳細情報を含む。</div></div>
+    <div class="glossary-item"><div class="glossary-term">段階的精査</div><div class="glossary-en">Progressive Refinement</div><div class="glossary-def">最初に大まかな構造を生成し、複数のパスを重ねて詳細を追加・精査していくマルチパスレビューのパターン。複雑なデータ抽出に適している。</div></div>
   </div>
 
   <!-- Section 6: Quiz -->
@@ -1993,6 +2250,54 @@
         <div class="quiz-option" onclick="selectAnswer('m4',4,2)">出力をそのまま信頼し、エラーが発生した場合のみ再試行する</div>
         <div class="quiz-option" onclick="selectAnswer('m4',4,3)">max_tokensを最大値に設定して出力の完全性を保証する</div>
         <div class="quiz-explanation" id="m4-q5-exp"></div>
+      </div>
+      <div class="quiz-question" id="m4-q6">
+        <div class="q-text">Q6. あなたは医療データ管理システムの開発者です。患者カルテから構造化データを抽出する処理で、抽出ミスが許されない高リスクな場面です。出力品質を最大限に高めるマルチパスレビューのパターンとして、最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',5,0)">自己評価 &mdash; 同一インスタンスに「出力を確認して修正してください」と依頼する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',5,1)">クロスチェック &mdash; 別の独立したインスタンスが元のカルテデータと出力を照合して検証する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',5,2)">段階的精査 &mdash; 第1パスで主要項目、第2パスで詳細を順次抽出する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',5,3)">マルチパスレビューは不要 &mdash; 制約付きデコーディングで構造は保証されるため</div>
+        <div class="quiz-explanation" id="m4-q6-exp"></div>
+      </div>
+      <div class="quiz-question" id="m4-q7">
+        <div class="q-text">Q7. あなたはECサイトのデータ分析担当者です。5万件の商品レビューを感情分析して結果をデータベースに保存したいと考えています。翌日の会議までに結果が必要ですが、リアルタイム性は不要です。最もコスト効率の良い方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',6,0)">Claude Opusの同期APIで1件ずつ処理する（最高品質を確保）</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',6,1)">Claude Sonnetの同期APIで並列処理する（速度とコストのバランス）</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',6,2)">Claude HaikuのBatches APIで一括処理する（50%割引 + 最安モデル）</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',6,3)">Claude HaikuのBatches APIで処理し、結果をOpusの同期APIで検証する</div>
+        <div class="quiz-explanation" id="m4-q7-exp"></div>
+      </div>
+      <div class="quiz-question" id="m4-q8">
+        <div class="q-text">Q8. PydanticのField(ge=1, le=5)で定義した「評価スコア（1〜5）」の制約は、Claude APIの構造化出力ではどのように処理されますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',7,0)">JSON Schemaのminimum/maximumに変換され、スキーマレベルで強制される</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',7,1)">SDKがdescriptionに変換してClaudeに伝え、レスポンス受信後にPydanticが再バリデーションする</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',7,2)">制約は無視され、Claudeは任意の整数値を返す可能性がある</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',7,3)">制約付きデコーディングにより、1〜5の範囲が100%保証される</div>
+        <div class="quiz-explanation" id="m4-q8-exp"></div>
+      </div>
+      <div class="quiz-question" id="m4-q9">
+        <div class="q-text">Q9. 200ページの契約書から「契約者情報」「金額」「期間」「特記事項」「免責条項」を構造化データとして抽出したい場合、最も効果的なマルチパスレビューのパターンはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',8,0)">自己評価 &mdash; 1回で全項目を抽出し、同じインスタンスに確認させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',8,1)">クロスチェック &mdash; 別インスタンスで全項目を再抽出し、結果を比較する</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',8,2)">段階的精査 &mdash; 第1パスで主要項目、第2パスで条件・例外、第3パスで整合性確認</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',8,3)">マルチパスレビュー不要 &mdash; additionalProperties: falseで十分</div>
+        <div class="quiz-explanation" id="m4-q9-exp"></div>
+      </div>
+      <div class="quiz-question" id="m4-q10">
+        <div class="q-text">Q10. Message Batches APIの特徴として正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',9,0)">リアルタイムのストリーミング応答が可能で、通常APIより高速</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',9,1)">通常APIと同じ出力品質を50%割引で提供し、結果返却まで最大24時間</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',9,2)">1バッチあたりの最大リクエスト数は1,000件まで</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',9,3)">Batches APIではJSON Outputs（構造化出力）は利用できない</div>
+        <div class="quiz-explanation" id="m4-q10-exp"></div>
+      </div>
+      <div class="quiz-question" id="m4-q11">
+        <div class="q-text">Q11. 制約付きデコーディング（Constrained Decoding）が保証するものと保証しないものの組み合わせとして正しいものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',10,0)">保証する: 数値の範囲制約 / 保証しない: JSONの構造</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',10,1)">保証する: すべてのJSON Schema制約 / 保証しない: なし</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',10,2)">保証する: JSONの構造（型・必須フィールド） / 保証しない: 値の範囲・パターン制約</div>
+        <div class="quiz-option" onclick="selectAnswer('m4',10,3)">保証する: enum値のみ / 保証しない: 型の一致</div>
+        <div class="quiz-explanation" id="m4-q11-exp"></div>
       </div>
 
       <button class="btn btn-accent" onclick="submitQuiz('m4')" id="m4-submit-btn">回答を確定する</button>
@@ -3335,6 +3640,8 @@
     <button class="section-tab" onclick="showSection('m7','s2',this)">内蔵ツールと権限</button>
     <button class="section-tab" onclick="showSection('m7','s3',this)">CLIとワークフロー</button>
     <button class="section-tab" onclick="showSection('m7','s4',this)">サブエージェント</button>
+    <button class="section-tab" onclick="showSection('m7','s7',this)">CI/CD統合</button>
+    <button class="section-tab" onclick="showSection('m7','s8',this)">セキュリティ</button>
     <button class="section-tab" onclick="showSection('m7','s5',this)">用語集</button>
     <button class="section-tab" onclick="showSection('m7','s6',this)">クイズ</button>
   </div>
@@ -3483,6 +3790,151 @@
     </div>
   </div>
 
+  <!-- Section 7: CI/CD統合 -->
+<div id="m7-s7" class="card" style="display:none">
+  <h2>CI/CD統合</h2>
+  <p>Claude Codeは対話的な開発だけでなく、<strong>CI/CDパイプライン</strong>（自動ビルド・テストの仕組み）の中でも活用できます。コードレビューの自動化や、テスト生成、ドキュメント更新など、開発プロセスの様々な場面で力を発揮します。</p>
+  <p>たとえるなら、対話モードが「一緒に作業する同僚」なら、CI/CD統合は「決まった手順書に沿って自動で仕事をしてくれるロボット社員」です。</p>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>CI/CD（Continuous Integration / Continuous Delivery）：</strong>コードの変更を自動でビルド・テスト・デプロイする仕組み。GitHub ActionsやGitLab CIが代表的なサービス。Claude CodeをCI/CDに組み込むことで、コードレビューやテスト生成を自動化できる。</p>
+  </div>
+
+  <h3>-pフラグ（非対話モード）の活用</h3>
+  <p><code>-p</code>（<code>--print</code>）フラグは、Claude Codeを<strong>ヘッドレスモード（Headless Mode）</strong>で起動します。人間の入力を待たずに、プロンプトに対する回答を返して終了するため、自動化に最適です。</p>
+
+  <table class="compare-table">
+    <tr><th>フラグ</th><th>役割</th><th>CI/CDでの使い所</th></tr>
+    <tr><td><code>-p "プロンプト"</code></td><td>非対話モードで実行</td><td>自動コードレビュー、テスト生成</td></tr>
+    <tr><td><code>--output-format json</code></td><td>結果をJSON形式で出力</td><td>後続の自動処理でパースしやすい</td></tr>
+    <tr><td><code>--max-turns N</code></td><td>エージェントのターン数制限</td><td>無限ループ防止（暴走対策）</td></tr>
+    <tr><td><code>--max-budget-usd N</code></td><td>API費用の上限設定</td><td>予期しないコスト発生の防止</td></tr>
+    <tr><td><code>--permission-mode</code></td><td>権限モード指定</td><td>CI環境に適した権限レベル設定</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;"><code>--max-turns</code>と<code>--max-budget-usd</code>は<code>-p</code>モード時のみ有効です。これらのフラグでCIパイプラインの暴走とコストの両方を制御できる点は、試験で問われやすいテーマです。</p>
+  </div>
+
+  <h3>Batch APIとの連携パターン</h3>
+  <p>大量のファイルを一括処理したい場合、Anthropicの<strong>Batch API（バッチAPI）</strong>と組み合わせるパターンが有効です。</p>
+
+  <table class="compare-table">
+    <tr><th>パターン</th><th>説明</th><th>適した場面</th></tr>
+    <tr><td><strong>直接実行</strong></td><td><code>claude -p</code>で1ファイルずつ処理</td><td>少数のファイル、即時結果が必要な場合</td></tr>
+    <tr><td><strong>Batch API連携</strong></td><td>複数リクエストをまとめて非同期処理</td><td>大量ファイルの一括レビュー、コスト最適化（50%割引）</td></tr>
+    <tr><td><strong>パイプ入力</strong></td><td><code>git diff | claude -p "レビューして"</code></td><td>差分のみを対象にした処理</td></tr>
+  </table>
+
+  <div class="concept-box">
+    <div class="label">Batch APIのメリット</div>
+    <p><strong>Batch API（バッチAPI）：</strong>複数のAPIリクエストを1つのバッチとしてまとめて送信し、非同期で処理する仕組み。通常のAPI呼び出しに比べて<strong>50%のコスト削減</strong>が可能。結果は24時間以内に返される。即時性は不要だが大量処理が必要なCI/CDジョブに最適。</p>
+  </div>
+
+  <h3>セッション隔離（CI環境のベストプラクティス）</h3>
+  <p>CI/CD環境でClaude Codeを使う際は、<strong>セッション隔離</strong>が重要です。複数のCIジョブが同時に実行されても、お互いに干渉しないようにする仕組みです。</p>
+
+  <table class="compare-table">
+    <tr><th>隔離方式</th><th>仕組み</th><th>メリット</th></tr>
+    <tr><td><strong>git worktree</strong></td><td><code>--worktree</code>フラグで独立した作業ディレクトリを作成</td><td>メインブランチに影響を与えない</td></tr>
+    <tr><td><strong>コンテナ隔離</strong></td><td>Docker等のコンテナ内で実行</td><td>完全なファイルシステム隔離。<code>bypassPermissions</code>モードが使える</td></tr>
+    <tr><td><strong>一時ディレクトリ</strong></td><td>一時的なクローンで作業</td><td>実行後に自動クリーンアップ</td></tr>
+  </table>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;"><code>bypassPermissions</code>（<code>--dangerously-skip-permissions</code>）モードは、<strong>コンテナなどの隔離環境でのみ</strong>使用してください。ローカル環境で使うと、意図しないファイル変更やコマンド実行のリスクがあります。</p>
+  </div>
+
+  <h3>実践例: GitHub Actionsでの活用</h3>
+  <table class="compare-table">
+    <tr><th>活用例</th><th>トリガー</th><th>Claude Codeの処理</th></tr>
+    <tr><td><strong>自動コードレビュー</strong></td><td>Pull Request作成時</td><td>差分を分析し、改善提案をPRコメントとして投稿</td></tr>
+    <tr><td><strong>テスト生成</strong></td><td>新規ファイル追加時</td><td>変更されたコードに対するテストを自動生成</td></tr>
+    <tr><td><strong>ドキュメント更新</strong></td><td>API変更時</td><td>変更に合わせてREADME等を自動更新</td></tr>
+    <tr><td><strong>Issue対応</strong></td><td>Issueにラベル付与時</td><td>Issueの内容を分析し、修正PRを自動作成</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">CI/CD統合で重要なのは「<strong>安全性と制御</strong>」です。<code>--max-turns</code>で暴走を防ぎ、<code>--max-budget-usd</code>でコストを制限し、隔離環境で実行する。この3層の安全策を理解しておきましょう。</p>
+  </div>
+</div>
+
+  <!-- Section 8: セキュリティ -->
+<div id="m7-s8" class="card" style="display:none">
+  <h2>Claude Codeのセキュリティ</h2>
+  <p>Claude Codeは強力なツールですが、ファイルの読み書きやコマンド実行ができるため、<strong>セキュリティ（安全対策）</strong>が非常に重要です。Anthropicはこの点を重視し、多層的な安全設計を採用しています。</p>
+  <p>たとえるなら、Claude Codeのセキュリティは「金庫室」のような仕組みです。入室する人（ツール操作）ごとに身分証（権限承認）をチェックし、持ち出せるもの（データ送信範囲）を制限し、監視カメラ（ログ記録）で記録を残します。</p>
+
+  <h3>セキュリティアーキテクチャ概要</h3>
+
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>ローカル実行モデル（Local Execution Model）：</strong>Claude Codeはユーザーのマシン上で直接実行される。コードや操作結果がクラウドに永続的に保存されることはない。APIとの通信はプロンプトと応答のやり取りのみで、作業ファイル全体がアップロードされるわけではない。</p>
+  </div>
+
+  <table class="compare-table">
+    <tr><th>層</th><th>仕組み</th><th>役割</th></tr>
+    <tr><td><strong>第1層: 権限モデル</strong></td><td>5つの権限モード + deny/ask/allow評価</td><td>ツール実行の承認・拒否を制御</td></tr>
+    <tr><td><strong>第2層: データ制御</strong></td><td>ローカル実行 + 送信データ範囲の制限</td><td>不要なデータがクラウドに送られることを防止</td></tr>
+    <tr><td><strong>第3層: 環境隔離</strong></td><td>コンテナ / git worktree / サンドボックス</td><td>操作の影響範囲を限定</td></tr>
+  </table>
+
+  <h3>データ取扱い</h3>
+  <table class="compare-table">
+    <tr><th>項目</th><th>説明</th></tr>
+    <tr><td><strong>実行場所</strong></td><td>ユーザーのローカルマシン上。クラウドサーバーで動作するわけではない</td></tr>
+    <tr><td><strong>APIに送信されるデータ</strong></td><td>会話のプロンプト、ツール実行の結果（ファイル内容の一部やコマンド出力）</td></tr>
+    <tr><td><strong>送信されないデータ</strong></td><td>プロジェクト全体のファイル、Git履歴全体、環境変数の値</td></tr>
+    <tr><td><strong>データの保持</strong></td><td>APIへの入出力はAnthropicの利用規約に基づく。商用契約ではゼロ保持（Zero Retention）オプションが利用可能</td></tr>
+    <tr><td><strong>モデル学習への利用</strong></td><td>APIを通じて送信されたデータは、デフォルトではモデルの学習に使用されない</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">Claude Codeは<strong>ローカル実行</strong>であり、プロジェクト全体がクラウドにアップロードされるわけではありません。APIに送信されるのは会話に必要なプロンプトとツール実行結果のみです。この区別は試験で問われやすいポイントです。</p>
+  </div>
+
+  <h3>権限モデル（サンドボックスとツール承認フロー）</h3>
+  <table class="compare-table">
+    <tr><th>安全機能</th><th>仕組み</th><th>効果</th></tr>
+    <tr><td><strong>deny優先原則</strong></td><td>denyルールは他のどの設定よりも優先される</td><td>明示的に禁止した操作は絶対に実行されない</td></tr>
+    <tr><td><strong>Managed Settings</strong></td><td>IT管理者が配布する上書き不可の設定</td><td>組織全体のセキュリティポリシーを強制適用</td></tr>
+    <tr><td><strong>ツール承認フロー</strong></td><td>defaultモードでは変更操作ごとにユーザー確認</td><td>意図しない変更を事前にブロック</td></tr>
+    <tr><td><strong>.gitディレクトリ保護</strong></td><td>bypassPermissionsモードでも.git等への書き込みは確認あり</td><td>Git履歴の意図しない改変を防止</td></tr>
+    <tr><td><strong>PreToolUseフック</strong></td><td>ツール実行前にカスタムスクリプトでチェック可能</td><td>組織独自のセキュリティルールを適用</td></tr>
+  </table>
+
+  <div class="concept-box">
+    <div class="label">覚え方のコツ</div>
+    <p>権限の優先順位は「<strong>否定は肯定に勝つ</strong>」と覚えましょう。denyがallowに常に優先するのは、セキュリティの世界では「明示的な禁止は暗黙の許可より強い」という原則に基づいています。設定ファイルの優先順位も「<strong>組織 &gt; セッション &gt; プロジェクト &gt; ユーザー</strong>」と、より広い範囲の設定が強い構造になっています。</p>
+  </div>
+
+  <h3>セキュリティベストプラクティス</h3>
+  <table class="compare-table">
+    <tr><th>カテゴリ</th><th>推奨事項</th><th>理由</th></tr>
+    <tr><td><strong>権限設定</strong></td><td>必要最小限の権限モードを選択する（最小権限の原則）</td><td>不要な操作リスクを排除</td></tr>
+    <tr><td><strong>CI/CD環境</strong></td><td>コンテナなどの隔離環境で実行する</td><td>操作の影響範囲を限定</td></tr>
+    <tr><td><strong>コスト管理</strong></td><td><code>--max-budget-usd</code>で費用上限を設定</td><td>予期しないコスト発生を防止</td></tr>
+    <tr><td><strong>暴走防止</strong></td><td><code>--max-turns</code>でターン数を制限</td><td>無限ループの防止</td></tr>
+    <tr><td><strong>組織管理</strong></td><td>Managed Settingsで組織ポリシーを配布</td><td>個人設定では上書きできないルールを強制</td></tr>
+    <tr><td><strong>監査</strong></td><td>PreToolUseフックでツール使用をログ記録</td><td>操作履歴の追跡と異常検知</td></tr>
+  </table>
+
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;"><code>.env</code>ファイルや認証情報（APIキー、パスワード等）を含むファイルには特に注意が必要です。Claude Codeがこれらのファイルを読み取ると、会話コンテキストの一部としてAPIに送信される可能性があります。機密ファイルは<code>.claudeignore</code>でアクセス対象から除外することを推奨します。</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">セキュリティの問題では「<strong>最小権限の原則（Principle of Least Privilege）</strong>」と「<strong>多層防御（Defense in Depth）</strong>」がキーワードです。権限モード選択（最小権限）、コンテナ隔離（環境分離）、Managed Settings（組織管理）、PreToolUseフック（カスタム制御）の4つを組み合わせた多層的な安全設計を理解しましょう。</p>
+  </div>
+</div>
+
   <div id="m7-s5" class="card" style="display:none">
     <h2>Module 7 用語集</h2>
     <div class="glossary-item"><div class="glossary-term">エージェント型ツール</div><div class="glossary-en">Agentic Tool</div><div class="glossary-def">ツールを使いながら自律的にタスクを遂行するAIシステム。Claude Codeはこの代表例。</div></div>
@@ -3493,6 +3945,14 @@
     <div class="glossary-item"><div class="glossary-term">チェックポイント</div><div class="glossary-en">Checkpoint</div><div class="glossary-def">ファイル変更前の状態を自動保存する機能。/rewindで復元可能。</div></div>
     <div class="glossary-item"><div class="glossary-term">ワークツリー</div><div class="glossary-en">Worktree</div><div class="glossary-def">git worktreeを使ってリポジトリの隔離コピーで作業する機能。</div></div>
     <div class="glossary-item"><div class="glossary-term">管理設定</div><div class="glossary-en">Managed Settings</div><div class="glossary-def">IT管理者が配布する上書き不可の設定。権限設定の優先順位で最も強い。</div></div>
+    <div class="glossary-item"><div class="glossary-term">ヘッドレスモード（非対話モード）</div><div class="glossary-en">Headless Mode</div><div class="glossary-def"><code>claude -p</code>で起動する、人間の入力を待たない実行モード。CI/CDパイプラインやスクリプトからの自動実行に使う。</div></div>
+    <div class="glossary-item"><div class="glossary-term">バッチAPI</div><div class="glossary-en">Batch API</div><div class="glossary-def">複数のAPIリクエストをまとめて非同期処理する仕組み。通常比50%のコスト削減が可能。24時間以内に結果が返される。</div></div>
+    <div class="glossary-item"><div class="glossary-term">セッション隔離</div><div class="glossary-en">Session Isolation</div><div class="glossary-def">複数のCIジョブが同時実行されても互いに干渉しないようにする仕組み。git worktreeやコンテナ隔離が代表的な方法。</div></div>
+    <div class="glossary-item"><div class="glossary-term">パイプ入力</div><div class="glossary-en">Pipe Input</div><div class="glossary-def">シェルのパイプ（<code>|</code>）を使ってClaude Codeに標準入力からデータを渡す方法。<code>git diff | claude -p</code>のように使う。</div></div>
+    <div class="glossary-item"><div class="glossary-term">ローカル実行モデル</div><div class="glossary-en">Local Execution Model</div><div class="glossary-def">Claude Codeがユーザーのマシン上で直接実行される方式。コードや操作結果がクラウドに永続保存されない。</div></div>
+    <div class="glossary-item"><div class="glossary-term">最小権限の原則</div><div class="glossary-en">Principle of Least Privilege</div><div class="glossary-def">必要最小限の権限のみを付与するセキュリティ原則。Claude Codeでは適切な権限モードの選択がこれに該当する。</div></div>
+    <div class="glossary-item"><div class="glossary-term">多層防御</div><div class="glossary-en">Defense in Depth</div><div class="glossary-def">複数のセキュリティ層を重ねて防御する設計思想。権限モデル・データ制御・環境隔離の3層で構成される。</div></div>
+    <div class="glossary-item"><div class="glossary-term">ゼロ保持</div><div class="glossary-en">Zero Retention</div><div class="glossary-def">APIへの入出力データをAnthropic側で一切保持しないオプション。商用契約で利用可能。</div></div>
   </div>
 
   <div id="m7-s6" class="card" style="display:none">
@@ -3539,6 +3999,54 @@
         <div class="quiz-option" onclick="selectAnswer('m7',4,3)">readonlyツールのみ許可するモードである</div>
         <div class="quiz-explanation" id="m7-q5-exp"></div>
       </div>
+      <div class="quiz-question" id="m7-q6">
+        <div class="q-text">Q6. CI/CDパイプラインでClaude Codeを使って自動コードレビューを実行する際、最も適切な起動方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',5,0)">claude コマンドで対話セッションを開始する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',5,1)">claude -p フラグでヘッドレスモードを使い、--max-turnsと--max-budget-usdで制限を設ける</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',5,2)">claude -c で前回のセッションを続行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',5,3)">claude --permission-mode bypassPermissions でローカル環境から実行する</div>
+        <div class="quiz-explanation" id="m7-q6-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q7">
+        <div class="q-text">Q7. CI環境で複数のClaude Codeジョブを同時に実行する際、セッション隔離のベストプラクティスとして最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',6,0)">すべてのジョブを同じディレクトリで順番に実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',6,1)">コンテナ内で実行し、bypassPermissionsモードを使用する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',6,2)">ローカル環境でbypassPermissionsモードを使用する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',6,3)">--max-turns 1に設定して各ジョブの実行時間を最小化する</div>
+        <div class="quiz-explanation" id="m7-q7-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q8">
+        <div class="q-text">Q8. 200ファイル以上に対して一括でコードレビューを実行したい場合、最もコスト効率の良いアプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',7,0)">claude -p を200回順番に実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',7,1)">1つのプロンプトに全ファイルを含めて実行する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',7,2)">Batch APIを使って複数リクエストを非同期で一括処理する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',7,3)">--max-budget-usd を0に設定して無料で実行する</div>
+        <div class="quiz-explanation" id="m7-q8-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q9">
+        <div class="q-text">Q9. 特定のシェルコマンドの実行を全社的に禁止したい場合、最も適切な方法はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',8,0)">各開発者の~/.claude/settings.jsonにdenyルールを追加するよう依頼する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',8,1)">プロジェクトの.claude/settings.jsonにdenyルールを追加する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',8,2)">Managed Settingsでdenyルールを配布し、個人設定で上書きできないようにする</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',8,3)">CLAUDE.mdに禁止コマンドを記述する</div>
+        <div class="quiz-explanation" id="m7-q9-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q10">
+        <div class="q-text">Q10. Claude Codeのデータ取扱いについて、正しい説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',9,0)">プロジェクト全体のファイルが自動的にクラウドにアップロードされる</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',9,1)">ローカルで実行され、APIに送信されるのは会話のプロンプトとツール実行結果のみ</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',9,2)">送信データはデフォルトでモデルの学習に使用される</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',9,3)">Git履歴全体が常にAPIに送信される</div>
+        <div class="quiz-explanation" id="m7-q10-exp"></div>
+      </div>
+      <div class="quiz-question" id="m7-q11">
+        <div class="q-text">Q11. Claude Codeの多層防御（Defense in Depth）のアプローチとして、正しい組み合わせはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',10,0)">bypassPermissionsモード + ローカル環境 + 無制限のターン数</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',10,1)">権限モデル（deny/ask/allow） + データ送信制御 + 環境隔離（コンテナ等）</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',10,2)">CLAUDE.mdの記述のみで全セキュリティを管理する</div>
+        <div class="quiz-option" onclick="selectAnswer('m7',10,3)">全ツールをallowに設定し、PostToolUseフックで事後チェックする</div>
+        <div class="quiz-explanation" id="m7-q11-exp"></div>
+      </div>
       <div id="m7-quiz-result" class="quiz-result" style="display:none"></div>
       <div class="btn-group">
         <button class="btn btn-accent" onclick="submitQuiz('m7')" id="m7-submit-btn">回答を確定する</button>
@@ -3576,6 +4084,10 @@
     <button class="section-tab" onclick="showSection('m8','s2',this)">設定ファイル体系</button>
     <button class="section-tab" onclick="showSection('m8','s3',this)">ワークフロー設計</button>
     <button class="section-tab" onclick="showSection('m8','s4',this)">チーム運用とCI/CD</button>
+    <button class="section-tab" onclick="showSection('m8','s7',this)">@importモジュール化</button>
+    <button class="section-tab" onclick="showSection('m8','s8',this)">.claude/rules/</button>
+    <button class="section-tab" onclick="showSection('m8','s9',this)">Plan mode</button>
+    <button class="section-tab" onclick="showSection('m8','s10',this)">Agent Skills</button>
     <button class="section-tab" onclick="showSection('m8','s5',this)">用語集</button>
     <button class="section-tab" onclick="showSection('m8','s6',this)">クイズ</button>
   </div>
@@ -3694,6 +4206,155 @@
     </div>
   </div>
 
+  <!-- Section 7: @importモジュール化 -->
+<div id="m8-s7" class="card" style="display:none">
+  <h2>@importモジュール化 &mdash; CLAUDE.mdを分割管理する</h2>
+  <p>プロジェクトが大きくなると、1つのCLAUDE.mdにすべてのルールを書くのは大変です。<strong>@importディレクティブ</strong>を使えば、CLAUDE.mdを複数ファイルに分割して管理できます。会社の就業規則が1冊ではなく「総則」「経理規程」「開発規程」と分冊されているのと同じ考え方です。</p>
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>@import（アットインポート）ディレクティブ：</strong>CLAUDE.md内で別のMarkdownファイルを読み込む構文。<code>@import ./docs/coding-rules.md</code> のように相対パスで記述する。読み込まれたファイルの内容は、その位置に展開される。</p>
+  </div>
+  <h3>いつ分割すべきか？</h3>
+  <table class="compare-table">
+    <tr><th>状況</th><th>推奨アプローチ</th><th>理由</th></tr>
+    <tr><td>小規模プロジェクト（1チーム）</td><td>CLAUDE.md 1ファイルで十分</td><td>分割のオーバーヘッドが利点を上回る</td></tr>
+    <tr><td>中規模プロジェクト（複数モジュール）</td><td>モジュール別に分割</td><td>各モジュールの担当者が独立して編集できる</td></tr>
+    <tr><td>monorepo（複数サービス）</td><td>サービス別 + 共通ルールに分割</td><td>共通ルールを1か所で管理しつつ、各サービス固有のルールを分離</td></tr>
+    <tr><td>マルチチーム開発</td><td>チーム別 + 共通ルールに分割</td><td>各チームが自分の領域のルールを独立管理できる</td></tr>
+  </table>
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>分割管理の原則：</strong>@importで分割しても、最終的にClaude Codeが読み込む内容の総量は変わりません。分割はあくまで<strong>人間の管理のしやすさ</strong>のためです。コンテキストウィンドウの節約にはなりません。</p>
+  </div>
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">@importは<strong>相対パス</strong>で指定します。読み込み先のファイルもMarkdown形式で、さらに@importをネスト（入れ子）にすることも可能です。ただし、ネストが深すぎるとコンテキストウィンドウを圧迫するため注意が必要です。</p>
+  </div>
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">@importで読み込むファイルにも秘密情報（APIキー等）を含めてはいけません。git管理されるCLAUDE.mdと同じルールが適用されます。また、循環参照（AがBを読み込み、BがAを読み込む）は避けてください。</p>
+  </div>
+</div>
+
+  <!-- Section 8: .claude/rules/ -->
+<div id="m8-s8" class="card" style="display:none">
+  <h2>.claude/rules/ &mdash; 条件付きルールファイル</h2>
+  <p>CLAUDE.mdに書いたルールは<strong>常に</strong>読み込まれますが、「特定の状況でだけ適用したいルール」もあります。<strong>.claude/rules/</strong> ディレクトリに置くルールファイルは、こうした条件付きの指示を実現します。</p>
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>ルールファイル（Rule File）：</strong><code>.claude/rules/</code> ディレクトリに配置するMarkdownファイル。ファイル冒頭のフロントマター（YAML形式のメタデータ）で適用条件を指定できる。CLAUDE.mdが「常に適用される社内規程」なら、ルールファイルは「特定の部署や業務にだけ適用される業務マニュアル」のようなものです。</p>
+  </div>
+  <h3>ルールの種類</h3>
+  <table class="compare-table">
+    <tr><th>種類</th><th>英語名</th><th>適用タイミング</th><th>例</th></tr>
+    <tr><td><strong>常時適用</strong></td><td>Always</td><td>常にコンテキストに含まれる</td><td>セキュリティポリシー、コード品質基準</td></tr>
+    <tr><td><strong>自動添付</strong></td><td>Auto Attached</td><td>指定したglobパターンに一致するファイル編集時</td><td>*.py 編集時のPython規約</td></tr>
+    <tr><td><strong>手動呼出</strong></td><td>Manual</td><td>ユーザーが明示的に参照した時のみ</td><td>リリース手順書、特殊な移行ガイド</td></tr>
+  </table>
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;"><code>globs</code> を指定すると<strong>Auto Attached（自動添付）</strong>ルールになります。globsを省略すると<strong>Always（常時適用）</strong>ルールになります。「いつ適用されるか」の区別は試験で問われやすいポイントです。</p>
+  </div>
+  <h3>CLAUDE.md と .claude/rules/ の使い分け</h3>
+  <table class="compare-table">
+    <tr><th>観点</th><th>CLAUDE.md</th><th>.claude/rules/</th></tr>
+    <tr><td><strong>適用範囲</strong></td><td>常に全体に適用</td><td>条件付き（ファイル種別等）で適用可能</td></tr>
+    <tr><td><strong>記述形式</strong></td><td>自由なMarkdown</td><td>フロントマター + Markdown</td></tr>
+    <tr><td><strong>管理単位</strong></td><td>1ファイル（@importで分割可）</td><td>ルールごとに独立ファイル</td></tr>
+    <tr><td><strong>向いている用途</strong></td><td>プロジェクト全体の方針・規約</td><td>言語別・フレームワーク別の細かいルール</td></tr>
+    <tr><td><strong>コンテキスト消費</strong></td><td>常に消費</td><td>条件一致時のみ消費（Auto Attached）</td></tr>
+  </table>
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>コンテキスト効率：</strong>Auto Attachedルールは必要なときだけ読み込まれるため、CLAUDE.mdに全ルールを書くよりもコンテキストウィンドウを効率的に使えます。大規模プロジェクトでは、共通ルールはCLAUDE.mdに、言語・フレームワーク固有のルールは.claude/rules/に分けるのがベストプラクティスです。</p>
+  </div>
+</div>
+
+  <!-- Section 9: Plan mode -->
+<div id="m8-s9" class="card" style="display:none">
+  <h2>Plan mode &mdash; まず計画、それから実装</h2>
+  <p>コードを書く前に「何をどう変更するか」を整理したい場面があります。<strong>Plan mode（計画モード）</strong>は、Claude Codeにファイル変更を行わせず、<strong>設計・方針の検討だけ</strong>をさせるモードです。建築で言えば「設計図を描く段階」です。</p>
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>Plan mode（計画モード）：</strong>Claude Codeの動作モードの一つ。コードの読み取りや検索は行えるが、ファイルの作成・編集・削除は行わない。設計方針の検討、影響範囲の調査、実装計画の策定に使う。</p>
+  </div>
+  <h3>Plan modeの起動方法</h3>
+  <table class="compare-table">
+    <tr><th>方法</th><th>操作</th><th>説明</th></tr>
+    <tr><td><strong>キーボードショートカット</strong></td><td><code>Shift+Tab</code></td><td>入力中にモードを切り替え。もう一度押すと通常モードに戻る</td></tr>
+    <tr><td><strong>CLI起動オプション</strong></td><td><code>claude --plan</code></td><td>起動時からPlan modeで開始する</td></tr>
+  </table>
+  <h3>Plan modeでできること・できないこと</h3>
+  <table class="compare-table">
+    <tr><th>できること</th><th>できないこと</th></tr>
+    <tr><td>ファイルの読み取り・検索</td><td>ファイルの作成・編集・削除</td></tr>
+    <tr><td>コードベースの調査・分析</td><td>コマンドの実行（ビルド・テスト等）</td></tr>
+    <tr><td>実装計画・設計方針の策定</td><td>git操作（commit、push等）</td></tr>
+    <tr><td>影響範囲の洗い出し</td><td>外部ツールの操作</td></tr>
+  </table>
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;">Plan modeは<strong>「読み取り専用」</strong>モードと覚えましょう。大規模な変更の前にPlan modeで影響範囲を把握してから通常モードで実装する、という流れがベストプラクティスです。</p>
+  </div>
+  <h3>Plan modeの活用パターン</h3>
+  <table class="compare-table">
+    <tr><th>場面</th><th>Plan modeの使い方</th><th>効果</th></tr>
+    <tr><td><strong>大規模リファクタリング</strong></td><td>変更対象のファイル・関数を洗い出し、順序と方針を整理</td><td>手戻りの防止</td></tr>
+    <tr><td><strong>新機能の設計</strong></td><td>既存コードを調査し、実装方針を複数案比較</td><td>最適なアプローチの選択</td></tr>
+    <tr><td><strong>バグの原因調査</strong></td><td>コードを追いかけて原因を特定（修正はまだしない）</td><td>正確な原因把握</td></tr>
+    <tr><td><strong>コードレビューの準備</strong></td><td>変更差分を分析し、レビューコメントの下書き</td><td>効率的なレビュー</td></tr>
+  </table>
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">Plan modeはあくまで<strong>Claude Code内の機能</strong>です。API経由でClaude（LLM）を利用する場合のPlan modeとは異なります。試験では「Claude Codeの機能」として問われる点に注意してください。</p>
+  </div>
+</div>
+
+  <!-- Section 10: Agent Skills概要 -->
+<div id="m8-s10" class="card" style="display:none">
+  <h2>Agent Skills &mdash; 専門知識をパッケージにする</h2>
+  <p>Claude Codeで繰り返し使う「特定分野の専門知識」をまとめたものが<strong>Agent Skills（エージェントスキル）</strong>です。料理に例えると、レシピ本をまるごと覚えさせるのではなく、「和食のスキル」「洋食のスキル」と分けて、必要なときだけ参照するイメージです。</p>
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>Agent Skills（エージェントスキル）：</strong>再利用可能な専門知識をMarkdownファイルにまとめたもの。CLAUDE.mdからの参照指示や、スラッシュコマンドから呼び出して使う。常に読み込むのではなく、<strong>必要なタスクの時だけ</strong>読み込むことでコンテキストウィンドウを効率的に使える。</p>
+  </div>
+  <h3>スキルの呼び出し方</h3>
+  <table class="compare-table">
+    <tr><th>方法</th><th>説明</th><th>例</th></tr>
+    <tr><td><strong>CLAUDE.mdからの参照</strong></td><td>特定のタスク時にスキルファイルを読むよう指示</td><td>「UIタスク時は skills/frontend.md を参照せよ」</td></tr>
+    <tr><td><strong>スラッシュコマンド</strong></td><td>ユーザーがコマンドで明示的に呼び出す</td><td><code>/skill-name</code> で実行</td></tr>
+    <tr><td><strong>ルールファイルから</strong></td><td>.claude/rules/ のAuto Attachedルールで自動参照</td><td>*.test.tsx 編集時にテストスキルを自動読み込み</td></tr>
+  </table>
+  <div class="tip-box">
+    <div class="label">試験のポイント</div>
+    <p style="margin-top:.25rem;"><strong>CLAUDE.md</strong> = 常に読み込まれるプロジェクト全体のルール / <strong>カスタムコマンド</strong> = ユーザーの操作で起動するワークフロー / <strong>スキル</strong> = 必要なときだけ読み込む専門知識パック、と整理しましょう。</p>
+  </div>
+  <h3>CLAUDE.md・カスタムコマンド・スキルの比較</h3>
+  <table class="compare-table">
+    <tr><th>観点</th><th>CLAUDE.md</th><th>カスタムコマンド</th><th>スキル</th></tr>
+    <tr><td><strong>読み込み</strong></td><td>常に自動</td><td>ユーザーが <code>/名前</code> で実行</td><td>必要時に参照</td></tr>
+    <tr><td><strong>主な内容</strong></td><td>プロジェクト方針・規約</td><td>ワークフロー・手順</td><td>専門知識・ベストプラクティス</td></tr>
+    <tr><td><strong>配置場所</strong></td><td>プロジェクトルート等</td><td><code>.claude/commands/</code></td><td>任意（スキル用ディレクトリ推奨）</td></tr>
+    <tr><td><strong>コンテキスト消費</strong></td><td>常に消費</td><td>実行時のみ</td><td>参照時のみ</td></tr>
+    <tr><td><strong>向いている用途</strong></td><td>全員が常に従うべきルール</td><td>繰り返す定型作業</td><td>特定分野の深い知識</td></tr>
+  </table>
+  <h3>エンタープライズでのスキル配布</h3>
+  <table class="compare-table">
+    <tr><th>配布方法</th><th>説明</th><th>メリット</th></tr>
+    <tr><td><strong>共有リポジトリ</strong></td><td>スキルファイルを専用リポジトリで管理し、各PJから参照</td><td>バージョン管理・変更履歴の一元管理</td></tr>
+    <tr><td><strong>組織テンプレート</strong></td><td>新規PJ作成時にスキルファイルを自動配置</td><td>新プロジェクトへの即時適用</td></tr>
+    <tr><td><strong>パッケージ配布</strong></td><td>npmパッケージ等で配布し、PJに組み込む</td><td>依存関係管理・自動更新</td></tr>
+  </table>
+  <div class="concept-box">
+    <div class="label">重要概念</div>
+    <p><strong>エンタープライズ配布の目的：</strong>スキルの中央管理により、組織全体でコーディング規約、セキュリティポリシー、テスト方針などを統一できます。各チームが独自にルールを作るのではなく、組織の標準スキルセットを全員が使うことで、品質のばらつきを防ぎます。</p>
+  </div>
+  <div class="warn-box">
+    <div class="label">注意</div>
+    <p style="margin-top:.25rem;">スキルファイルを大量に読み込むとコンテキストウィンドウを圧迫します。<strong>「必要なスキルだけを、必要なときに」</strong>が鉄則です。CLAUDE.mdに「常にすべてのスキルを読め」と書くのは逆効果です。</p>
+  </div>
+</div>
+
   <div id="m8-s5" class="card" style="display:none">
     <h2>Module 8 用語集</h2>
     <div class="glossary-item"><div class="glossary-term">CLAUDE.md</div><div class="glossary-en">CLAUDE.md</div><div class="glossary-def">Claude Code向けのMarkdown形式の指示書ファイル。起動時に自動で読み込まれる。</div></div>
@@ -3704,6 +4365,12 @@
     <div class="glossary-item"><div class="glossary-term">ヘッドレスモード</div><div class="glossary-en">Headless Mode</div><div class="glossary-def">対話なしで実行するモード。--printフラグで起動。CI/CD向け。</div></div>
     <div class="glossary-item"><div class="glossary-term">標準エラー出力</div><div class="glossary-en">stderr</div><div class="glossary-def">Hooksではstderrに書いたメッセージがClaudeにフィードバックされる。</div></div>
     <div class="glossary-item"><div class="glossary-term">プレースホルダー</div><div class="glossary-en">Placeholder</div><div class="glossary-def">カスタムコマンドで$ARGUMENTSがユーザー入力のプレースホルダー。</div></div>
+    <div class="glossary-item"><div class="glossary-term">@importディレクティブ</div><div class="glossary-en">@import Directive</div><div class="glossary-def">CLAUDE.md内で別のMarkdownファイルを読み込む構文。大規模プロジェクトでの設定分割管理に使う。</div></div>
+    <div class="glossary-item"><div class="glossary-term">ルールファイル</div><div class="glossary-en">Rule File</div><div class="glossary-def">.claude/rules/ に配置するMarkdownファイル。フロントマターで適用条件（globs等）を指定し、条件付きで自動適用される指示。</div></div>
+    <div class="glossary-item"><div class="glossary-term">自動添付ルール</div><div class="glossary-en">Auto Attached Rule</div><div class="glossary-def">globパターンで指定したファイル編集時に自動的にコンテキストに含まれるルール。コンテキスト効率が良い。</div></div>
+    <div class="glossary-item"><div class="glossary-term">計画モード</div><div class="glossary-en">Plan Mode</div><div class="glossary-def">Claude Codeの読み取り専用モード。ファイル変更を行わず、設計・調査・計画策定に使う。Shift+Tabで切り替え。</div></div>
+    <div class="glossary-item"><div class="glossary-term">エージェントスキル</div><div class="glossary-en">Agent Skill</div><div class="glossary-def">再利用可能な専門知識をMarkdownファイルにパッケージ化したもの。必要なときだけ読み込んでコンテキストを節約する。</div></div>
+    <div class="glossary-item"><div class="glossary-term">フロントマター</div><div class="glossary-en">Frontmatter</div><div class="glossary-def">Markdownファイル冒頭の---で囲まれたYAML形式のメタデータ領域。ルールファイルでは適用条件の指定に使う。</div></div>
   </div>
 
   <div id="m8-s6" class="card" style="display:none">
@@ -3749,6 +4416,70 @@
         <div class="quiz-option" onclick="selectAnswer('m8',4,2)">サブディレクトリ > ユーザーローカル > リポジトリルート > グローバル</div>
         <div class="quiz-option" onclick="selectAnswer('m8',4,3)">すべて同じ優先度で矛盾する場合はエラーになる</div>
         <div class="quiz-explanation" id="m8-q5-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q6">
+        <div class="q-text">Q6. CLAUDE.mdの@importディレクティブについて正しい説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',5,0)">@importで読み込んだファイルはコンテキストウィンドウを消費しない</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',5,1)">@importは相対パスで指定し、読み込んだ内容はその位置に展開される</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',5,2)">@importはsettings.json内でのみ使用できる構文である</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',5,3)">@importで読み込んだファイルは元のCLAUDE.mdより常に優先される</div>
+        <div class="quiz-explanation" id="m8-q6-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q7">
+        <div class="q-text">Q7. monorepoで複数サービスのClaude Code設定を管理する場合、最も適切なアプローチはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',6,0)">すべてのルールをルートのCLAUDE.md 1ファイルに書く</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',6,1)">各サービスのディレクトリにCLAUDE.mdを置き、共通ルールは@importで共有する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',6,2)">settings.jsonにすべてのルールをJSON形式で書く</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',6,3)">各サービスごとに独立したCLAUDE.mdを作り、共通ルールは各ファイルにコピーする</div>
+        <div class="quiz-explanation" id="m8-q7-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q8">
+        <div class="q-text">Q8. .claude/rules/ のルールファイルで、globs フィールドに "**/*.py" と指定した場合、そのルールはいつ適用されますか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',7,0)">Claude Code起動時に常に読み込まれる</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',7,1)">Pythonファイルを編集する時に自動的に読み込まれる</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',7,2)">ユーザーが /python-rules コマンドで呼び出した時のみ</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',7,3)">Pythonファイルがリポジトリに存在する場合に常に読み込まれる</div>
+        <div class="quiz-explanation" id="m8-q8-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q9">
+        <div class="q-text">Q9. コンテキストウィンドウの効率を最大化するために、プロジェクト固有のルールをどう管理すべきですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',8,0)">すべてのルールをCLAUDE.mdに書いて常に読み込ませる</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',8,1)">すべてのルールを.claude/rules/ にManualルールとして配置する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',8,2)">共通ルールはCLAUDE.mdに、言語固有のルールは.claude/rules/ のAuto Attachedルールに分ける</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',8,3)">settings.jsonのpermissionsにすべてのルールを記述する</div>
+        <div class="quiz-explanation" id="m8-q9-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q10">
+        <div class="q-text">Q10. 大規模なリファクタリングの前に影響範囲を調査したい場合、Claude Codeの最も適切な使い方はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',9,0)">通常モードで「変更しないで調査だけして」と指示する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',9,1)">Plan modeで影響範囲を調査・計画策定し、通常モードに切り替えて実装する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',9,2)">--print モードでリファクタリング計画を出力する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',9,3)">MCPサーバー経由でコード解析ツールに接続する</div>
+        <div class="quiz-explanation" id="m8-q10-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q11">
+        <div class="q-text">Q11. Plan modeについて正しい説明はどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',10,0)">Plan modeではファイルの読み取りもできない</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',10,1)">Plan modeではファイルの読み取りと検索はできるが、変更はできない</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',10,2)">Plan modeでは軽微な変更（コメント追加等）のみ許可される</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',10,3)">Plan modeはCI/CD環境でのみ使用できる</div>
+        <div class="quiz-explanation" id="m8-q11-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q12">
+        <div class="q-text">Q12. Agent Skillsの主な目的として最も適切なものはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',11,0)">Claude Codeの実行速度を向上させる</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',11,1)">再利用可能な専門知識をパッケージ化し、必要なときだけ読み込むことでコンテキストを効率的に使う</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',11,2)">Claude Codeに新しいプログラミング言語のサポートを追加する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',11,3)">settings.jsonの権限設定を自動化する</div>
+        <div class="quiz-explanation" id="m8-q12-exp"></div>
+      </div>
+      <div class="quiz-question" id="m8-q13">
+        <div class="q-text">Q13. スキルファイルを中央管理して各チームに配布する運用の主なメリットはどれですか？</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',12,0)">各チームのClaude Codeの実行コストが削減される</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',12,1)">コーディング規約やセキュリティポリシーを全チームで統一し、品質のばらつきを防げる</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',12,2)">Claude Codeのレスポンス速度が向上する</div>
+        <div class="quiz-option" onclick="selectAnswer('m8',12,3)">各チームが独自のCLAUDE.mdを作成する必要がなくなる</div>
+        <div class="quiz-explanation" id="m8-q13-exp"></div>
       </div>
       <button class="btn btn-accent" onclick="submitQuiz('m8')" id="m8-submit-btn">回答を確定する</button>
       <button class="btn btn-outline" onclick="retryQuiz('m8')" id="m8-retry-btn" style="display:none">もう一度挑戦</button>
@@ -6329,13 +7060,19 @@ const QUIZ_DATA = {
     ]
   },
   m4: {
-    answers: [1, 2, 1, 1, 1],
+    answers: [1, 2, 1, 1, 1, 1, 2, 1, 2, 1, 2],
     explanations: [
       'データ分類のようにAIの応答そのものを構造化データとして使いたい場合は、JSON Outputs（output_config方式）が最適です。enumを使えば選択肢を限定でき、制約付きデコーディングにより100%スキーマ準拠が保証されます。Prefillは最新モデルでは非推奨です。',
       'Claude APIの構造化出力では minimum や maximum などの数値制約はサポートされていません。代わりに、descriptionフィールドに自然言語で制約を記述します。pattern や anyOf も同様にサポートされていません。',
       'エージェントがツール（外部API等）を呼び出す際のパラメータ形式を保証するには、Strict Tool Use（strict: true）が最適です。JSON Outputsは応答テキスト全体の構造化に適しており、ツール呼び出しのパラメータ保証には Strict Tool Use を使います。',
       'additionalProperties: false を設定すると、スキーマで定義していないフィールドが出力に含まれることを防げます。これは「余白への書き込み禁止」にあたり、予期しないデータの混入を防ぐベストプラクティスです。必須仕様ではありませんが、常に設定することが推奨されます。',
-      '検証-再試行ループでは、出力を生成したインスタンスとは別の独立したインスタンスで検証することが推奨されます。同一セッション内での自己レビューでは、同じバイアスや誤りを引き継ぐ可能性があるため、「ダブルチェック体制」として別の視点から確認します。'
+      '検証-再試行ループでは、出力を生成したインスタンスとは別の独立したインスタンスで検証することが推奨されます。同一セッション内での自己レビューでは、同じバイアスや誤りを引き継ぐ可能性があるため、「ダブルチェック体制」として別の視点から確認します。',
+      'クロスチェック（別インスタンスによる検証）が最適です。医療データのような高リスクな場面では、同一インスタンスの自己評価では同じバイアスを引き継ぐリスクがあります。独立した検証者が元のカルテデータと照合することで、抽出ミスを検出できます。',
+      'Batches APIは通常のAPIと同じ品質の出力を50%割引で提供しますが、結果の返却まで最大24時間かかる非同期処理です。夜間にバッチを投入し翌朝結果を確認するワークフローが最適です。',
+      'PydanticのField(ge=1)のような値の制約は、SDKがJSON Schemaのdescriptionに自動変換してClaudeに伝えます。Claudeが出力を生成した後、SDKが元のPydantic制約で再バリデーション（事後検証）を行います。',
+      '段階的精査（Progressive Refinement）が最適です。200ページの契約書からの情報抽出では、一度にすべてを完璧に処理するのは困難です。第1パスで主要項目を抽出し、第2パスで条件・例外を補完、第3パスで整合性を確認する段階的アプローチが効果的です。',
+      'Batches APIの最大の特徴は非同期処理による50%のコスト削減です。リアルタイム応答は提供されません（結果返却まで最大24時間）。同期APIと同じモデル品質の出力を低コストで大量処理できます。バッチサイズ上限は1バッチあたり最大10万件です。',
+      '制約付きデコーディング（Constrained Decoding）はJSONの構造（型・必須フィールド・enum値）を保証しますが、数値の範囲（minimum/maximum）や文字列のパターン（pattern）といった値の制約はサポートされません。値の制約はPydanticの事後バリデーションで検証が必要です。'
     ]
   },
   m5: {
@@ -6369,23 +7106,37 @@ const QUIZ_DATA = {
     ]
   },
   m7: {
-    answers: [2, 1, 2, 1, 1],
+    answers: [2, 1, 2, 1, 1, 1, 1, 2, 2, 1, 1],
     explanations: [
       'Read（ファイル読み取り）は読み取り専用ツールであり、権限承認なしで使用できます。Write、Bash、WebFetchはいずれも変更や外部アクセスを伴うため、権限承認が必要です。Grep、Glob、Agentも同様に権限不要のツールです。',
       '--print（-p）フラグはヘッドレスモードでClaude Codeを起動します。対話的な入力を待たずに、回答を返して終了するため、CI/CDパイプラインやスクリプトからの自動実行に最適です。--max-turnsや--max-budget-usdで暴走やコストも制限できます。',
       'Claude Codeの権限ルールはdeny → ask → allowの順で評価されます。deny（拒否）が常に最優先で、明示的に拒否されたツール操作は他の設定で上書きできません。この評価順序は安全性を最優先にする設計思想に基づいています。',
       'Exploreサブエージェントは高速・低コストのHaikuモデルを使い、読み取り専用ツール（Read, Grep, Glob等）のみアクセスできます。コードベースの探索や検索に特化しており、ファイル変更やコマンド実行はできません。',
-      'bypassPermissionsモードはコンテナなどの隔離環境でのみ使用すべきです。全権限チェックをスキップしますが、.git、.claude、.vscode、.ideaディレクトリへの書き込みは例外的に確認があります。CLIフラグでは--dangerously-skip-permissionsという名前で、危険性を示しています。'
+      'bypassPermissionsモードはコンテナなどの隔離環境でのみ使用すべきです。全権限チェックをスキップしますが、.git、.claude、.vscode、.ideaディレクトリへの書き込みは例外的に確認があります。CLIフラグでは--dangerously-skip-permissionsという名前で、危険性を示しています。',
+      'CI/CDパイプラインでは-p（--print）フラグでヘッドレスモードを使います。対話入力を待たずに処理が完了するため、自動化に最適です。--max-turnsで暴走を防ぎ、--max-budget-usdでコストを制限するのがベストプラクティスです。bypassPermissionsはコンテナ隔離環境でのみ使用すべきです。',
+      'コンテナ内での実行は完全なファイルシステム隔離を提供し、複数ジョブの同時実行に最適です。隔離環境であればbypassPermissionsモードも安全に使用できます。ローカル環境でのbypassPermissionsは意図しないファイル変更のリスクがあり避けるべきです。',
+      'Batch APIは複数のリクエストをまとめて非同期処理でき、通常のAPI呼び出しに比べて50%のコスト削減が可能です。結果は24時間以内に返されるため、即時性は不要だが大量処理が必要なケースに最適です。',
+      'Managed Settings（管理設定）はIT管理者が配布する上書き不可の設定で、権限設定の優先順位で最も強い位置にあります。個人の設定ファイルやプロジェクト設定では上書きできないため、組織全体のセキュリティポリシーを確実に強制できます。',
+      'Claude Codeはユーザーのローカルマシンで実行されます。APIに送信されるのは会話に必要なプロンプトとツール実行結果（ファイル内容の一部やコマンド出力）のみです。プロジェクト全体やGit履歴全体がアップロードされるわけではありません。',
+      'Claude Codeの多層防御は、第1層の権限モデル（deny/ask/allowの評価順序）、第2層のデータ制御（ローカル実行・送信データ範囲の制限）、第3層の環境隔離（コンテナ/git worktree/サンドボックス）で構成されます。'
     ]
   },
   m8: {
-    answers: [1, 1, 1, 1, 2],
+    answers: [1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1],
     explanations: [
       'チーム全員に共通のルールを適用するには、プロジェクトルートのCLAUDE.md（git管理）に記述します。グローバル（~/.claude/CLAUDE.md）は個人の全PJ共通設定用、ユーザーローカル（.claude/CLAUDE.md）は個人メモ用です。settings.jsonは機械的な設定（権限等）用であり、自然言語の規約には向きません。',
       'permissions.denyは常にpermissions.allowより優先されます。これは「ブラックリスト方式」で、明示的に禁止されたコマンドは、allowに含まれていても実行できません。セキュリティの観点から、禁止事項が許可事項を上回る設計になっています。',
       'PreToolUseフックでコマンドをブロックするには、stderrにフィードバックメッセージを出力し、非ゼロの終了コードで終了します。非ゼロ終了コードがブロックのシグナルとなり、stderrの内容がClaudeへのフィードバックとして渡されます。stdoutはツール結果の変更に使われるため、フィードバック用にはstderrを使います。',
       'CI/CDでClaude Codeを使うには、--print（または -p）モードで非対話実行し、ANTHROPIC_API_KEYを環境変数に設定する必要があります。CLAUDE.mdはあくまで指示書であり、CI実行を自動トリガーする機能はありません。対話モードはCI/CDには不向きです。',
-      'CLAUDE.mdは「後から読まれたものが先のものを上書き（override）」します。読み込み順序はグローバル→リポジトリルート→ユーザーローカル→サブディレクトリの順で、後に読まれるサブディレクトリが最も優先度が高くなります。つまり「最も近いCLAUDE.mdが最優先」です。'
+      'CLAUDE.mdは「後から読まれたものが先のものを上書き（override）」します。読み込み順序はグローバル→リポジトリルート→ユーザーローカル→サブディレクトリの順で、後に読まれるサブディレクトリが最も優先度が高くなります。つまり「最も近いCLAUDE.mdが最優先」です。',
+      '@importディレクティブは相対パスでファイルを指定し、読み込んだ内容はCLAUDE.md内のその記述位置に展開されます。ただし、読み込んだ内容もコンテキストウィンドウを消費します。@importはあくまで人間の管理のしやすさのための機能であり、コンテキスト節約にはなりません。settings.json内では使用できません。',
+      'monorepoでは各サービスのディレクトリにCLAUDE.mdを配置し、共通ルールは@importで共有するのがベストプラクティスです。共通ルールを1か所で管理しつつ、各サービス固有のルールを分離できます。ルールのコピーは変更時の同期漏れを招くため避けましょう。',
+      'globsフィールドに "**/*.py" を指定したルールはAuto Attached（自動添付）ルールとなり、Pythonファイルを編集する時に自動的にコンテキストに含まれます。常時読み込み（Always）ではなく、該当ファイルの編集時のみ適用される点がポイントです。',
+      '共通ルール（全員が常に従うべきもの）はCLAUDE.mdに、言語やフレームワーク固有のルールは.claude/rules/のAuto Attachedルールに分けるのがベストプラクティスです。Auto Attachedルールは該当ファイル編集時のみ読み込まれるため、コンテキストウィンドウを効率的に使えます。',
+      'Plan modeは設計・調査に特化した読み取り専用モードです。大規模な変更の前にPlan modeで影響範囲を調査し、計画を立ててから通常モードに切り替えて実装するのがベストプラクティスです。通常モードで「変更しないで」と指示するよりも、Plan modeを使う方が安全で確実です。',
+      'Plan modeは「読み取り専用」モードです。ファイルの読み取りやコードベースの検索・分析はできますが、ファイルの作成・編集・削除やコマンド実行は行いません。Shift+Tabで通常モードとPlan modeを切り替えられます。',
+      'Agent Skillsの主な目的は、再利用可能な専門知識をMarkdownファイルにパッケージ化し、必要なタスクの時だけ読み込むことです。CLAUDE.mdに全知識を書くと常にコンテキストを消費しますが、スキルとして分離すれば必要時のみ消費するため、コンテキストウィンドウを効率的に使えます。',
+      'スキルの中央管理・配布により、コーディング規約やセキュリティポリシーなどの組織標準を全チームに統一適用できます。各チームが独自にルールを作ると品質にばらつきが出ますが、中央管理された標準スキルセットを使うことでこれを防ぎます。実行コストやレスポンス速度とは直接関係ありません。'
     ]
   }
 };
