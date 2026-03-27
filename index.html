@@ -31,7 +31,7 @@
   .app { display: flex; min-height: 100vh; }
   .sidebar { width: var(--sidebar-w); background: #1F2937; color: #F9FAFB; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100; transition: transform .3s; }
   .sidebar.closed { transform: translateX(-100%); }
-  .main { margin-left: var(--sidebar-w); flex: 1; padding: 2rem 3rem; max-width: 900px; transition: margin-left .3s; }
+  .main { margin-left: var(--sidebar-w); flex: 1; padding: 1.5rem 3rem; max-width: 900px; transition: margin-left .3s; }
   .main.full { margin-left: 0; }
 
   /* Sidebar */
@@ -70,7 +70,7 @@
   .sidebar-progress { padding: 1rem 1.5rem; border-top: 1px solid #374151; }
   .sidebar-progress-label { font-size: .75rem; color: #9CA3AF; margin-bottom: .4rem; }
   .progress-bar { background: #374151; border-radius: 4px; height: 6px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #F59E0B, #10B981); border-radius: 4px; transition: width .5s ease; }
+  .progress-bar-fill { height: 100%; background: #10B981; border-radius: 4px; transition: width .5s ease; }
 
   /* Toggle button */
   .sidebar-toggle { display: none; position: fixed; top: 1rem; left: 1rem; z-index: 200; background: #1F2937; color: white; border: none; border-radius: 8px; padding: .5rem .75rem; cursor: pointer; font-size: 1.2rem; }
@@ -82,7 +82,7 @@
   .card p { margin-bottom: .75rem; }
 
   /* Module header */
-  .module-header { margin-bottom: 2rem; }
+  .module-header { margin-bottom: 1.5rem; }
   .module-header .week-badge { display: inline-block; background: var(--primary-light); color: var(--primary-dark); font-size: .8rem; font-weight: 600; padding: .25rem .75rem; border-radius: 999px; margin-bottom: .5rem; }
   .module-header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: .25rem; }
   .module-header .subtitle { color: var(--text-light); font-size: 1rem; }
@@ -147,11 +147,6 @@
   .domain-row .domain-bar-fill { height: 100%; border-radius: 4px; transition: width .5s; }
   .domain-row .domain-bar-label { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: .75rem; font-weight: 600; }
 
-  /* Section navigation */
-  .section-nav { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-  .section-tab { padding: .4rem 1rem; border-radius: 999px; border: 2px solid var(--border); background: white; cursor: pointer; font-size: .85rem; font-weight: 500; transition: all .15s; }
-  .section-tab:hover { border-color: var(--primary); }
-  .section-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
   /* Tip box */
   .tip-box { background: #ECFDF5; border-left: 4px solid var(--success); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
@@ -178,7 +173,7 @@
   @media (max-width: 768px) {
     .sidebar { transform: translateX(-100%); }
     .sidebar.open { transform: translateX(0); }
-    .main { margin-left: 0; padding: 1rem 1.25rem; padding-top: 4rem; }
+    .main { margin-left: 0; padding: 1rem 1.25rem; padding-top: 3rem; }
     .sidebar-toggle { display: block; }
     .scenario-grid { grid-template-columns: 1fr; }
   }
@@ -477,25 +472,28 @@
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m0','s1',this)">Claudeとは</button>
-    <button class="section-tab" onclick="showSection('m0','s2',this)">製品群</button>
-    <button class="section-tab" onclick="showSection('m0','s3',this)">試験の構成</button>
-    <button class="section-tab" onclick="showSection('m0','s4',this)">シナリオ</button>
-    <button class="section-tab" onclick="showSection('m0','s5',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m0','s6',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m0-s1-heading" style="color: var(--primary); text-decoration: none;">Claudeとは</a></li>
+      <li><a href="#m0-s2-heading" style="color: var(--primary); text-decoration: none;">製品群</a></li>
+      <li><a href="#m0-s3-heading" style="color: var(--primary); text-decoration: none;">試験の構成</a></li>
+      <li><a href="#m0-s4-heading" style="color: var(--primary); text-decoration: none;">シナリオ</a></li>
+      <li><a href="#m0-s5-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m0-s6-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: Claudeとは -->
   <div id="m0-s1" class="card">
-    <h2>Claudeとは何か</h2>
+    <h2 id="m0-s1-heading">Claudeとは何か</h2>
     <p>Claude（クロード）は、Anthropic社が開発したAIアシスタントです。人間が書いた大量のテキストを学習し、質問への回答、文章の作成、分析、コード生成など、幅広いタスクをこなすことができます。</p>
 
     <h3>なぜ「Claude」が注目されるのか</h3>
     <p>AIアシスタントは複数の会社から提供されていますが、Claudeには以下のような特徴があります。</p>
     <p><strong>安全性への注力：</strong>Anthropicは「AIの安全性」を企業理念の中心に据えています。Claudeは、有害な出力を避け、正確で信頼できる応答を提供することを重視して設計されています。</p>
-    <p><strong>長文の処理能力：</strong>Claudeは非常に長い文章（数百ページ相当）を一度に読んで理解できます。これを「コンテキストウィンドウ」と呼びます。</p>
+    <p><strong>長文の処理能力：</strong>Claudeは非常に長い文章を一度に読んで理解できます。これを「コンテキストウィンドウ」と呼びます。最新モデルではClaude Opus 4.6とSonnet 4.6が100万トークン（約750,000語）、Claude Haiku 4.5が200,000トークンのウィンドウを持ちます。</p>
     <p><strong>ツール連携：</strong>Claudeは、外部のツールやデータベースと連携して、検索・計算・ファイル操作などを行うことができます。これが試験で重要なテーマとなります。</p>
 
     <div class="concept-box">
@@ -519,8 +517,8 @@
   </div>
 
   <!-- Section 2: 製品群 -->
-  <div id="m0-s2" class="card" style="display:none">
-    <h2>Anthropicの製品群</h2>
+  <div id="m0-s2" class="card">
+    <h2 id="m0-s2-heading">Anthropicの製品群</h2>
     <p>Anthropicは、Claudeを様々な方法で利用できるようにしています。それぞれのインターフェースは異なりますが、裏側では同じClaudeモデルが動いています。</p>
 
     <table class="compare-table">
@@ -547,8 +545,8 @@
   </div>
 
   <!-- Section 3: 試験の構成 -->
-  <div id="m0-s3" class="card" style="display:none">
-    <h2>CCA-F 試験の構成</h2>
+  <div id="m0-s3" class="card">
+    <h2 id="m0-s3-heading">CCA-F 試験の構成</h2>
     <p>CCA-F試験は5つの「ドメイン（出題領域）」から構成されています。各ドメインには配点のウェイトがあり、重みづけを意識した学習が効率的です。</p>
 
     <h3>5つのドメインと配点</h3>
@@ -572,8 +570,8 @@
   </div>
 
   <!-- Section 4: シナリオ -->
-  <div id="m0-s4" class="card" style="display:none">
-    <h2>6つの試験シナリオ</h2>
+  <div id="m0-s4" class="card">
+    <h2 id="m0-s4-heading">6つの試験シナリオ</h2>
     <p>CCA-F試験の大きな特徴は、<strong>シナリオベース</strong>であることです。60問すべてが、実際のビジネスユースケースを想定した「シナリオ」に基づいて出題されます。</p>
 
     <div class="warn-box">
@@ -621,8 +619,8 @@
   </div>
 
   <!-- Section 5: 用語集 -->
-  <div id="m0-s5" class="card" style="display:none">
-    <h2>基本用語集</h2>
+  <div id="m0-s5" class="card">
+    <h2 id="m0-s5-heading">基本用語集</h2>
     <p>この学習を進める上で頻出する用語をまとめました。試験は英語のため、英語表記も併記しています。</p>
 
     <div class="glossary-item">
@@ -633,7 +631,7 @@
     <div class="glossary-item">
       <div class="glossary-term">コンテキストウィンドウ</div>
       <div class="glossary-en">Context Window</div>
-      <div class="glossary-def">AIが一度に「見る」ことができるテキストの量。Claudeは非常に長いコンテキストウィンドウを持つのが特徴です。</div>
+      <div class="glossary-def">AIが一度に「見る」ことができるテキストの量。Claude Opus 4.6/Sonnet 4.6は100万トークン、Haiku 4.5は200,000トークンのウィンドウを持つ。</div>
     </div>
     <div class="glossary-item">
       <div class="glossary-term">トークン</div>
@@ -678,7 +676,7 @@
   </div>
 
   <!-- Section 6: Quiz -->
-  <div id="m0-s6" class="card" style="display:none">
+  <div id="m0-s6" class="card">
     <div class="quiz-section">
       <h3>Module 0 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -762,18 +760,21 @@
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m1','s1',this)">製品ラインナップ</button>
-    <button class="section-tab" onclick="showSection('m1','s2',this)">APIとSDK</button>
-    <button class="section-tab" onclick="showSection('m1','s3',this)">Claude Code</button>
-    <button class="section-tab" onclick="showSection('m1','s4',this)">使い分けガイド</button>
-    <button class="section-tab" onclick="showSection('m1','s5',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m1-s1-heading" style="color: var(--primary); text-decoration: none;">製品ラインナップ</a></li>
+      <li><a href="#m1-s2-heading" style="color: var(--primary); text-decoration: none;">APIとSDK</a></li>
+      <li><a href="#m1-s3-heading" style="color: var(--primary); text-decoration: none;">Claude Code</a></li>
+      <li><a href="#m1-s4-heading" style="color: var(--primary); text-decoration: none;">使い分けガイド</a></li>
+      <li><a href="#m1-s5-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: 製品ラインナップ -->
   <div id="m1-s1" class="card">
-    <h2>Claudeの製品ラインナップ</h2>
+    <h2 id="m1-s1-heading">Claudeの製品ラインナップ</h2>
     <p>Module 0では「Claudeは様々な方法で使える」と学びました。ここでは、各製品の特徴と対象ユーザーを詳しく見ていきます。</p>
     <p>イメージとしては、Claudeは「優秀なスタッフ」で、製品群は「そのスタッフに仕事を頼む窓口」です。窓口の種類によって、頼み方や頼める範囲が変わります。</p>
 
@@ -823,8 +824,8 @@
   </div>
 
   <!-- Section 2: APIとSDK -->
-  <div id="m1-s2" class="card" style="display:none">
-    <h2>APIとSDK — プログラムからClaudeを使う</h2>
+  <div id="m1-s2" class="card">
+    <h2 id="m1-s2-heading">APIとSDK — プログラムからClaudeを使う</h2>
     <p>Module 0で「APIはレストランの出前注文窓口のようなもの」と紹介しました。ここでは、その注文の仕組みをもう少し詳しく見ていきましょう。</p>
 
     <h3>Messages API（メッセージAPI）</h3>
@@ -892,8 +893,8 @@
   </div>
 
   <!-- Section 3: Claude Code -->
-  <div id="m1-s3" class="card" style="display:none">
-    <h2>Claude Code — AIコーディングエージェント</h2>
+  <div id="m1-s3" class="card">
+    <h2 id="m1-s3-heading">Claude Code — AIコーディングエージェント</h2>
     <p>Claude Codeは、CCA-F試験の<strong>ドメイン2（配点20%）</strong>に直結する重要な製品です。Module 7-8で詳しく学びますが、ここでは全体像を把握しましょう。</p>
 
     <div class="concept-box">
@@ -942,8 +943,8 @@
   </div>
 
   <!-- Section 4: 使い分けガイド -->
-  <div id="m1-s4" class="card" style="display:none">
-    <h2>製品の使い分けガイド</h2>
+  <div id="m1-s4" class="card">
+    <h2 id="m1-s4-heading">製品の使い分けガイド</h2>
     <p>「どの製品をいつ使うべきか」は、CCA-F試験で繰り返し問われるテーマです。ユースケースに応じた最適な選択ができるようになりましょう。</p>
 
     <h3>ユーザータイプ別の推奨製品</h3>
@@ -992,7 +993,7 @@
   </div>
 
   <!-- Section 5: Quiz -->
-  <div id="m1-s5" class="card" style="display:none">
+  <div id="m1-s5" class="card">
     <div class="quiz-section">
       <h3>Module 1 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -1076,18 +1077,21 @@
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m2','s1',this)">基本原則</button>
-    <button class="section-tab" onclick="showSection('m2','s2',this)">構造化のテクニック</button>
-    <button class="section-tab" onclick="showSection('m2','s3',this)">高度なテクニック</button>
-    <button class="section-tab" onclick="showSection('m2','s4',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m2','s5',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m2-s1-heading" style="color: var(--primary); text-decoration: none;">基本原則</a></li>
+      <li><a href="#m2-s2-heading" style="color: var(--primary); text-decoration: none;">構造化のテクニック</a></li>
+      <li><a href="#m2-s3-heading" style="color: var(--primary); text-decoration: none;">高度なテクニック</a></li>
+      <li><a href="#m2-s4-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m2-s5-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: 基本原則 -->
   <div id="m2-s1" class="card">
-    <h2>プロンプトエンジニアリングとは</h2>
+    <h2 id="m2-s1-heading">プロンプトエンジニアリングとは</h2>
     <p>プロンプトエンジニアリング（Prompt Engineering）とは、AIに対して<strong>的確な指示を設計する技術</strong>です。料理に例えるなら、AIは腕の良いシェフ。でも「何かおいしいもの作って」と言っても期待通りの料理は出てきません。「鶏もも肉を使った和風の煮込み、4人分、30分以内で」と伝えるほど、期待に合う結果が返ってきます。</p>
 
     <div class="concept-box">
@@ -1129,8 +1133,8 @@
   </div>
 
   <!-- Section 2: 構造化のテクニック -->
-  <div id="m2-s2" class="card" style="display:none">
-    <h2>プロンプトを構造化する</h2>
+  <div id="m2-s2" class="card">
+    <h2 id="m2-s2-heading">プロンプトを構造化する</h2>
     <p>プロンプトが長くなると、Claudeがどこが指示でどこがデータなのか混乱することがあります。そこで活躍するのが<strong>XMLタグによる構造化</strong>です。</p>
 
     <h3>XMLタグ構造化（XML Tag Structuring）</h3>
@@ -1203,8 +1207,8 @@
   </div>
 
   <!-- Section 3: 高度なテクニック -->
-  <div id="m2-s3" class="card" style="display:none">
-    <h2>高度なプロンプトテクニック</h2>
+  <div id="m2-s3" class="card">
+    <h2 id="m2-s3-heading">高度なプロンプトテクニック</h2>
 
     <h3>Chain-of-Thought（思考の連鎖）</h3>
     <p>人間も複雑な問題を解くとき、いきなり答えを出さず順を追って考えます。Claudeも同じで、<strong>「ステップバイステップで考えてください」</strong>と指示するだけで、推論の正確さが大きく向上します。</p>
@@ -1276,8 +1280,8 @@
   </div>
 
   <!-- Section 4: 用語集 -->
-  <div id="m2-s4" class="card" style="display:none">
-    <h2>用語集 &#8212; Module 2</h2>
+  <div id="m2-s4" class="card">
+    <h2 id="m2-s4-heading">用語集 &#8212; Module 2</h2>
     <p>試験は英語で実施されます。日本語で概念を理解したら、英語の用語名もセットで覚えましょう。</p>
 
     <div class="glossary-item">
@@ -1348,8 +1352,8 @@
   </div>
 
   <!-- Section 5: クイズ -->
-  <div id="m2-s5" class="card" style="display:none">
-    <h2>確認クイズ &#8212; Module 2</h2>
+  <div id="m2-s5" class="card">
+    <h2 id="m2-s5-heading">確認クイズ &#8212; Module 2</h2>
     <p>5つの質問に答えて、理解度を確認しましょう。</p>
 
     <div class="quiz-section">
@@ -1415,7 +1419,7 @@
     <span class="week-badge">Week 3</span>
     <h1>Module 3: システムプロンプト設計</h1>
     <p class="subtitle">本番環境のためのプロンプト設計パターンを習得する</p>
-    <span class="domain-tag">ドメイン3: プロンプト工学 (20%)</span>
+    <span class="domain-tag">ドメイン3: プロンプトエンジニアリングと構造化出力 (20%)</span>
   </div>
 
   <div class="objectives">
@@ -1429,19 +1433,22 @@
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m3','s1',this)">システムプロンプトとは</button>
-    <button class="section-tab" onclick="showSection('m3','s2',this)">設計パターン</button>
-    <button class="section-tab" onclick="showSection('m3','s3',this)">構造化とXML</button>
-    <button class="section-tab" onclick="showSection('m3','s4',this)">運用と安全性</button>
-    <button class="section-tab" onclick="showSection('m3','s5',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m3','s6',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m3-s1-heading" style="color: var(--primary); text-decoration: none;">システムプロンプトとは</a></li>
+      <li><a href="#m3-s2-heading" style="color: var(--primary); text-decoration: none;">設計パターン</a></li>
+      <li><a href="#m3-s3-heading" style="color: var(--primary); text-decoration: none;">構造化とXML</a></li>
+      <li><a href="#m3-s4-heading" style="color: var(--primary); text-decoration: none;">運用と安全性</a></li>
+      <li><a href="#m3-s5-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m3-s6-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: システムプロンプトとは -->
   <div id="m3-s1" class="card">
-    <h2>システムプロンプトとは何か</h2>
+    <h2 id="m3-s1-heading">システムプロンプトとは何か</h2>
     <p>システムプロンプト（System Prompt）とは、AIに対して「あなたはどう振る舞うべきか」を伝える<strong>舞台裏の指示書</strong>です。レストランに例えると、お客さんが注文する料理が「ユーザープロンプト」、キッチンに貼ってある調理マニュアルや店のルールが「システムプロンプト」にあたります。</p>
 
     <p>お客さん（ユーザー）には見えませんが、シェフ（Claude）の料理の仕方を根本から決める、非常に重要な存在です。</p>
@@ -1473,8 +1480,8 @@
   </div>
 
   <!-- Section 2: 設計パターン -->
-  <div id="m3-s2" class="card" style="display:none">
-    <h2>システムプロンプトの設計パターン</h2>
+  <div id="m3-s2" class="card">
+    <h2 id="m3-s2-heading">システムプロンプトの設計パターン</h2>
     <p>効果的なシステムプロンプトには、いくつかの定番パターンがあります。これらを組み合わせることで、Claudeの振る舞いを精密にコントロールできます。</p>
 
     <h3>パターン1: ペルソナ/ロール設定（Role Assignment）</h3>
@@ -1524,8 +1531,8 @@
   </div>
 
   <!-- Section 3: 構造化とXML -->
-  <div id="m3-s3" class="card" style="display:none">
-    <h2>XMLタグによるプロンプト構造化</h2>
+  <div id="m3-s3" class="card">
+    <h2 id="m3-s3-heading">XMLタグによるプロンプト構造化</h2>
     <p>長いシステムプロンプトを整理するために、AnthropicはXMLタグの使用を推奨しています。これは本の「目次」のようなもので、Claudeが指示の各部分を正確に区別できるようになります。</p>
 
     <h3>なぜXMLタグが有効なのか</h3>
@@ -1577,8 +1584,8 @@
   </div>
 
   <!-- Section 4: 運用と安全性 -->
-  <div id="m3-s4" class="card" style="display:none">
-    <h2>本番環境でのプロンプト管理と安全性</h2>
+  <div id="m3-s4" class="card">
+    <h2 id="m3-s4-heading">本番環境でのプロンプト管理と安全性</h2>
     <p>システムプロンプトは「書いて終わり」ではありません。本番環境では、管理・最適化・安全性の3つの観点が求められます。</p>
 
     <h3>プロンプトテンプレートと変数</h3>
@@ -1631,8 +1638,8 @@
   </div>
 
   <!-- Section 5: 用語集 -->
-  <div id="m3-s5" class="card" style="display:none">
-    <h2>Module 3 用語集</h2>
+  <div id="m3-s5" class="card">
+    <h2 id="m3-s5-heading">Module 3 用語集</h2>
     <p>このモジュールで登場した重要用語をまとめました。試験は英語のため、英語表記も確認しておきましょう。</p>
 
     <div class="glossary-item">
@@ -1683,7 +1690,7 @@
   </div>
 
   <!-- Section 6: Quiz -->
-  <div id="m3-s6" class="card" style="display:none">
+  <div id="m3-s6" class="card">
     <div class="quiz-section">
       <h3>Module 3 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -1753,7 +1760,7 @@
     <span class="week-badge">Week 4</span>
     <h1>Module 4: 構造化出力とJSON</h1>
     <p class="subtitle">AIの出力を「決まった形」で返させ、プログラムで確実に処理する</p>
-    <span class="domain-tag">ドメイン3: プロンプト工学と構造化出力 (20%)</span>
+    <span class="domain-tag">ドメイン3: プロンプトエンジニアリングと構造化出力 (20%)</span>
   </div>
 
   <div class="objectives">
@@ -1767,22 +1774,25 @@
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m4','s1',this)">構造化出力とは</button>
-    <button class="section-tab" onclick="showSection('m4','s2',this)">2つのアプローチ</button>
-    <button class="section-tab" onclick="showSection('m4','s3',this)">スキーマ設計</button>
-    <button class="section-tab" onclick="showSection('m4','s4',this)">実践パターン</button>
-    <button class="section-tab" onclick="showSection('m4','s7',this)">マルチパスレビュー</button>
-    <button class="section-tab" onclick="showSection('m4','s8',this)">Batches API</button>
-    <button class="section-tab" onclick="showSection('m4','s9',this)">Pydantic実践</button>
-    <button class="section-tab" onclick="showSection('m4','s5',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m4','s6',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m4-s1-heading" style="color: var(--primary); text-decoration: none;">構造化出力とは</a></li>
+      <li><a href="#m4-s2-heading" style="color: var(--primary); text-decoration: none;">2つのアプローチ</a></li>
+      <li><a href="#m4-s3-heading" style="color: var(--primary); text-decoration: none;">スキーマ設計</a></li>
+      <li><a href="#m4-s4-heading" style="color: var(--primary); text-decoration: none;">実践パターン</a></li>
+      <li><a href="#m4-s7-heading" style="color: var(--primary); text-decoration: none;">マルチパスレビュー</a></li>
+      <li><a href="#m4-s8-heading" style="color: var(--primary); text-decoration: none;">Batches API</a></li>
+      <li><a href="#m4-s9-heading" style="color: var(--primary); text-decoration: none;">Pydantic実践</a></li>
+      <li><a href="#m4-s5-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m4-s6-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: 構造化出力とは -->
   <div id="m4-s1" class="card">
-    <h2>構造化出力（Structured Output）とは</h2>
+    <h2 id="m4-s1-heading">構造化出力（Structured Output）とは</h2>
     <p>AIに質問すると、通常は自由な文章で回答が返ってきます。しかし、その回答をプログラムで自動処理したい場合、「自由な文章」では困ります。たとえば、顧客メールから「名前」「問い合わせ内容」「緊急度」を抜き出したいとき、AIが毎回違う書き方で返してきたら、プログラムが正しく読み取れません。</p>
     <p>そこで登場するのが<strong>構造化出力（Structured Output）</strong>です。AIの回答を<strong>JSON</strong>などの決まった形式で返させることで、プログラムが確実にデータを読み取れるようにします。</p>
 
@@ -1824,8 +1834,8 @@
   </div>
 
   <!-- Section 2: 2つのアプローチ -->
-  <div id="m4-s2" class="card" style="display:none">
-    <h2>構造化出力を得る2つの方法</h2>
+  <div id="m4-s2" class="card">
+    <h2 id="m4-s2-heading">構造化出力を得る2つの方法</h2>
     <p>Claude APIで構造化出力を得るには、大きく2つのアプローチがあります。それぞれ「どこに出力されるか」「どんな場面に向いているか」が異なります。</p>
 
     <h3>アプローチ1: JSON Outputs（output_config方式）</h3>
@@ -1865,8 +1875,8 @@
   </div>
 
   <!-- Section 3: スキーマ設計 -->
-  <div id="m4-s3" class="card" style="display:none">
-    <h2>JSON Schemaによるスキーマ設計</h2>
+  <div id="m4-s3" class="card">
+    <h2 id="m4-s3-heading">JSON Schemaによるスキーマ設計</h2>
     <p>構造化出力を使うには、「どんな形のJSONが欲しいか」を定義する<strong>JSON Schema（設計図）</strong>が必要です。これは「記入用紙のフォーマット設計図」のようなものです。</p>
 
     <h3>基本的なスキーマの構造</h3>
@@ -1929,8 +1939,8 @@
   </div>
 
   <!-- Section 4: 実践パターン -->
-  <div id="m4-s4" class="card" style="display:none">
-    <h2>実践的な活用パターン</h2>
+  <div id="m4-s4" class="card">
+    <h2 id="m4-s4-heading">実践的な活用パターン</h2>
     <p>構造化出力は、さまざまなビジネスシーンで活用されています。CCA-F試験のシナリオにも直結するパターンを見ていきましょう。</p>
 
     <h3>パターン1: データ抽出（Extraction）</h3>
@@ -1983,252 +1993,252 @@
   </div>
 
   <!-- Section 7: マルチパスレビュー -->
-<div id="m4-s7" class="card" style="display:none">
-  <h2>マルチパスレビュー（Multi-pass Review）</h2>
-  <p>構造化出力の品質をさらに高めるために、<strong>マルチパスレビュー</strong>という手法があります。これは「1回のAI呼び出しで終わり」ではなく、<strong>複数回のパス（処理）を通して出力を検証・改善する</strong>アプローチです。</p>
-  <p>身近な例で言えば、レポートを書いた後に「自分で読み返す」→「同僚にチェックしてもらう」→「上司の最終確認」という多段階の確認プロセスに似ています。</p>
-
-  <div class="concept-box">
-    <div class="label">重要概念</div>
-    <p><strong>マルチパスレビュー（Multi-pass Review）：</strong>AIの出力を1回で信頼するのではなく、複数のステップ（パス）を通じて検証・修正するアーキテクチャパターン。「生成→検証→修正」のループを回すことで、出力の正確性と信頼性を高めます。</p>
+  <div id="m4-s7" class="card">
+    <h2 id="m4-s7-heading">マルチパスレビュー（Multi-pass Review）</h2>
+    <p>構造化出力の品質をさらに高めるために、<strong>マルチパスレビュー</strong>という手法があります。これは「1回のAI呼び出しで終わり」ではなく、<strong>複数回のパス（処理）を通して出力を検証・改善する</strong>アプローチです。</p>
+    <p>身近な例で言えば、レポートを書いた後に「自分で読み返す」→「同僚にチェックしてもらう」→「上司の最終確認」という多段階の確認プロセスに似ています。</p>
+  
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>マルチパスレビュー（Multi-pass Review）：</strong>AIの出力を1回で信頼するのではなく、複数のステップ（パス）を通じて検証・修正するアーキテクチャパターン。「生成→検証→修正」のループを回すことで、出力の正確性と信頼性を高めます。</p>
+    </div>
+  
+    <h3>なぜマルチパスレビューが必要なのか</h3>
+    <p>AIは非常に優秀ですが、1回の出力で常に完璧な結果を返すとは限りません。特に以下のような場面では、マルチパスレビューが効果的です。</p>
+    <ul>
+      <li><strong>高精度が求められる場面</strong> &mdash; 医療データの抽出、法務文書の分析など、ミスが許されない場面</li>
+      <li><strong>複雑な構造化出力</strong> &mdash; 多くのフィールドを持つJSONで、すべてが正確であることを確認したい場面</li>
+      <li><strong>ビジネスルールの遵守</strong> &mdash; 特定の制約条件を確実に満たす必要がある場面</li>
+    </ul>
+  
+    <h3>3つの実装パターン</h3>
+    <p>マルチパスレビューには、主に3つの実装パターンがあります。場面に応じて使い分けましょう。</p>
+  
+    <h4>パターン1: 自己評価（Self-Evaluation）</h4>
+    <p>AIが自分の出力を「もう一度見直す」パターンです。同じAIに「この出力は正しいですか？問題があれば修正してください」と依頼します。</p>
+    <p>手軽に導入できますが、<strong>同じモデルが同じバイアスを持つ可能性がある</strong>ため、完全な検証には限界があります。「自分で自分の宿題を採点する」ようなものです。</p>
+  
+    <div class="tip-box">
+      <div class="label">ポイント</div>
+      <p style="margin-top:.25rem;">自己評価を効果的にするには、生成時と検証時で<strong>異なるプロンプト（視点）</strong>を使うことが大切です。たとえば、生成時は「データを抽出してください」、検証時は「この抽出結果に漏れや誤りがないか確認してください」と、別の角度から確認させます。</p>
+    </div>
+  
+    <h4>パターン2: クロスチェック（Cross-Check）</h4>
+    <p>出力を生成したインスタンスとは<strong>別の独立したAIインスタンス</strong>で検証するパターンです。Module 4の「検証-再試行ループ」で紹介した方法がこれにあたります。</p>
+    <p>「別の担当者にダブルチェックしてもらう」イメージで、生成者と検証者を分離することで、同じバイアスに陥るリスクを軽減します。</p>
+  
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>クロスチェックの仕組み：</strong>インスタンスA（生成者）がJSONを出力 → インスタンスB（検証者）がそのJSONを受け取り、元のソースデータと照合して正確性を検証 → 問題があれば修正指示を返し、インスタンスAが再生成します。</p>
+    </div>
+  
+    <h4>パターン3: 段階的精査（Progressive Refinement）</h4>
+    <p>最初は大まかな構造を生成し、パスを重ねるごとに<strong>詳細を追加・精査していく</strong>パターンです。</p>
+    <p>たとえば、長い契約書からデータを抽出する場合：</p>
+    <ul>
+      <li><strong>第1パス</strong>: 主要項目（契約者名、金額、期間）を抽出</li>
+      <li><strong>第2パス</strong>: 条件・例外事項を補完</li>
+      <li><strong>第3パス</strong>: 全体の整合性と漏れを最終確認</li>
+    </ul>
+    <p>一度にすべてを完璧に処理しようとするより、段階を分けることで各パスの精度が上がります。</p>
+  
+    <h3>3パターンの比較</h3>
+    <table class="compare-table">
+      <tr><th>パターン</th><th>検証者</th><th>メリット</th><th>デメリット</th><th>適した場面</th></tr>
+      <tr>
+        <td><strong>自己評価</strong></td>
+        <td>同一インスタンス</td>
+        <td>コスト低・導入簡単</td>
+        <td>同じバイアスのリスク</td>
+        <td>軽微な修正、形式チェック</td>
+      </tr>
+      <tr>
+        <td><strong>クロスチェック</strong></td>
+        <td>別インスタンス</td>
+        <td>バイアス軽減・高信頼</td>
+        <td>コスト2倍・レイテンシ増</td>
+        <td>高精度が必須の場面</td>
+      </tr>
+      <tr>
+        <td><strong>段階的精査</strong></td>
+        <td>複数パスで順次</td>
+        <td>複雑なタスクを分解</td>
+        <td>パス数に比例してコスト増</td>
+        <td>大量データ・複雑な構造</td>
+      </tr>
+    </table>
+  
+    <h3>品質向上のベストプラクティス</h3>
+    <table class="compare-table">
+      <tr><th>プラクティス</th><th>説明</th></tr>
+      <tr><td><strong>明確な評価基準を設定</strong></td><td>検証者に「何をチェックすべきか」を具体的に指示する。「正しいか確認して」ではなく「金額が元データと一致するか」など</td></tr>
+      <tr><td><strong>生成と検証でプロンプトを分離</strong></td><td>同じプロンプトを使い回さず、検証用には別の視点・基準を与える</td></tr>
+      <tr><td><strong>元ソースデータを検証者にも渡す</strong></td><td>検証者が出力だけでなく「元のデータ」と照合できるようにする</td></tr>
+      <tr><td><strong>ループ回数に上限を設ける</strong></td><td>無限ループを防ぐため、最大リトライ回数（通常2〜3回）を設定する</td></tr>
+    </table>
+  
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">マルチパスレビューはコスト（API呼び出し回数）とレイテンシ（応答時間）が増加します。<strong>すべての場面で使う必要はありません</strong>。「ミスのコスト」と「追加の検証コスト」を天秤にかけ、高リスクな場面に絞って導入しましょう。</p>
+    </div>
   </div>
-
-  <h3>なぜマルチパスレビューが必要なのか</h3>
-  <p>AIは非常に優秀ですが、1回の出力で常に完璧な結果を返すとは限りません。特に以下のような場面では、マルチパスレビューが効果的です。</p>
-  <ul>
-    <li><strong>高精度が求められる場面</strong> &mdash; 医療データの抽出、法務文書の分析など、ミスが許されない場面</li>
-    <li><strong>複雑な構造化出力</strong> &mdash; 多くのフィールドを持つJSONで、すべてが正確であることを確認したい場面</li>
-    <li><strong>ビジネスルールの遵守</strong> &mdash; 特定の制約条件を確実に満たす必要がある場面</li>
-  </ul>
-
-  <h3>3つの実装パターン</h3>
-  <p>マルチパスレビューには、主に3つの実装パターンがあります。場面に応じて使い分けましょう。</p>
-
-  <h4>パターン1: 自己評価（Self-Evaluation）</h4>
-  <p>AIが自分の出力を「もう一度見直す」パターンです。同じAIに「この出力は正しいですか？問題があれば修正してください」と依頼します。</p>
-  <p>手軽に導入できますが、<strong>同じモデルが同じバイアスを持つ可能性がある</strong>ため、完全な検証には限界があります。「自分で自分の宿題を採点する」ようなものです。</p>
-
-  <div class="tip-box">
-    <div class="label">ポイント</div>
-    <p style="margin-top:.25rem;">自己評価を効果的にするには、生成時と検証時で<strong>異なるプロンプト（視点）</strong>を使うことが大切です。たとえば、生成時は「データを抽出してください」、検証時は「この抽出結果に漏れや誤りがないか確認してください」と、別の角度から確認させます。</p>
-  </div>
-
-  <h4>パターン2: クロスチェック（Cross-Check）</h4>
-  <p>出力を生成したインスタンスとは<strong>別の独立したAIインスタンス</strong>で検証するパターンです。Module 4の「検証-再試行ループ」で紹介した方法がこれにあたります。</p>
-  <p>「別の担当者にダブルチェックしてもらう」イメージで、生成者と検証者を分離することで、同じバイアスに陥るリスクを軽減します。</p>
-
-  <div class="concept-box">
-    <div class="label">重要概念</div>
-    <p><strong>クロスチェックの仕組み：</strong>インスタンスA（生成者）がJSONを出力 → インスタンスB（検証者）がそのJSONを受け取り、元のソースデータと照合して正確性を検証 → 問題があれば修正指示を返し、インスタンスAが再生成します。</p>
-  </div>
-
-  <h4>パターン3: 段階的精査（Progressive Refinement）</h4>
-  <p>最初は大まかな構造を生成し、パスを重ねるごとに<strong>詳細を追加・精査していく</strong>パターンです。</p>
-  <p>たとえば、長い契約書からデータを抽出する場合：</p>
-  <ul>
-    <li><strong>第1パス</strong>: 主要項目（契約者名、金額、期間）を抽出</li>
-    <li><strong>第2パス</strong>: 条件・例外事項を補完</li>
-    <li><strong>第3パス</strong>: 全体の整合性と漏れを最終確認</li>
-  </ul>
-  <p>一度にすべてを完璧に処理しようとするより、段階を分けることで各パスの精度が上がります。</p>
-
-  <h3>3パターンの比較</h3>
-  <table class="compare-table">
-    <tr><th>パターン</th><th>検証者</th><th>メリット</th><th>デメリット</th><th>適した場面</th></tr>
-    <tr>
-      <td><strong>自己評価</strong></td>
-      <td>同一インスタンス</td>
-      <td>コスト低・導入簡単</td>
-      <td>同じバイアスのリスク</td>
-      <td>軽微な修正、形式チェック</td>
-    </tr>
-    <tr>
-      <td><strong>クロスチェック</strong></td>
-      <td>別インスタンス</td>
-      <td>バイアス軽減・高信頼</td>
-      <td>コスト2倍・レイテンシ増</td>
-      <td>高精度が必須の場面</td>
-    </tr>
-    <tr>
-      <td><strong>段階的精査</strong></td>
-      <td>複数パスで順次</td>
-      <td>複雑なタスクを分解</td>
-      <td>パス数に比例してコスト増</td>
-      <td>大量データ・複雑な構造</td>
-    </tr>
-  </table>
-
-  <h3>品質向上のベストプラクティス</h3>
-  <table class="compare-table">
-    <tr><th>プラクティス</th><th>説明</th></tr>
-    <tr><td><strong>明確な評価基準を設定</strong></td><td>検証者に「何をチェックすべきか」を具体的に指示する。「正しいか確認して」ではなく「金額が元データと一致するか」など</td></tr>
-    <tr><td><strong>生成と検証でプロンプトを分離</strong></td><td>同じプロンプトを使い回さず、検証用には別の視点・基準を与える</td></tr>
-    <tr><td><strong>元ソースデータを検証者にも渡す</strong></td><td>検証者が出力だけでなく「元のデータ」と照合できるようにする</td></tr>
-    <tr><td><strong>ループ回数に上限を設ける</strong></td><td>無限ループを防ぐため、最大リトライ回数（通常2〜3回）を設定する</td></tr>
-  </table>
-
-  <div class="warn-box">
-    <div class="label">注意</div>
-    <p style="margin-top:.25rem;">マルチパスレビューはコスト（API呼び出し回数）とレイテンシ（応答時間）が増加します。<strong>すべての場面で使う必要はありません</strong>。「ミスのコスト」と「追加の検証コスト」を天秤にかけ、高リスクな場面に絞って導入しましょう。</p>
-  </div>
-</div>
 
   <!-- Section 8: Batches APIコスト最適化 -->
-<div id="m4-s8" class="card" style="display:none">
-  <h2>Batches APIによるコスト最適化</h2>
-  <p>構造化出力を大量に処理したい場合、1件ずつリアルタイムでAPI呼び出しをするのはコストがかかります。そこで活用したいのが<strong>Message Batches API（メッセージバッチAPI）</strong>です。</p>
-  <p>たとえば、1万件の商品レビューを分類したい場合、通常のAPIで1件ずつ処理するよりも、まとめて一括処理する方が<strong>コストが半分</strong>になります。「宅配便を1個ずつ送る」のではなく「まとめてトラック1台で運ぶ」イメージです。</p>
-
-  <div class="concept-box">
-    <div class="label">重要概念</div>
-    <p><strong>Message Batches API（メッセージバッチAPI）：</strong>大量のAPIリクエストを非同期で一括処理するサービス。通常のAPIと<strong>同じ品質の出力</strong>を、<strong>50%の割引価格</strong>（半額）で利用できます。ただしリアルタイムではなく、結果の返却まで最大24時間かかります。</p>
-  </div>
-
-  <h3>Batches APIの仕組み</h3>
-  <p>Batches APIの処理フローは以下の通りです。</p>
-  <ul>
-    <li><strong>ステップ1: バッチ作成</strong> &mdash; 処理したいリクエスト（最大10万件）をまとめて送信</li>
-    <li><strong>ステップ2: 非同期処理</strong> &mdash; Anthropicのサーバーが順次処理（この間、待つ必要なし）</li>
-    <li><strong>ステップ3: 結果取得</strong> &mdash; 処理完了後に結果を一括取得（通常数分〜数時間、最大24時間）</li>
-  </ul>
-
-  <div class="tip-box">
-    <div class="label">試験のポイント</div>
-    <p style="margin-top:.25rem;">Batches APIの最大の特徴は<strong>「50%割引」</strong>と<strong>「非同期処理」</strong>です。試験では「大量処理でコストを最小化するには？」という問いに対して、Batches API + 適切なモデル選定（Haikuなど）の組み合わせが正解になることが多いです。</p>
-  </div>
-
-  <h3>料金体系</h3>
-  <table class="compare-table">
-    <tr><th>項目</th><th>通常API（同期）</th><th>Batches API（非同期）</th></tr>
-    <tr><td><strong>入力トークン単価</strong></td><td>モデルごとの標準価格</td><td>標準価格の <strong>50%</strong></td></tr>
-    <tr><td><strong>出力トークン単価</strong></td><td>モデルごとの標準価格</td><td>標準価格の <strong>50%</strong></td></tr>
-    <tr><td><strong>応答速度</strong></td><td>リアルタイム（数秒）</td><td>非同期（最大24時間）</td></tr>
-    <tr><td><strong>最大リクエスト数</strong></td><td>1件ずつ</td><td>1バッチあたり最大10万件</td></tr>
-  </table>
-
-  <h3>バッチ処理に適したユースケース</h3>
-  <p>Batches APIは「すぐに結果が必要ない」大量処理に最適です。</p>
-
-  <table class="compare-table">
-    <tr><th>ユースケース</th><th>説明</th><th>構造化出力との組合せ</th></tr>
-    <tr><td><strong>大量データ分類</strong></td><td>数千〜数万件のレビュー・メール・文書の感情分析やカテゴリ分類</td><td>enum指定のJSON Outputsで分類結果を構造化</td></tr>
-    <tr><td><strong>バッチデータ抽出</strong></td><td>請求書・履歴書など定型ドキュメントから情報を一括抽出</td><td>スキーマ定義で抽出項目を統一</td></tr>
-    <tr><td><strong>コンテンツ生成</strong></td><td>商品説明文・FAQ・翻訳の一括生成</td><td>出力フォーマットをスキーマで統一</td></tr>
-    <tr><td><strong>品質評価</strong></td><td>AI出力のバッチ評価・採点（マルチパスレビューの検証パス）</td><td>評価結果をスコア付きJSONで構造化</td></tr>
-  </table>
-
-  <h3>同期APIとの使い分け判断基準</h3>
-  <table class="compare-table">
-    <tr><th>判断基準</th><th>同期API（通常）</th><th>Batches API</th></tr>
-    <tr><td><strong>応答速度の要件</strong></td><td>リアルタイム応答が必要（チャット、対話型UI）</td><td>数時間の遅延が許容できる</td></tr>
-    <tr><td><strong>処理件数</strong></td><td>少量（1件〜数十件）</td><td>大量（数百件〜数万件）</td></tr>
-    <tr><td><strong>コスト感度</strong></td><td>速度を優先、コストは二の次</td><td>コスト削減が重要</td></tr>
-    <tr><td><strong>ユーザー体験</strong></td><td>ユーザーが画面の前で待っている</td><td>バックグラウンド処理（結果は後で確認）</td></tr>
-  </table>
-
-  <div class="concept-box">
-    <div class="label">判断フローチャート</div>
-    <p>1. ユーザーが即座に結果を必要としている？ → <strong>Yes</strong>: 同期API / <strong>No</strong>: 次へ</p>
-    <p>2. 処理件数が100件以上？ → <strong>Yes</strong>: Batches API推奨 / <strong>No</strong>: コスト感度による</p>
-    <p>3. コスト削減が重要？ → <strong>Yes</strong>: Batches API / <strong>No</strong>: 同期APIでもOK</p>
-  </div>
-
-  <h3>コスト最適化の実践パターン</h3>
-  <table class="compare-table">
-    <tr><th>戦略</th><th>説明</th><th>コスト削減効果</th></tr>
-    <tr><td><strong>モデル選定の最適化</strong></td><td>単純な分類タスクにはClaude Haiku（最安モデル）を使い、Batches APIと組み合わせる</td><td>Haiku + Batch = 最安構成</td></tr>
-    <tr><td><strong>プロンプトキャッシュとの併用</strong></td><td>同じシステムプロンプトを使う場合、キャッシュされた入力トークンはBatchでも割引対象</td><td>入力コストをさらに削減</td></tr>
-    <tr><td><strong>適切なバッチサイズ</strong></td><td>小さすぎるバッチは管理オーバーヘッドが増える。まとまった量でバッチを構成する</td><td>管理コスト削減</td></tr>
-    <tr><td><strong>夜間・オフピーク処理</strong></td><td>緊急でない処理は営業時間外にバッチ実行し、翌朝結果を確認</td><td>業務フローの最適化</td></tr>
-  </table>
-
-  <div class="warn-box">
-    <div class="label">注意</div>
-    <p style="margin-top:.25rem;">Batches APIの結果は<strong>最大24時間</strong>で期限切れになります。処理完了後は速やかに結果を取得してください。また、バッチ内の各リクエストは独立して処理されるため、1件が失敗しても他のリクエストには影響しません。失敗したリクエストは個別に確認・再処理します。</p>
-  </div>
-</div>
-
-  <!-- Section 9: Pydantic実践 -->
-<div id="m4-s9" class="card" style="display:none">
-  <h2>Pydantic実践 — 型安全な構造化出力</h2>
-  <p>Module 4のスキーマ設計セクションで、PydanticがPythonクラスからJSON Schemaを自動生成できることを紹介しました。ここでは、実際にPydanticをClaude APIと連携させて<strong>型安全な構造化出力</strong>を得る方法を詳しく見ていきましょう。</p>
-  <p>Pydanticを使うと、「JSON Schemaを手書きする」手間がなくなり、さらに<strong>Pythonの型システムで出力データを安全に扱える</strong>ようになります。「手書きの伝票」から「入力フォーム付きの業務システム」にアップグレードするイメージです。</p>
-
-  <div class="concept-box">
-    <div class="label">重要概念</div>
-    <p><strong>Pydantic（パイダンティック）</strong>は、Pythonでデータの「型」と「制約」をクラスとして定義できるライブラリです。Claude SDKと連携すると、以下が自動で行われます。</p>
+  <div id="m4-s8" class="card">
+    <h2 id="m4-s8-heading">Batches APIによるコスト最適化</h2>
+    <p>構造化出力を大量に処理したい場合、1件ずつリアルタイムでAPI呼び出しをするのはコストがかかります。そこで活用したいのが<strong>Message Batches API（メッセージバッチAPI）</strong>です。</p>
+    <p>たとえば、1万件の商品レビューを分類したい場合、通常のAPIで1件ずつ処理するよりも、まとめて一括処理する方が<strong>コストが半分</strong>になります。「宅配便を1個ずつ送る」のではなく「まとめてトラック1台で運ぶ」イメージです。</p>
+  
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Message Batches API（メッセージバッチAPI）：</strong>大量のAPIリクエストを非同期で一括処理するサービス。通常のAPIと<strong>同じ品質の出力</strong>を、<strong>50%の割引価格</strong>（半額）で利用できます。ただしリアルタイムではなく、結果の返却まで最大24時間かかります。</p>
+    </div>
+  
+    <h3>Batches APIの仕組み</h3>
+    <p>Batches APIの処理フローは以下の通りです。</p>
     <ul>
-      <li>Pythonクラス → JSON Schemaへの自動変換</li>
-      <li>APIレスポンス → Pythonオブジェクトへの自動変換</li>
-      <li>制約の自動バリデーション（検証）</li>
+      <li><strong>ステップ1: バッチ作成</strong> &mdash; 処理したいリクエスト（最大10万件）をまとめて送信</li>
+      <li><strong>ステップ2: 非同期処理</strong> &mdash; Anthropicのサーバーが順次処理（この間、待つ必要なし）</li>
+      <li><strong>ステップ3: 結果取得</strong> &mdash; 処理完了後に結果を一括取得（通常数分〜数時間、最大24時間）</li>
     </ul>
+  
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">Batches APIの最大の特徴は<strong>「50%割引」</strong>と<strong>「非同期処理」</strong>です。試験では「大量処理でコストを最小化するには？」という問いに対して、Batches API + 適切なモデル選定（Haikuなど）の組み合わせが正解になることが多いです。</p>
+    </div>
+  
+    <h3>料金体系</h3>
+    <table class="compare-table">
+      <tr><th>項目</th><th>通常API（同期）</th><th>Batches API（非同期）</th></tr>
+      <tr><td><strong>入力トークン単価</strong></td><td>モデルごとの標準価格</td><td>標準価格の <strong>50%</strong></td></tr>
+      <tr><td><strong>出力トークン単価</strong></td><td>モデルごとの標準価格</td><td>標準価格の <strong>50%</strong></td></tr>
+      <tr><td><strong>応答速度</strong></td><td>リアルタイム（数秒）</td><td>非同期（最大24時間）</td></tr>
+      <tr><td><strong>最大リクエスト数</strong></td><td>1件ずつ</td><td>1バッチあたり最大10万件</td></tr>
+    </table>
+  
+    <h3>バッチ処理に適したユースケース</h3>
+    <p>Batches APIは「すぐに結果が必要ない」大量処理に最適です。</p>
+  
+    <table class="compare-table">
+      <tr><th>ユースケース</th><th>説明</th><th>構造化出力との組合せ</th></tr>
+      <tr><td><strong>大量データ分類</strong></td><td>数千〜数万件のレビュー・メール・文書の感情分析やカテゴリ分類</td><td>enum指定のJSON Outputsで分類結果を構造化</td></tr>
+      <tr><td><strong>バッチデータ抽出</strong></td><td>請求書・履歴書など定型ドキュメントから情報を一括抽出</td><td>スキーマ定義で抽出項目を統一</td></tr>
+      <tr><td><strong>コンテンツ生成</strong></td><td>商品説明文・FAQ・翻訳の一括生成</td><td>出力フォーマットをスキーマで統一</td></tr>
+      <tr><td><strong>品質評価</strong></td><td>AI出力のバッチ評価・採点（マルチパスレビューの検証パス）</td><td>評価結果をスコア付きJSONで構造化</td></tr>
+    </table>
+  
+    <h3>同期APIとの使い分け判断基準</h3>
+    <table class="compare-table">
+      <tr><th>判断基準</th><th>同期API（通常）</th><th>Batches API</th></tr>
+      <tr><td><strong>応答速度の要件</strong></td><td>リアルタイム応答が必要（チャット、対話型UI）</td><td>数時間の遅延が許容できる</td></tr>
+      <tr><td><strong>処理件数</strong></td><td>少量（1件〜数十件）</td><td>大量（数百件〜数万件）</td></tr>
+      <tr><td><strong>コスト感度</strong></td><td>速度を優先、コストは二の次</td><td>コスト削減が重要</td></tr>
+      <tr><td><strong>ユーザー体験</strong></td><td>ユーザーが画面の前で待っている</td><td>バックグラウンド処理（結果は後で確認）</td></tr>
+    </table>
+  
+    <div class="concept-box">
+      <div class="label">判断フローチャート</div>
+      <p>1. ユーザーが即座に結果を必要としている？ → <strong>Yes</strong>: 同期API / <strong>No</strong>: 次へ</p>
+      <p>2. 処理件数が100件以上？ → <strong>Yes</strong>: Batches API推奨 / <strong>No</strong>: コスト感度による</p>
+      <p>3. コスト削減が重要？ → <strong>Yes</strong>: Batches API / <strong>No</strong>: 同期APIでもOK</p>
+    </div>
+  
+    <h3>コスト最適化の実践パターン</h3>
+    <table class="compare-table">
+      <tr><th>戦略</th><th>説明</th><th>コスト削減効果</th></tr>
+      <tr><td><strong>モデル選定の最適化</strong></td><td>単純な分類タスクにはClaude Haiku（最安モデル）を使い、Batches APIと組み合わせる</td><td>Haiku + Batch = 最安構成</td></tr>
+      <tr><td><strong>プロンプトキャッシュとの併用</strong></td><td>同じシステムプロンプトを使う場合、キャッシュされた入力トークンはBatchでも割引対象</td><td>入力コストをさらに削減</td></tr>
+      <tr><td><strong>適切なバッチサイズ</strong></td><td>小さすぎるバッチは管理オーバーヘッドが増える。まとまった量でバッチを構成する</td><td>管理コスト削減</td></tr>
+      <tr><td><strong>夜間・オフピーク処理</strong></td><td>緊急でない処理は営業時間外にバッチ実行し、翌朝結果を確認</td><td>業務フローの最適化</td></tr>
+    </table>
+  
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">Batches APIの結果は<strong>最大24時間</strong>で期限切れになります。処理完了後は速やかに結果を取得してください。また、バッチ内の各リクエストは独立して処理されるため、1件が失敗しても他のリクエストには影響しません。失敗したリクエストは個別に確認・再処理します。</p>
+    </div>
   </div>
-
-  <h3>基本的な使い方: messages.parse()</h3>
-  <p>Anthropic Python SDKには<code>messages.parse()</code>という専用メソッドがあります。通常の<code>messages.create()</code>と異なり、<strong>レスポンスを自動的にPydanticモデルに変換</strong>してくれます。</p>
-
-  <div class="concept-box">
-    <div class="label">仕組みの流れ</div>
-    <p>1. Pydanticクラスでデータ構造を定義（例: 顧客情報クラス）</p>
-    <p>2. <code>messages.parse()</code>に <code>output_schema=顧客情報クラス</code> を指定</p>
-    <p>3. SDKがPydanticクラスからJSON Schemaを自動生成し、APIに送信</p>
-    <p>4. Claudeがスキーマ準拠のJSONを返す</p>
-    <p>5. SDKがJSONをPydanticオブジェクトに自動変換して返す</p>
-    <p>結果として、<code>response.name</code> のようにPythonの属性アクセスでデータを取得できます。</p>
+  
+  <!-- Section 9: Pydantic実践 -->
+  <div id="m4-s9" class="card">
+    <h2 id="m4-s9-heading">Pydantic実践 — 型安全な構造化出力</h2>
+    <p>Module 4のスキーマ設計セクションで、PydanticがPythonクラスからJSON Schemaを自動生成できることを紹介しました。ここでは、実際にPydanticをClaude APIと連携させて<strong>型安全な構造化出力</strong>を得る方法を詳しく見ていきましょう。</p>
+    <p>Pydanticを使うと、「JSON Schemaを手書きする」手間がなくなり、さらに<strong>Pythonの型システムで出力データを安全に扱える</strong>ようになります。「手書きの伝票」から「入力フォーム付きの業務システム」にアップグレードするイメージです。</p>
+  
+    <div class="concept-box">
+      <div class="label">重要概念</div>
+      <p><strong>Pydantic（パイダンティック）</strong>は、Pythonでデータの「型」と「制約」をクラスとして定義できるライブラリです。Claude SDKと連携すると、以下が自動で行われます。</p>
+      <ul>
+        <li>Pythonクラス → JSON Schemaへの自動変換</li>
+        <li>APIレスポンス → Pythonオブジェクトへの自動変換</li>
+        <li>制約の自動バリデーション（検証）</li>
+      </ul>
+    </div>
+  
+    <h3>基本的な使い方: messages.parse()</h3>
+    <p>Anthropic Python SDKには<code>messages.parse()</code>という専用メソッドがあります。通常の<code>messages.create()</code>と異なり、<strong>レスポンスを自動的にPydanticモデルに変換</strong>してくれます。</p>
+  
+    <div class="concept-box">
+      <div class="label">仕組みの流れ</div>
+      <p>1. Pydanticクラスでデータ構造を定義（例: 顧客情報クラス）</p>
+      <p>2. <code>messages.parse()</code>に <code>output_schema=顧客情報クラス</code> を指定</p>
+      <p>3. SDKがPydanticクラスからJSON Schemaを自動生成し、APIに送信</p>
+      <p>4. Claudeがスキーマ準拠のJSONを返す</p>
+      <p>5. SDKがJSONをPydanticオブジェクトに自動変換して返す</p>
+      <p>結果として、<code>response.name</code> のようにPythonの属性アクセスでデータを取得できます。</p>
+    </div>
+  
+    <h3>tool_use + Pydanticの組み合わせ</h3>
+    <p>Pydanticは<strong>JSON Outputs（output_config方式）</strong>だけでなく、<strong>Strict Tool Use</strong>とも組み合わせられます。ツールの入力スキーマをPydanticクラスで定義することで、ツール呼び出しのパラメータも型安全に扱えます。</p>
+  
+    <table class="compare-table">
+      <tr><th>方式</th><th>Pydanticの使い方</th><th>適した場面</th></tr>
+      <tr><td><strong>output_schema方式</strong></td><td><code>messages.parse(output_schema=MyModel)</code> で応答テキストを構造化</td><td>データ抽出・分類・レポート生成</td></tr>
+      <tr><td><strong>tool_use方式</strong></td><td>ツール定義の <code>input_schema</code> にPydanticモデルを使用</td><td>エージェントのツール呼び出し</td></tr>
+    </table>
+  
+    <h3>Field制約とdescription自動変換</h3>
+    <p>Pydanticの<code>Field()</code>で設定した制約（最小値、最大値など）は、Claude APIのJSON Schemaではサポートされていません。しかし、SDKが自動的に<strong>description（説明文）に変換</strong>してくれます。</p>
+  
+    <div class="concept-box">
+      <div class="label">変換の仕組み</div>
+      <p><strong>Pydantic側:</strong> <code>age: int = Field(ge=18, le=120, description="ユーザーの年齢")</code></p>
+      <p><strong>↓ SDKが自動変換 ↓</strong></p>
+      <p><strong>JSON Schema側:</strong> <code>"age": {"type": "integer", "description": "ユーザーの年齢（18以上120以下）"}</code></p>
+      <p>Claudeはdescriptionの指示に従ってJSON生成 → SDKがレスポンス受信後にPydanticの元の制約（ge=18, le=120）で<strong>再バリデーション</strong>を実行します。</p>
+    </div>
+  
+    <div class="tip-box">
+      <div class="label">試験のポイント</div>
+      <p style="margin-top:.25rem;">試験では「PydanticのField制約はどう処理されるか？」が問われることがあります。答えは<strong>「SDKがdescriptionに変換 → Claudeが従う → SDKが元の制約で再バリデーション」</strong>という2段階の仕組みです。スキーマレベルでの強制ではなく、「お願い＋事後チェック」のアプローチです。</p>
+    </div>
+  
+    <h3>バリデーションとエラーハンドリング</h3>
+    <p>Pydanticの大きなメリットは、自動バリデーション（検証）です。Claudeの出力がPydanticの制約に違反した場合、<code>ValidationError</code>（バリデーションエラー）が発生します。</p>
+  
+    <table class="compare-table">
+      <tr><th>エラーの種類</th><th>原因</th><th>対処法</th></tr>
+      <tr><td><strong>型の不一致</strong></td><td>文字列が期待される場所に数値が入っている等</td><td>スキーマのdescriptionをより明確にする</td></tr>
+      <tr><td><strong>制約違反</strong></td><td>Field(ge=18)で17が返された等</td><td>リトライ、またはdescriptionで制約を強調する</td></tr>
+      <tr><td><strong>必須フィールドの欠落</strong></td><td>requiredフィールドがnullまたは欠損</td><td>制約付きデコーディングを利用すれば発生しない（JSON Outputs / strict: true使用時）</td></tr>
+    </table>
+  
+    <div class="concept-box">
+      <div class="label">エラーハンドリングのベストプラクティス</div>
+      <p>1. <strong>try-except で ValidationError をキャッチ</strong>: エラー発生時にログ記録＋リトライ</p>
+      <p>2. <strong>リトライ時にエラー内容をプロンプトに含める</strong>: 「前回の出力でage=15が返されましたが、18以上を指定してください」と具体的にフィードバック</p>
+      <p>3. <strong>最大リトライ回数を設定</strong>: 無限ループ防止（通常2〜3回）</p>
+      <p>4. <strong>制約付きデコーディングとの併用</strong>: JSON構造の保証はAPIに任せ、Pydanticはビジネスロジックの検証に集中</p>
+    </div>
+  
+    <div class="warn-box">
+      <div class="label">注意</div>
+      <p style="margin-top:.25rem;">制約付きデコーディング（Constrained Decoding）はJSONの<strong>構造（型・必須フィールド）</strong>を保証しますが、<strong>値の制約（最小値・最大値・パターン）</strong>は保証しません。値の制約はPydanticの事後バリデーションで確認する必要があります。この「構造はAPI保証、値はアプリ検証」という役割分担を理解しておきましょう。</p>
+    </div>
   </div>
-
-  <h3>tool_use + Pydanticの組み合わせ</h3>
-  <p>Pydanticは<strong>JSON Outputs（output_config方式）</strong>だけでなく、<strong>Strict Tool Use</strong>とも組み合わせられます。ツールの入力スキーマをPydanticクラスで定義することで、ツール呼び出しのパラメータも型安全に扱えます。</p>
-
-  <table class="compare-table">
-    <tr><th>方式</th><th>Pydanticの使い方</th><th>適した場面</th></tr>
-    <tr><td><strong>output_schema方式</strong></td><td><code>messages.parse(output_schema=MyModel)</code> で応答テキストを構造化</td><td>データ抽出・分類・レポート生成</td></tr>
-    <tr><td><strong>tool_use方式</strong></td><td>ツール定義の <code>input_schema</code> にPydanticモデルを使用</td><td>エージェントのツール呼び出し</td></tr>
-  </table>
-
-  <h3>Field制約とdescription自動変換</h3>
-  <p>Pydanticの<code>Field()</code>で設定した制約（最小値、最大値など）は、Claude APIのJSON Schemaではサポートされていません。しかし、SDKが自動的に<strong>description（説明文）に変換</strong>してくれます。</p>
-
-  <div class="concept-box">
-    <div class="label">変換の仕組み</div>
-    <p><strong>Pydantic側:</strong> <code>age: int = Field(ge=18, le=120, description="ユーザーの年齢")</code></p>
-    <p><strong>↓ SDKが自動変換 ↓</strong></p>
-    <p><strong>JSON Schema側:</strong> <code>"age": {"type": "integer", "description": "ユーザーの年齢（18以上120以下）"}</code></p>
-    <p>Claudeはdescriptionの指示に従ってJSON生成 → SDKがレスポンス受信後にPydanticの元の制約（ge=18, le=120）で<strong>再バリデーション</strong>を実行します。</p>
-  </div>
-
-  <div class="tip-box">
-    <div class="label">試験のポイント</div>
-    <p style="margin-top:.25rem;">試験では「PydanticのField制約はどう処理されるか？」が問われることがあります。答えは<strong>「SDKがdescriptionに変換 → Claudeが従う → SDKが元の制約で再バリデーション」</strong>という2段階の仕組みです。スキーマレベルでの強制ではなく、「お願い＋事後チェック」のアプローチです。</p>
-  </div>
-
-  <h3>バリデーションとエラーハンドリング</h3>
-  <p>Pydanticの大きなメリットは、自動バリデーション（検証）です。Claudeの出力がPydanticの制約に違反した場合、<code>ValidationError</code>（バリデーションエラー）が発生します。</p>
-
-  <table class="compare-table">
-    <tr><th>エラーの種類</th><th>原因</th><th>対処法</th></tr>
-    <tr><td><strong>型の不一致</strong></td><td>文字列が期待される場所に数値が入っている等</td><td>スキーマのdescriptionをより明確にする</td></tr>
-    <tr><td><strong>制約違反</strong></td><td>Field(ge=18)で17が返された等</td><td>リトライ、またはdescriptionで制約を強調する</td></tr>
-    <tr><td><strong>必須フィールドの欠落</strong></td><td>requiredフィールドがnullまたは欠損</td><td>制約付きデコーディングを利用すれば発生しない（JSON Outputs / strict: true使用時）</td></tr>
-  </table>
-
-  <div class="concept-box">
-    <div class="label">エラーハンドリングのベストプラクティス</div>
-    <p>1. <strong>try-except で ValidationError をキャッチ</strong>: エラー発生時にログ記録＋リトライ</p>
-    <p>2. <strong>リトライ時にエラー内容をプロンプトに含める</strong>: 「前回の出力でage=15が返されましたが、18以上を指定してください」と具体的にフィードバック</p>
-    <p>3. <strong>最大リトライ回数を設定</strong>: 無限ループ防止（通常2〜3回）</p>
-    <p>4. <strong>制約付きデコーディングとの併用</strong>: JSON構造の保証はAPIに任せ、Pydanticはビジネスロジックの検証に集中</p>
-  </div>
-
-  <div class="warn-box">
-    <div class="label">注意</div>
-    <p style="margin-top:.25rem;">制約付きデコーディング（Constrained Decoding）はJSONの<strong>構造（型・必須フィールド）</strong>を保証しますが、<strong>値の制約（最小値・最大値・パターン）</strong>は保証しません。値の制約はPydanticの事後バリデーションで確認する必要があります。この「構造はAPI保証、値はアプリ検証」という役割分担を理解しておきましょう。</p>
-  </div>
-</div>
-
-  <!-- Section 5: 用語集 -->
-  <div id="m4-s5" class="card" style="display:none">
-    <h2>Module 4 用語集</h2>
+  
+    <!-- Section 5: 用語集 -->
+    <div id="m4-s5" class="card">
+      <h2 id="m4-s5-heading">Module 4 用語集</h2>
     <p>構造化出力に関する重要用語をまとめました。試験は英語のため、英語表記も覚えておきましょう。</p>
 
     <div class="glossary-item">
@@ -2284,7 +2294,7 @@
   </div>
 
   <!-- Section 6: Quiz -->
-  <div id="m4-s6" class="card" style="display:none">
+  <div id="m4-s6" class="card">
     <div class="quiz-section">
       <h3>Module 4 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -2400,7 +2410,7 @@
     <span class="week-badge">Week 5</span>
     <h1>Module 5: ツール設計の基礎</h1>
     <p class="subtitle">Claudeに外部機能を与える仕組みを理解する</p>
-    <span class="domain-tag">ドメイン4: ツール &amp; MCP (18%)</span>
+    <span class="domain-tag">ドメイン4: ツール設計とMCP統合 (18%)</span>
   </div>
 
   <div class="objectives">
@@ -2413,27 +2423,30 @@
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m5','s1',this)">Tool Useとは</button>
-    <button class="section-tab" onclick="showSection('m5','s2',this)">ツール定義の設計</button>
-    <button class="section-tab" onclick="showSection('m5','s3',this)">実行フローと制御</button>
-    <button class="section-tab" onclick="showSection('m5','s4',this)">エラー処理と注意点</button>
-    <button class="section-tab" onclick="showSection('m5','s5',this)">説明文のLLM最適化</button>
-    <button class="section-tab" onclick="showSection('m5','s6',this)">構造化エラー設計</button>
-    <button class="section-tab" onclick="showSection('m5','s7',this)">ツール分配と管理</button>
-    <button class="section-tab" onclick="showSection('m5','s8',this)">推論オーバーロード防止</button>
-    <button class="section-tab" onclick="showSection('m5','s9',this)">tool_choice応用</button>
-    <button class="section-tab" onclick="showSection('m5','s12',this)">説明文の実践</button>
-    <button class="section-tab" onclick="showSection('m5','s13',this)">構造化エラー実装</button>
-    <button class="section-tab" onclick="showSection('m5','s14',this)">ツール分配戦略</button>
-    <button class="section-tab" onclick="showSection('m5','s10',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m5','s11',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m5-s1-heading" style="color: var(--primary); text-decoration: none;">Tool Useとは</a></li>
+      <li><a href="#m5-s2-heading" style="color: var(--primary); text-decoration: none;">ツール定義の設計</a></li>
+      <li><a href="#m5-s3-heading" style="color: var(--primary); text-decoration: none;">実行フローと制御</a></li>
+      <li><a href="#m5-s4-heading" style="color: var(--primary); text-decoration: none;">エラー処理と注意点</a></li>
+      <li><a href="#m5-s5-heading" style="color: var(--primary); text-decoration: none;">説明文のLLM最適化</a></li>
+      <li><a href="#m5-s6-heading" style="color: var(--primary); text-decoration: none;">構造化エラー設計</a></li>
+      <li><a href="#m5-s7-heading" style="color: var(--primary); text-decoration: none;">ツール分配と管理</a></li>
+      <li><a href="#m5-s8-heading" style="color: var(--primary); text-decoration: none;">推論オーバーロード防止</a></li>
+      <li><a href="#m5-s9-heading" style="color: var(--primary); text-decoration: none;">tool_choice応用</a></li>
+      <li><a href="#m5-s12-heading" style="color: var(--primary); text-decoration: none;">説明文の実践</a></li>
+      <li><a href="#m5-s13-heading" style="color: var(--primary); text-decoration: none;">構造化エラー実装</a></li>
+      <li><a href="#m5-s14-heading" style="color: var(--primary); text-decoration: none;">ツール分配戦略</a></li>
+      <li><a href="#m5-s10-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m5-s11-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: Tool Useとは -->
   <div id="m5-s1" class="card">
-    <h2>Tool Use（ツール利用）とは何か</h2>
+    <h2 id="m5-s1-heading">Tool Use（ツール利用）とは何か</h2>
     <p>Claude自体は、天気を調べたりデータベースを検索したりすることができません。しかし「ツール」を定義して渡すことで、Claudeは<strong>「このツールを使いたい」</strong>と意思表示し、外部の機能を間接的に利用できるようになります。</p>
 
     <p>これは、レストランの注文に似ています。お客さん（ユーザー）が「今日のおすすめは？」と聞くと、ウェイター（Claude）は自分では厨房に入れませんが、<strong>「シェフに聞いてきます」と伝票を書いて渡す</strong>ことができます。開発者のプログラムがその伝票を受け取り、実際にシェフ（外部API）に問い合わせて結果を返します。</p>
@@ -2471,8 +2484,8 @@
   </div>
 
   <!-- Section 2: ツール定義の設計 -->
-  <div id="m5-s2" class="card" style="display:none">
-    <h2>ツール定義の設計</h2>
+  <div id="m5-s2" class="card">
+    <h2 id="m5-s2-heading">ツール定義の設計</h2>
     <p>ツールを使うには、まず「どんなツールがあるか」をClaudeに伝える必要があります。これを<strong>ツール定義（Tool Definition）</strong>と呼びます。ツール定義はJSON形式で記述し、APIリクエストの<code>tools</code>パラメータに渡します。</p>
 
     <h3>ツール定義の3つの要素</h3>
@@ -2540,8 +2553,8 @@
   </div>
 
   <!-- Section 3: 実行フローと制御 -->
-  <div id="m5-s3" class="card" style="display:none">
-    <h2>ツール実行フローと制御</h2>
+  <div id="m5-s3" class="card">
+    <h2 id="m5-s3-heading">ツール実行フローと制御</h2>
     <p>Tool Useは、4つのステップで動作します。この流れを正確に理解することがCCA-F試験の鍵です。</p>
 
     <h3>4ステップの通信フロー</h3>
@@ -2606,8 +2619,8 @@
   </div>
 
   <!-- Section 4: エラー処理と注意点 -->
-  <div id="m5-s4" class="card" style="display:none">
-    <h2>エラーハンドリングとアンチパターン</h2>
+  <div id="m5-s4" class="card">
+    <h2 id="m5-s4-heading">エラーハンドリングとアンチパターン</h2>
     <p>ツールの実行は常に成功するとは限りません。APIがダウンしていたり、パラメータが不正だったりする場合のエラー処理もTool Useの重要な要素です。</p>
 
     <h3>is_error フラグ</h3>
@@ -2653,8 +2666,8 @@
   </div>
 
   <!-- Section 5: ツール説明文のLLM最適化 -->
-  <div id="m5-s5" class="card" style="display:none">
-    <h2>ツール説明文（description）のLLM最適化</h2>
+  <div id="m5-s5" class="card">
+    <h2 id="m5-s5-heading">ツール説明文（description）のLLM最適化</h2>
     <p>Module 5の前半で「descriptionがツール選択の最大の判断材料」と学びました。ここでは一歩進んで、<strong>LLMの視点から最適な説明文をどう書くか</strong>を深掘りします。</p>
 
     <h3>Claudeはdescriptionをどう「読んで」いるか</h3>
@@ -2718,8 +2731,8 @@
   </div>
 
   <!-- Section 6: 構造化エラーハンドリング -->
-  <div id="m5-s6" class="card" style="display:none">
-    <h2>構造化エラーハンドリング（isError / isRetryable）</h2>
+  <div id="m5-s6" class="card">
+    <h2 id="m5-s6-heading">構造化エラーハンドリング（isError / isRetryable）</h2>
     <p>前半のセクションで<code>is_error</code>フラグの基本を学びました。ここでは、本番環境で重要になる<strong>構造化されたエラーレスポンス</strong>の設計を深掘りします。</p>
 
     <h3>なぜ「構造化」が必要なのか</h3>
@@ -2785,8 +2798,8 @@
   </div>
 
   <!-- Section 7: ツール分配と管理 -->
-  <div id="m5-s7" class="card" style="display:none">
-    <h2>ツール分配（Tool Distribution）と管理</h2>
+  <div id="m5-s7" class="card">
+    <h2 id="m5-s7-heading">ツール分配（Tool Distribution）と管理</h2>
     <p>実際のアプリケーションでは、数十個以上のツールを扱うことが珍しくありません。このとき、すべてのツールを毎回Claudeに渡すのではなく、<strong>必要なツールだけを適切に配分する</strong>戦略が重要になります。</p>
 
     <h3>なぜツール分配が必要なのか</h3>
@@ -2849,8 +2862,8 @@
   </div>
 
   <!-- Section 8: 推論オーバーロード防止 -->
-  <div id="m5-s8" class="card" style="display:none">
-    <h2>推論オーバーロード防止</h2>
+  <div id="m5-s8" class="card">
+    <h2 id="m5-s8-heading">推論オーバーロード防止</h2>
     <p>ツールの数が増えすぎると、Claudeのパフォーマンスが劣化する現象を<strong>推論オーバーロード（Inference Overload）</strong>と呼びます。</p>
 
     <div class="concept-box">
@@ -2909,8 +2922,8 @@
   </div>
 
   <!-- Section 9: tool_choiceの高度な使い方 -->
-  <div id="m5-s9" class="card" style="display:none">
-    <h2>tool_choiceの高度な使い方</h2>
+  <div id="m5-s9" class="card">
+    <h2 id="m5-s9-heading">tool_choiceの高度な使い方</h2>
     <p>前半で<code>tool_choice</code>の4つのモード（auto / any / tool / none）を学びました。ここでは、これらを<strong>ワークフロー制御に応用する</strong>高度なパターンを見ていきます。</p>
 
     <h3>tool_choiceでワークフローを制御する</h3>
@@ -2966,8 +2979,8 @@
   </div>
 
   <!-- Section 12: 説明文の実践最適化 -->
-  <div id="m5-s12" class="card" style="display:none">
-    <h2>ツール説明文（description）の実践最適化</h2>
+  <div id="m5-s12" class="card">
+    <h2 id="m5-s12-heading">ツール説明文（description）の実践最適化</h2>
     <p>Anthropic公式ドキュメントでは、descriptionを<strong>「新しいチームメンバーにツールを説明するつもりで書く」</strong>ことが推奨されています。暗黙知を明示化し、LLMがツール選択で迷わない記述を目指します。</p>
 
     <h3>公式推奨: 説明文に含めるべき5要素</h3>
@@ -3066,8 +3079,8 @@
   </div>
 
   <!-- Section 13: 構造化エラーの実装 -->
-  <div id="m5-s13" class="card" style="display:none">
-    <h2>構造化エラーハンドリングの実装パターン</h2>
+  <div id="m5-s13" class="card">
+    <h2 id="m5-s13-heading">構造化エラーハンドリングの実装パターン</h2>
     <p>公式ドキュメントでは、エラーメッセージを<strong>「何が問題で、次に何をすべきか」を明示的に伝える</strong>ことが強く推奨されています。ここでは公式の最新仕様に基づく実装パターンを深掘りします。</p>
 
     <h3>公式仕様: is_errorフラグの正確な理解</h3>
@@ -3191,8 +3204,8 @@
   </div>
 
   <!-- Section 14: ツール分配と統合戦略 -->
-  <div id="m5-s14" class="card" style="display:none">
-    <h2>ツール分配と統合戦略（公式推奨パターン）</h2>
+  <div id="m5-s14" class="card">
+    <h2 id="m5-s14-heading">ツール分配と統合戦略（公式推奨パターン）</h2>
     <p>Anthropic公式のengineering blogでは、ツール設計の最も重要な原則として<strong>「エージェントが人間と同じようにタスクを分解・解決できる粒度でツールを設計する」</strong>ことが掲げられています。</p>
 
     <h3>ツール分配の3層モデル</h3>
@@ -3327,8 +3340,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 10: 用語集 -->
-  <div id="m5-s10" class="card" style="display:none">
-    <h2>ツール設計 用語集</h2>
+  <div id="m5-s10" class="card">
+    <h2 id="m5-s10-heading">ツール設計 用語集</h2>
     <p>このモジュールで登場した重要な用語をまとめています。試験は英語のため、英語表記も併記しています。</p>
 
     <div class="glossary-item">
@@ -3439,7 +3452,7 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 11: クイズ -->
-  <div id="m5-s11" class="card" style="display:none">
+  <div id="m5-s11" class="card">
     <div class="quiz-section">
       <h3>Module 5 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -3622,24 +3635,27 @@ tool_choice: {"type": "auto"}</pre>
     </ul>
   </div>
 
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m6','s1',this)">MCPとは</button>
-    <button class="section-tab" onclick="showSection('m6','s2',this)">アーキテクチャ</button>
-    <button class="section-tab" onclick="showSection('m6','s3',this)">3つのプリミティブ</button>
-    <button class="section-tab" onclick="showSection('m6','s4',this)">Tool Useとの違い</button>
-    <button class="section-tab" onclick="showSection('m6','s5',this)">設定ファイル階層</button>
-    <button class="section-tab" onclick="showSection('m6','s6',this)">サーバー設計</button>
-    <button class="section-tab" onclick="showSection('m6','s7',this)">高度な機能</button>
-    <button class="section-tab" onclick="showSection('m6','s8',this)">トランスポート選定</button>
-    <button class="section-tab" onclick="showSection('m6','s11',this)">設定の実践</button>
-    <button class="section-tab" onclick="showSection('m6','s12',this)">認証とセキュリティ</button>
-    <button class="section-tab" onclick="showSection('m6','s13',this)">高度な通信</button>
-    <button class="section-tab" onclick="showSection('m6','s9',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m6','s10',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m6-s1-heading" style="color: var(--primary); text-decoration: none;">MCPとは</a></li>
+      <li><a href="#m6-s2-heading" style="color: var(--primary); text-decoration: none;">アーキテクチャ</a></li>
+      <li><a href="#m6-s3-heading" style="color: var(--primary); text-decoration: none;">3つのプリミティブ</a></li>
+      <li><a href="#m6-s4-heading" style="color: var(--primary); text-decoration: none;">Tool Useとの違い</a></li>
+      <li><a href="#m6-s5-heading" style="color: var(--primary); text-decoration: none;">設定ファイル階層</a></li>
+      <li><a href="#m6-s6-heading" style="color: var(--primary); text-decoration: none;">サーバー設計</a></li>
+      <li><a href="#m6-s7-heading" style="color: var(--primary); text-decoration: none;">高度な機能</a></li>
+      <li><a href="#m6-s8-heading" style="color: var(--primary); text-decoration: none;">トランスポート選定</a></li>
+      <li><a href="#m6-s11-heading" style="color: var(--primary); text-decoration: none;">設定の実践</a></li>
+      <li><a href="#m6-s12-heading" style="color: var(--primary); text-decoration: none;">認証とセキュリティ</a></li>
+      <li><a href="#m6-s13-heading" style="color: var(--primary); text-decoration: none;">高度な通信</a></li>
+      <li><a href="#m6-s9-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m6-s10-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
 
   <div id="m6-s1" class="card">
-    <h2>MCPとは何か</h2>
+    <h2 id="m6-s1-heading">MCPとは何か</h2>
     <p>MCP（Model Context Protocol / モデルコンテキストプロトコル）は、Anthropicが2024年11月に公開した<strong>オープンプロトコル（通信規約）</strong>です。AIモデルと外部のツールやデータソースを、<strong>標準化された方法で接続する</strong>ために設計されました。</p>
     <h3>MCPが解決する問題 — 「M×N問題」</h3>
     <p>MCPが登場する前は、AIアプリケーションが外部サービスに接続するたびに、<strong>サービスごとに専用のコード</strong>を書く必要がありました。AIアプリがM個、接続先サービスがN個あると、M×N通りの接続コードが必要になります。これを「M×N問題」と呼びます。</p>
@@ -3658,8 +3674,8 @@ tool_choice: {"type": "auto"}</pre>
     </div>
   </div>
 
-  <div id="m6-s2" class="card" style="display:none">
-    <h2>MCPのアーキテクチャ</h2>
+  <div id="m6-s2" class="card">
+    <h2 id="m6-s2-heading">MCPのアーキテクチャ</h2>
     <p>MCPのアーキテクチャは、<strong>3つの役割</strong>と<strong>2つのトランスポート方式</strong>で構成されています。</p>
     <h3>3つの役割: Host / Client / Server</h3>
     <table class="compare-table">
@@ -3697,8 +3713,8 @@ tool_choice: {"type": "auto"}</pre>
     </div>
   </div>
 
-  <div id="m6-s3" class="card" style="display:none">
-    <h2>MCPの3つのプリミティブ</h2>
+  <div id="m6-s3" class="card">
+    <h2 id="m6-s3-heading">MCPの3つのプリミティブ</h2>
     <p>MCPサーバーが提供できる機能は、<strong>3つのプリミティブ（Primitives / 基本要素）</strong>に分類されます。</p>
     <h3>1. Resources（リソース）— データの公開</h3>
     <p>MCPサーバーが持つ<strong>読み取り用のデータ</strong>です。ファイルの内容、データベースのレコード、APIの応答など。</p>
@@ -3733,8 +3749,8 @@ tool_choice: {"type": "auto"}</pre>
     <p>MCPにはもう一つ、<strong>Sampling</strong>という仕組みがあります。MCPサーバーがクライアントを通じて<strong>LLMに推論をリクエスト</strong>できる逆方向の通信です。部下（サーバー）が上司（LLM）に「判断をお願いします」と相談するイメージです。</p>
   </div>
 
-  <div id="m6-s4" class="card" style="display:none">
-    <h2>MCP と Tool Use の違い</h2>
+  <div id="m6-s4" class="card">
+    <h2 id="m6-s4-heading">MCP と Tool Use の違い</h2>
     <p>Module 5で学んだ<strong>Tool Use（Function Calling）</strong>と<strong>MCP</strong>は、どちらもAIにツールを使わせる仕組みですが、位置づけが異なります。</p>
     <h3>比較表</h3>
     <table class="compare-table">
@@ -3770,8 +3786,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 5: MCP設定ファイルの階層構造 -->
-  <div id="m6-s5" class="card" style="display:none">
-    <h2>MCP設定ファイルの階層構造</h2>
+  <div id="m6-s5" class="card">
+    <h2 id="m6-s5-heading">MCP設定ファイルの階層構造</h2>
     <p>MCPサーバーをClaude Codeで使うには、<strong>設定ファイル</strong>に接続情報を記述します。設定ファイルには複数のレベルがあり、「どの設定ファイルに書くか」で<strong>適用範囲が変わる</strong>仕組みです。</p>
 
     <div class="concept-box">
@@ -3845,8 +3861,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 6: MCPサーバー設計パターン -->
-  <div id="m6-s6" class="card" style="display:none">
-    <h2>MCPサーバー設計パターン</h2>
+  <div id="m6-s6" class="card">
+    <h2 id="m6-s6-heading">MCPサーバー設計パターン</h2>
     <p>MCPサーバーを設計・構築する際には、<strong>セキュリティ</strong>と<strong>使いやすさ</strong>の両面を考慮する必要があります。</p>
 
     <h3>認証・権限管理のパターン</h3>
@@ -3913,8 +3929,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 7: MCPの高度な機能 -->
-  <div id="m6-s7" class="card" style="display:none">
-    <h2>MCPの高度な機能</h2>
+  <div id="m6-s7" class="card">
+    <h2 id="m6-s7-heading">MCPの高度な機能</h2>
     <p>MCPには基本的な3つのプリミティブ（Resources, Tools, Prompts）に加えて、より高度な機能があります。</p>
 
     <h3>サンプリング（Sampling）— AIの力を借りる</h3>
@@ -3971,8 +3987,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 8: トランスポート選定ガイド -->
-  <div id="m6-s8" class="card" style="display:none">
-    <h2>トランスポート選定ガイド</h2>
+  <div id="m6-s8" class="card">
+    <h2 id="m6-s8-heading">トランスポート選定ガイド</h2>
     <p>MCPには複数の<strong>トランスポート方式</strong>（データの運び方）があり、用途に応じて選び分けます。</p>
 
     <h3>3つのトランスポート方式の比較</h3>
@@ -4035,8 +4051,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 11: 設定の実践 -->
-  <div id="m6-s11" class="card" style="display:none">
-    <h2>MCP設定ファイルの実践ガイド</h2>
+  <div id="m6-s11" class="card">
+    <h2 id="m6-s11-heading">MCP設定ファイルの実践ガイド</h2>
     <p>Module 6の基礎編で学んだ<strong>.mcp.json</strong>（プロジェクト設定）と<strong>~/.claude.json</strong>（グローバル設定）の使い分けを、実践的な場面に沿ってさらに深掘りします。</p>
 
     <h3>チーム共有パターン</h3>
@@ -4111,8 +4127,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 12: 認証とセキュリティ -->
-  <div id="m6-s12" class="card" style="display:none">
-    <h2>MCPサーバーの認証とセキュリティ</h2>
+  <div id="m6-s12" class="card">
+    <h2 id="m6-s12-heading">MCPサーバーの認証とセキュリティ</h2>
     <p>MCPサーバーを安全に運用するには、<strong>「誰がアクセスしているか（認証）」</strong>と<strong>「何ができるか（認可）」</strong>を適切に管理する必要があります。</p>
 
     <div class="concept-box">
@@ -4206,8 +4222,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 13: 高度な通信 -->
-  <div id="m6-s13" class="card" style="display:none">
-    <h2>MCPの高度な通信パターン</h2>
+  <div id="m6-s13" class="card">
+    <h2 id="m6-s13-heading">MCPの高度な通信パターン</h2>
     <p>MCPの高度な機能をさらに深掘りし、<strong>サンプリングの詳細</strong>、<strong>新しいプリミティブ</strong>、<strong>トランスポート選定の実践基準</strong>を学びます。</p>
 
     <h3>サンプリング（Sampling）の詳細</h3>
@@ -4306,8 +4322,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 9: 用語集 -->
-  <div id="m6-s9" class="card" style="display:none">
-    <h2>用語集</h2>
+  <div id="m6-s9" class="card">
+    <h2 id="m6-s9-heading">用語集</h2>
     <p>Module 6で登場した重要用語をまとめました。</p>
     <div class="glossary-item"><div class="glossary-term">MCP</div><div class="glossary-en">Model Context Protocol</div><div class="glossary-def">AIモデルと外部ツール・データソースを接続するためのオープンな標準プロトコル。</div></div>
     <div class="glossary-item"><div class="glossary-term">MCPホスト</div><div class="glossary-en">MCP Host</div><div class="glossary-def">ユーザーが直接操作するAIアプリケーション。内部にMCPクライアントを持つ。</div></div>
@@ -4333,8 +4349,8 @@ tool_choice: {"type": "auto"}</pre>
     <div class="glossary-item"><div class="glossary-term">セッション管理</div><div class="glossary-en">Session Management</div><div class="glossary-def">Streamable HTTPでクライアントとサーバーの状態を維持する仕組み。Mcp-Session-Idヘッダーで管理される。</div></div>
   </div>
 
-  <div id="m6-s10" class="card" style="display:none">
-    <h2>確認クイズ</h2>
+  <div id="m6-s10" class="card">
+    <h2 id="m6-s10-heading">確認クイズ</h2>
     <p>Module 6の内容を確認しましょう。全5問、すべて4択です。</p>
     <div class="quiz-section" id="m6-quiz">
       <div class="quiz-question" id="m6-q1">
@@ -4494,7 +4510,7 @@ tool_choice: {"type": "auto"}</pre>
     <span class="week-badge">Week 6</span>
     <h1>Module 7: Claude Code入門</h1>
     <p class="subtitle">開発者向けエージェント型コーディングツールの基本を理解する</p>
-    <span class="domain-tag">ドメイン2: Claude Code (20%)</span>
+    <span class="domain-tag">ドメイン2: Claude Codeの設定とワークフロー (20%)</span>
   </div>
 
   <div class="objectives">
@@ -4508,19 +4524,22 @@ tool_choice: {"type": "auto"}</pre>
     </ul>
   </div>
 
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m7','s1',this)">Claude Codeとは</button>
-    <button class="section-tab" onclick="showSection('m7','s2',this)">内蔵ツールと権限</button>
-    <button class="section-tab" onclick="showSection('m7','s3',this)">CLIとワークフロー</button>
-    <button class="section-tab" onclick="showSection('m7','s4',this)">サブエージェント</button>
-    <button class="section-tab" onclick="showSection('m7','s7',this)">CI/CD統合</button>
-    <button class="section-tab" onclick="showSection('m7','s8',this)">セキュリティ</button>
-    <button class="section-tab" onclick="showSection('m7','s5',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m7','s6',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m7-s1-heading" style="color: var(--primary); text-decoration: none;">Claude Codeとは</a></li>
+      <li><a href="#m7-s2-heading" style="color: var(--primary); text-decoration: none;">内蔵ツールと権限</a></li>
+      <li><a href="#m7-s3-heading" style="color: var(--primary); text-decoration: none;">CLIとワークフロー</a></li>
+      <li><a href="#m7-s4-heading" style="color: var(--primary); text-decoration: none;">サブエージェント</a></li>
+      <li><a href="#m7-s7-heading" style="color: var(--primary); text-decoration: none;">CI/CD統合</a></li>
+      <li><a href="#m7-s8-heading" style="color: var(--primary); text-decoration: none;">セキュリティ</a></li>
+      <li><a href="#m7-s5-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m7-s6-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
 
   <div id="m7-s1" class="card">
-    <h2>Claude Codeとは何か</h2>
+    <h2 id="m7-s1-heading">Claude Codeとは何か</h2>
     <p>Claude Code（クロード・コード）は、Anthropicが提供する<strong>エージェント型コーディングツール</strong>です。普通のチャットAIとの違いは、「会話するだけ」ではなく、<strong>実際にファイルを読み書きし、コマンドを実行し、Gitを操作できる</strong>点です。</p>
     <p>たとえるなら、普通のAIチャットが「電話で相談できるアドバイザー」なら、Claude Codeは「実際にオフィスに来て一緒に作業してくれる同僚」です。</p>
     <div class="concept-box">
@@ -4541,8 +4560,8 @@ tool_choice: {"type": "auto"}</pre>
     </div>
   </div>
 
-  <div id="m7-s2" class="card" style="display:none">
-    <h2>内蔵ツールと権限モデル</h2>
+  <div id="m7-s2" class="card">
+    <h2 id="m7-s2-heading">内蔵ツールと権限モデル</h2>
     <p>Claude Codeには多数の内蔵ツール（Built-in Tools）があり、それぞれに<strong>権限が必要かどうか</strong>が決まっています。</p>
     <h3>主要な内蔵ツール</h3>
     <table class="compare-table">
@@ -4591,8 +4610,8 @@ tool_choice: {"type": "auto"}</pre>
     </div>
   </div>
 
-  <div id="m7-s3" class="card" style="display:none">
-    <h2>CLIコマンドとワークフロー</h2>
+  <div id="m7-s3" class="card">
+    <h2 id="m7-s3-heading">CLIコマンドとワークフロー</h2>
     <h3>基本コマンド</h3>
     <table class="compare-table">
       <tr><th>コマンド</th><th>説明</th></tr>
@@ -4628,8 +4647,8 @@ tool_choice: {"type": "auto"}</pre>
     <p>Claude Codeはファイル変更前の状態を<strong>自動保存（チェックポイント）</strong>します。<code>/rewind</code>コマンドで以前の状態に復元できます。</p>
   </div>
 
-  <div id="m7-s4" class="card" style="display:none">
-    <h2>サブエージェントの仕組み</h2>
+  <div id="m7-s4" class="card">
+    <h2 id="m7-s4-heading">サブエージェントの仕組み</h2>
     <p>Claude Codeには<strong>サブエージェント（Sub-agents）</strong>機能があります。メインのClaude Codeが「上司」、サブエージェントは「特定の仕事を任された部下」です。</p>
     <h3>組み込みサブエージェント</h3>
     <table class="compare-table">
@@ -4664,8 +4683,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 7: CI/CD統合 -->
-<div id="m7-s7" class="card" style="display:none">
-  <h2>CI/CD統合</h2>
+<div id="m7-s7" class="card">
+  <h2 id="m7-s7-heading">CI/CD統合</h2>
   <p>Claude Codeは対話的な開発だけでなく、<strong>CI/CDパイプライン</strong>（自動ビルド・テストの仕組み）の中でも活用できます。コードレビューの自動化や、テスト生成、ドキュメント更新など、開発プロセスの様々な場面で力を発揮します。</p>
   <p>たとえるなら、対話モードが「一緒に作業する同僚」なら、CI/CD統合は「決まった手順書に沿って自動で仕事をしてくれるロボット社員」です。</p>
 
@@ -4737,8 +4756,8 @@ tool_choice: {"type": "auto"}</pre>
 </div>
 
   <!-- Section 8: セキュリティ -->
-<div id="m7-s8" class="card" style="display:none">
-  <h2>Claude Codeのセキュリティ</h2>
+<div id="m7-s8" class="card">
+  <h2 id="m7-s8-heading">Claude Codeのセキュリティ</h2>
   <p>Claude Codeは強力なツールですが、ファイルの読み書きやコマンド実行ができるため、<strong>セキュリティ（安全対策）</strong>が非常に重要です。Anthropicはこの点を重視し、多層的な安全設計を採用しています。</p>
   <p>たとえるなら、Claude Codeのセキュリティは「金庫室」のような仕組みです。入室する人（ツール操作）ごとに身分証（権限承認）をチェックし、持ち出せるもの（データ送信範囲）を制限し、監視カメラ（ログ記録）で記録を残します。</p>
 
@@ -4808,8 +4827,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 </div>
 
-  <div id="m7-s5" class="card" style="display:none">
-    <h2>Module 7 用語集</h2>
+  <div id="m7-s5" class="card">
+    <h2 id="m7-s5-heading">Module 7 用語集</h2>
     <div class="glossary-item"><div class="glossary-term">エージェント型ツール</div><div class="glossary-en">Agentic Tool</div><div class="glossary-def">ツールを使いながら自律的にタスクを遂行するAIシステム。Claude Codeはこの代表例。</div></div>
     <div class="glossary-item"><div class="glossary-term">権限モード</div><div class="glossary-en">Permission Mode</div><div class="glossary-def">Claude Codeのツール使用に対する承認レベル。plan, default, acceptEdits, dontAsk, bypassPermissionsの5種類。</div></div>
     <div class="glossary-item"><div class="glossary-term">ヘッドレスモード</div><div class="glossary-en">Headless Mode</div><div class="glossary-def"><code>claude -p</code>で起動する非対話モード。CI/CD向け。</div></div>
@@ -4828,7 +4847,7 @@ tool_choice: {"type": "auto"}</pre>
     <div class="glossary-item"><div class="glossary-term">ゼロ保持</div><div class="glossary-en">Zero Retention</div><div class="glossary-def">APIへの入出力データをAnthropic側で一切保持しないオプション。商用契約で利用可能。</div></div>
   </div>
 
-  <div id="m7-s6" class="card" style="display:none">
+  <div id="m7-s6" class="card">
     <div class="quiz-section">
       <h3>Module 7 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。</p>
@@ -4952,21 +4971,24 @@ tool_choice: {"type": "auto"}</pre>
     </ul>
   </div>
 
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m8','s1',this)">CLAUDE.mdとは</button>
-    <button class="section-tab" onclick="showSection('m8','s2',this)">設定ファイル体系</button>
-    <button class="section-tab" onclick="showSection('m8','s3',this)">ワークフロー設計</button>
-    <button class="section-tab" onclick="showSection('m8','s4',this)">チーム運用とCI/CD</button>
-    <button class="section-tab" onclick="showSection('m8','s7',this)">@importモジュール化</button>
-    <button class="section-tab" onclick="showSection('m8','s8',this)">.claude/rules/</button>
-    <button class="section-tab" onclick="showSection('m8','s9',this)">Plan mode</button>
-    <button class="section-tab" onclick="showSection('m8','s10',this)">Agent Skills</button>
-    <button class="section-tab" onclick="showSection('m8','s5',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m8','s6',this)">クイズ</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m8-s1-heading" style="color: var(--primary); text-decoration: none;">CLAUDE.mdとは</a></li>
+      <li><a href="#m8-s2-heading" style="color: var(--primary); text-decoration: none;">設定ファイル体系</a></li>
+      <li><a href="#m8-s3-heading" style="color: var(--primary); text-decoration: none;">ワークフロー設計</a></li>
+      <li><a href="#m8-s4-heading" style="color: var(--primary); text-decoration: none;">チーム運用とCI/CD</a></li>
+      <li><a href="#m8-s7-heading" style="color: var(--primary); text-decoration: none;">@importモジュール化</a></li>
+      <li><a href="#m8-s8-heading" style="color: var(--primary); text-decoration: none;">.claude/rules/</a></li>
+      <li><a href="#m8-s9-heading" style="color: var(--primary); text-decoration: none;">Plan mode</a></li>
+      <li><a href="#m8-s10-heading" style="color: var(--primary); text-decoration: none;">Agent Skills</a></li>
+      <li><a href="#m8-s5-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m8-s6-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
 
   <div id="m8-s1" class="card">
-    <h2>CLAUDE.md &mdash; Claude Codeの「ルールブック」</h2>
+    <h2 id="m8-s1-heading">CLAUDE.md &mdash; Claude Codeの「ルールブック」</h2>
     <p>CLAUDE.mdは、Claude Codeがプロジェクトで作業する際に<strong>自動的に読み込む指示書ファイル</strong>です。新入社員が初日に「社内ルールブック」を渡されるのと同じです。</p>
     <div class="concept-box">
       <div class="label">重要概念</div>
@@ -4997,8 +5019,8 @@ tool_choice: {"type": "auto"}</pre>
     </div>
   </div>
 
-  <div id="m8-s2" class="card" style="display:none">
-    <h2>Claude Codeの設定ファイル体系</h2>
+  <div id="m8-s2" class="card">
+    <h2 id="m8-s2-heading">Claude Codeの設定ファイル体系</h2>
     <h3>settings.json &mdash; 機械的な設定</h3>
     <p>settings.jsonは<strong>JSON形式の設定ファイル</strong>で、権限、MCPサーバー、環境変数などの機械的な設定を記述します。</p>
     <table class="compare-table">
@@ -5018,8 +5040,8 @@ tool_choice: {"type": "auto"}</pre>
     </div>
   </div>
 
-  <div id="m8-s3" class="card" style="display:none">
-    <h2>ワークフロー設計 &mdash; Hooks、Commands、Skills</h2>
+  <div id="m8-s3" class="card">
+    <h2 id="m8-s3-heading">ワークフロー設計 &mdash; Hooks、Commands、Skills</h2>
     <h3>Hooks（フック）&mdash; 自動チェックポイント</h3>
     <p>特定のイベントの前後に<strong>スクリプトを自動実行</strong>する仕組み。settings.jsonで定義します。</p>
     <table class="compare-table">
@@ -5047,8 +5069,8 @@ tool_choice: {"type": "auto"}</pre>
     </div>
   </div>
 
-  <div id="m8-s4" class="card" style="display:none">
-    <h2>チーム開発とCI/CDでのClaude Code活用</h2>
+  <div id="m8-s4" class="card">
+    <h2 id="m8-s4-heading">チーム開発とCI/CDでのClaude Code活用</h2>
     <h3>チーム開発での設定管理</h3>
     <table class="compare-table">
       <tr><th>ファイル</th><th>git管理</th><th>理由</th></tr>
@@ -5080,8 +5102,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 7: @importモジュール化 -->
-<div id="m8-s7" class="card" style="display:none">
-  <h2>@importモジュール化 &mdash; CLAUDE.mdを分割管理する</h2>
+<div id="m8-s7" class="card">
+  <h2 id="m8-s7-heading">@importモジュール化 &mdash; CLAUDE.mdを分割管理する</h2>
   <p>プロジェクトが大きくなると、1つのCLAUDE.mdにすべてのルールを書くのは大変です。<strong>@importディレクティブ</strong>を使えば、CLAUDE.mdを複数ファイルに分割して管理できます。会社の就業規則が1冊ではなく「総則」「経理規程」「開発規程」と分冊されているのと同じ考え方です。</p>
   <div class="concept-box">
     <div class="label">重要概念</div>
@@ -5110,8 +5132,8 @@ tool_choice: {"type": "auto"}</pre>
 </div>
 
   <!-- Section 8: .claude/rules/ -->
-<div id="m8-s8" class="card" style="display:none">
-  <h2>.claude/rules/ &mdash; 条件付きルールファイル</h2>
+<div id="m8-s8" class="card">
+  <h2 id="m8-s8-heading">.claude/rules/ &mdash; 条件付きルールファイル</h2>
   <p>CLAUDE.mdに書いたルールは<strong>常に</strong>読み込まれますが、「特定の状況でだけ適用したいルール」もあります。<strong>.claude/rules/</strong> ディレクトリに置くルールファイルは、こうした条件付きの指示を実現します。</p>
   <div class="concept-box">
     <div class="label">重要概念</div>
@@ -5144,8 +5166,8 @@ tool_choice: {"type": "auto"}</pre>
 </div>
 
   <!-- Section 9: Plan mode -->
-<div id="m8-s9" class="card" style="display:none">
-  <h2>Plan mode &mdash; まず計画、それから実装</h2>
+<div id="m8-s9" class="card">
+  <h2 id="m8-s9-heading">Plan mode &mdash; まず計画、それから実装</h2>
   <p>コードを書く前に「何をどう変更するか」を整理したい場面があります。<strong>Plan mode（計画モード）</strong>は、Claude Codeにファイル変更を行わせず、<strong>設計・方針の検討だけ</strong>をさせるモードです。建築で言えば「設計図を描く段階」です。</p>
   <div class="concept-box">
     <div class="label">重要概念</div>
@@ -5184,8 +5206,8 @@ tool_choice: {"type": "auto"}</pre>
 </div>
 
   <!-- Section 10: Agent Skills概要 -->
-<div id="m8-s10" class="card" style="display:none">
-  <h2>Agent Skills &mdash; 専門知識をパッケージにする</h2>
+<div id="m8-s10" class="card">
+  <h2 id="m8-s10-heading">Agent Skills &mdash; 専門知識をパッケージにする</h2>
   <p>Claude Codeで繰り返し使う「特定分野の専門知識」をまとめたものが<strong>Agent Skills（エージェントスキル）</strong>です。料理に例えると、レシピ本をまるごと覚えさせるのではなく、「和食のスキル」「洋食のスキル」と分けて、必要なときだけ参照するイメージです。</p>
   <div class="concept-box">
     <div class="label">重要概念</div>
@@ -5228,8 +5250,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 </div>
 
-  <div id="m8-s5" class="card" style="display:none">
-    <h2>Module 8 用語集</h2>
+  <div id="m8-s5" class="card">
+    <h2 id="m8-s5-heading">Module 8 用語集</h2>
     <div class="glossary-item"><div class="glossary-term">CLAUDE.md</div><div class="glossary-en">CLAUDE.md</div><div class="glossary-def">Claude Code向けのMarkdown形式の指示書ファイル。起動時に自動で読み込まれる。</div></div>
     <div class="glossary-item"><div class="glossary-term">settings.json</div><div class="glossary-en">settings.json</div><div class="glossary-def">Claude Codeの機械的な設定ファイル。権限、MCPサーバー、環境変数をJSON形式で定義。</div></div>
     <div class="glossary-item"><div class="glossary-term">フック</div><div class="glossary-en">Hook</div><div class="glossary-def">特定イベントにスクリプトを自動実行する仕組み。settings.jsonで定義。</div></div>
@@ -5246,7 +5268,7 @@ tool_choice: {"type": "auto"}</pre>
     <div class="glossary-item"><div class="glossary-term">フロントマター</div><div class="glossary-en">Frontmatter</div><div class="glossary-def">Markdownファイル冒頭の---で囲まれたYAML形式のメタデータ領域。ルールファイルでは適用条件の指定に使う。</div></div>
   </div>
 
-  <div id="m8-s6" class="card" style="display:none">
+  <div id="m8-s6" class="card">
     <div class="quiz-section">
       <h3>Module 8 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。</p>
@@ -5371,7 +5393,7 @@ tool_choice: {"type": "auto"}</pre>
     <span class="week-badge">Week 7</span>
     <h1>Module 9: エージェントアーキテクチャ</h1>
     <p class="subtitle">自律的に動くAIシステムの設計パターンを理解する</p>
-    <span class="domain-tag">ドメイン1: エージェント設計 (27%)</span>
+    <span class="domain-tag">ドメイン1: エージェント型アーキテクチャとオーケストレーション (27%)</span>
   </div>
 
   <div class="objectives">
@@ -5390,28 +5412,30 @@ tool_choice: {"type": "auto"}</pre>
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m9','s1',this)">エージェントとは</button>
-    <button class="section-tab" onclick="showSection('m9','s2',this)">5つのワークフロー</button>
-    <button class="section-tab" onclick="showSection('m9','s3',this)">自律エージェント</button>
-    <button class="section-tab" onclick="showSection('m9','s4',this)">設計の原則</button>
-    <button class="section-tab" onclick="showSection('m9','s5',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m9','s6',this)">クイズ</button>
-    <button class="section-tab" onclick="showSection('m9','s7',this)">Agent SDK</button>
-    <button class="section-tab" onclick="showSection('m9','s8',this)">Hooks</button>
-    <button class="section-tab" onclick="showSection('m9','s9',this)">エラー処理</button>
-    <button class="section-tab" onclick="showSection('m9','s10',this)">コンテキスト隔離</button>
-    <button class="section-tab" onclick="showSection('m9','s11',this)">安全なデプロイ</button>
-    <button class="section-tab" onclick="showSection('m9','s12',this)">SDK実装詳細</button>
-    <button class="section-tab" onclick="showSection('m9','s13',this)">Hooks実践</button>
-    <button class="section-tab" onclick="showSection('m9','s14',this)">エラー伝搬設計</button>
-    <button class="section-tab" onclick="showSection('m9','s15',this)">安全なデプロイ実践</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m9-s1-heading" style="color: var(--primary); text-decoration: none;">エージェントとは</a></li>
+      <li><a href="#m9-s2-heading" style="color: var(--primary); text-decoration: none;">5つのワークフロー</a></li>
+      <li><a href="#m9-s3-heading" style="color: var(--primary); text-decoration: none;">自律エージェント</a></li>
+      <li><a href="#m9-s4-heading" style="color: var(--primary); text-decoration: none;">設計の原則</a></li>
+      <li><a href="#m9-s7-heading" style="color: var(--primary); text-decoration: none;">Agent SDK</a></li>
+      <li><a href="#m9-s8-heading" style="color: var(--primary); text-decoration: none;">Hooks</a></li>
+      <li><a href="#m9-s9-heading" style="color: var(--primary); text-decoration: none;">エラー処理</a></li>
+      <li><a href="#m9-s10-heading" style="color: var(--primary); text-decoration: none;">コンテキスト隔離</a></li>
+      <li><a href="#m9-s11-heading" style="color: var(--primary); text-decoration: none;">安全なデプロイ</a></li>
+      <li><a href="#m9-s12-heading" style="color: var(--primary); text-decoration: none;">SDK実装詳細</a></li>
+      <li><a href="#m9-s13-heading" style="color: var(--primary); text-decoration: none;">Hooks実践</a></li>
+      <li><a href="#m9-s14-heading" style="color: var(--primary); text-decoration: none;">エラー伝搬設計</a></li>
+      <li><a href="#m9-s15-heading" style="color: var(--primary); text-decoration: none;">安全なデプロイ実践</a></li>
+      <li><a href="#m9-s5-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m9-s6-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+    </ol>
+  </nav>
 
   <!-- Section 1: エージェントとは -->
   <div id="m9-s1" class="card">
-    <h2>エージェントとは何か</h2>
+    <h2 id="m9-s1-heading">エージェントとは何か</h2>
     <p>これまでのモジュールで、Claudeにプロンプトを送り、ツールを使わせる方法を学びました。しかし、現実の仕事は「1回のやり取り」では終わりません。調べ物をして、判断して、実行して、結果を確認して、必要なら修正する ── この<strong>ループ（繰り返し）</strong>を自律的に回せるAIシステムが「エージェント」です。</p>
 
     <p>身近な例えで言うと、チャットAIは「質問したら答えてくれる辞書」、エージェントは「指示を出したら自分で段取りを考え、必要な道具を使いこなして仕事を片付けてくれる優秀な部下」のようなものです。</p>
@@ -5461,8 +5485,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 2: 5つのワークフローパターン -->
-  <div id="m9-s2" class="card" style="display:none">
-    <h2>5つのワークフローパターン</h2>
+  <div id="m9-s2" class="card">
+    <h2 id="m9-s2-heading">5つのワークフローパターン</h2>
     <p>Anthropicは公式ブログ「Building effective agents」で、5つの基本ワークフローパターンを提唱しています。これらはCCA-F試験で最も頻出するテーマの一つです。</p>
 
     <h3>1. プロンプト連鎖（Prompt Chaining）</h3>
@@ -5525,8 +5549,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 3: 自律エージェント -->
-  <div id="m9-s3" class="card" style="display:none">
-    <h2>自律エージェントとエージェントループ</h2>
+  <div id="m9-s3" class="card">
+    <h2 id="m9-s3-heading">自律エージェントとエージェントループ</h2>
     <p>5つのワークフローパターンでは対応できない、手順が事前に予測できないタスクには<strong>自律エージェント</strong>を使います。</p>
 
     <h3>エージェントループ（Agentic Loop）の仕組み</h3>
@@ -5585,8 +5609,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 4: 設計の原則 -->
-  <div id="m9-s4" class="card" style="display:none">
-    <h2>エージェント設計の原則とベストプラクティス</h2>
+  <div id="m9-s4" class="card">
+    <h2 id="m9-s4-heading">エージェント設計の原則とベストプラクティス</h2>
     <p>27%という最大配点を持つこのドメインでは、「どうやってエージェントを作るか」だけでなく、「どう設計すべきか」「何を避けるべきか」の判断力が問われます。</p>
 
     <h3>Anthropicの3原則</h3>
@@ -5648,8 +5672,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 5: 用語集 -->
-  <div id="m9-s5" class="card" style="display:none">
-    <h2>エージェントアーキテクチャ 用語集</h2>
+  <div id="m9-s5" class="card">
+    <h2 id="m9-s5-heading">エージェントアーキテクチャ 用語集</h2>
     <p>このモジュールで登場した重要な用語をまとめています。試験は英語のため、英語表記も併記しています。</p>
 
     <div class="glossary-item">
@@ -5795,7 +5819,7 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 6: クイズ -->
-  <div id="m9-s6" class="card" style="display:none">
+  <div id="m9-s6" class="card">
     <div class="quiz-section">
       <h3>Module 9 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -5971,8 +5995,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 7: Agent SDK -->
-  <div id="m9-s7" class="card" style="display:none">
-    <h2>Agent SDKで作るエージェント</h2>
+  <div id="m9-s7" class="card">
+    <h2 id="m9-s7-heading">Agent SDKで作るエージェント</h2>
     <p>ここまでエージェントの「考え方」を学びました。ここからは、Anthropicが提供する<strong>Agent SDK</strong>を使って、実際にどうやってエージェントを「動かす」のかを見ていきましょう。</p>
 
     <p>Agent SDKは、エージェントを作るための「公式キット」です。身近な例えで言うと、エージェントループのSection 3で学んだ「計画→実行→確認→修正」のサイクルを、最小限のコードで動かせるようにした「組み立てキット」のようなものです。</p>
@@ -6038,8 +6062,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 8: Hooks（決定論的処理注入） -->
-  <div id="m9-s8" class="card" style="display:none">
-    <h2>Hooks — 決定論的な処理を注入する</h2>
+  <div id="m9-s8" class="card">
+    <h2 id="m9-s8-heading">Hooks — 決定論的な処理を注入する</h2>
     <p>Section 4で「プログラム的エンフォースメント」を学びました。その実装手段が<strong>Hooks（フック）</strong>です。</p>
 
     <p>Hooksとは、エージェントの動作の「特定のタイミング」にコード処理を差し込む仕組みです。身近な例えで言うと、工場の品質管理です。製品が工程から工程に移るとき、必ず検査を通す仕組み ── それがHooksです。</p>
@@ -6094,8 +6118,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 9: エラー伝搬とフォールバック -->
-  <div id="m9-s9" class="card" style="display:none">
-    <h2>エラー処理とフォールバック設計</h2>
+  <div id="m9-s9" class="card">
+    <h2 id="m9-s9-heading">エラー処理とフォールバック設計</h2>
     <p>エージェントは複数のツールを連続で使うため、途中でエラーが起きることは避けられません。ここでは「エラーが起きたらどうするか」を設計する方法を学びます。</p>
 
     <h3>ツールエラーの2つの分類</h3>
@@ -6156,8 +6180,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 10: コンテキスト隔離 -->
-  <div id="m9-s10" class="card" style="display:none">
-    <h2>コンテキスト隔離 — サブエージェントの「記憶」は共有されない</h2>
+  <div id="m9-s10" class="card">
+    <h2 id="m9-s10-heading">コンテキスト隔離 — サブエージェントの「記憶」は共有されない</h2>
     <p>マルチエージェントシステムを設計するうえで、最も誤解されやすいのが<strong>コンテキスト隔離</strong>です。ここをしっかり理解すると、試験でのミスを大幅に減らせます。</p>
 
     <h3>コンテキスト隔離とは</h3>
@@ -6206,8 +6230,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 11: 安全なデプロイ（Secure Deployment） -->
-  <div id="m9-s11" class="card" style="display:none">
-    <h2>エージェントの安全なデプロイ</h2>
+  <div id="m9-s11" class="card">
+    <h2 id="m9-s11-heading">エージェントの安全なデプロイ</h2>
     <p>優秀なエージェントを作っても、安全に動かせなければ意味がありません。Anthropicは、エージェントを本番環境にデプロイ（公開・運用開始）する際の<strong>3つの安全原則</strong>を提唱しています。</p>
 
     <h3>3つの安全原則</h3>
@@ -6275,8 +6299,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 12: Agent SDK実装詳細 -->
-  <div id="m9-s12" class="card" style="display:none">
-    <h2>Agent SDK実装詳細 &mdash; ストリーミング・max_turns・SDK vs 直接API</h2>
+  <div id="m9-s12" class="card">
+    <h2 id="m9-s12-heading">Agent SDK実装詳細 &mdash; ストリーミング・max_turns・SDK vs 直接API</h2>
     <p>Section 7ではAgent SDKの基本を学びました。ここでは、実際にエージェントを動かすときに知っておくべき<strong>実装レベルの詳細</strong>を掘り下げます。</p>
 
     <h3>Client SDK vs Agent SDK &mdash; 2つのSDKの違い</h3>
@@ -6362,8 +6386,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 13: Hooks実践 -->
-  <div id="m9-s13" class="card" style="display:none">
-    <h2>Hooks実践 &mdash; ガードレール・監査ログ・権限制御</h2>
+  <div id="m9-s13" class="card">
+    <h2 id="m9-s13-heading">Hooks実践 &mdash; ガードレール・監査ログ・権限制御</h2>
     <p>Section 8ではHooksの基本（4つのタイミング）を学びました。ここでは公式ドキュメントに基づいた<strong>実践的な設計パターン</strong>を深掘りします。</p>
 
     <h3>Hookイベントの全体像</h3>
@@ -6446,8 +6470,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 14: エラー伝搬設計 -->
-  <div id="m9-s14" class="card" style="display:none">
-    <h2>エラー伝搬設計 &mdash; スキップ・エスカレーション・構造化エラー</h2>
+  <div id="m9-s14" class="card">
+    <h2 id="m9-s14-heading">エラー伝搬設計 &mdash; スキップ・エスカレーション・構造化エラー</h2>
     <p>Section 9ではエラー処理の基本を学びました。ここでは、マルチエージェントシステムにおける<strong>より高度なエラー伝搬パターン</strong>を掘り下げます。</p>
 
     <h3>エラー対応の4つの戦略</h3>
@@ -6527,8 +6551,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 15: 安全なデプロイ実践 -->
-  <div id="m9-s15" class="card" style="display:none">
-    <h2>安全なデプロイ実践 &mdash; サンドボックス・データフロー制御</h2>
+  <div id="m9-s15" class="card">
+    <h2 id="m9-s15-heading">安全なデプロイ実践 &mdash; サンドボックス・データフロー制御</h2>
     <p>Section 11ではSecure Deploymentの3原則を学びました。ここでは公式ドキュメントに基づいた<strong>具体的な実装手法</strong>を掘り下げます。</p>
 
     <h3>脅威モデル &mdash; 何から守るのか</h3>
@@ -6647,25 +6671,28 @@ tool_choice: {"type": "auto"}</pre>
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m10','s1',this)">マルチエージェントとは</button>
-    <button class="section-tab" onclick="showSection('m10','s2',this)">設計パターン</button>
-    <button class="section-tab" onclick="showSection('m10','s3',this)">通信と連携</button>
-    <button class="section-tab" onclick="showSection('m10','s4',this)">安全性と信頼性</button>
-    <button class="section-tab" onclick="showSection('m10','s5',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m10','s6',this)">クイズ</button>
-    <button class="section-tab" onclick="showSection('m10','s7',this)">高度なパターン</button>
-    <button class="section-tab" onclick="showSection('m10','s8',this)">情報追跡と障害対応</button>
-    <button class="section-tab" onclick="showSection('m10','s9',this)">Hub-and-Spoke実装詳細</button>
-    <button class="section-tab" onclick="showSection('m10','s10',this)">Agent-as-Tool vs Handoff詳細</button>
-    <button class="section-tab" onclick="showSection('m10','s11',this)">情報出所追跡詳細</button>
-    <button class="section-tab" onclick="showSection('m10','s12',this)">フォールバックループ詳細</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m10-s1-heading" style="color: var(--primary); text-decoration: none;">マルチエージェントとは</a></li>
+      <li><a href="#m10-s2-heading" style="color: var(--primary); text-decoration: none;">設計パターン</a></li>
+      <li><a href="#m10-s3-heading" style="color: var(--primary); text-decoration: none;">通信と連携</a></li>
+      <li><a href="#m10-s4-heading" style="color: var(--primary); text-decoration: none;">安全性と信頼性</a></li>
+      <li><a href="#m10-s5-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m10-s6-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+      <li><a href="#m10-s7-heading" style="color: var(--primary); text-decoration: none;">高度なパターン</a></li>
+      <li><a href="#m10-s8-heading" style="color: var(--primary); text-decoration: none;">情報追跡と障害対応</a></li>
+      <li><a href="#m10-s9-heading" style="color: var(--primary); text-decoration: none;">Hub-and-Spoke実装詳細</a></li>
+      <li><a href="#m10-s10-heading" style="color: var(--primary); text-decoration: none;">Agent-as-Tool vs Handoff詳細</a></li>
+      <li><a href="#m10-s11-heading" style="color: var(--primary); text-decoration: none;">情報出所追跡詳細</a></li>
+      <li><a href="#m10-s12-heading" style="color: var(--primary); text-decoration: none;">フォールバックループ詳細</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: マルチエージェントとは -->
   <div id="m10-s1" class="card">
-    <h2>マルチエージェントシステムとは</h2>
+    <h2 id="m10-s1-heading">マルチエージェントシステムとは</h2>
     <p>Module 9で学んだエージェント（自律的にタスクを遂行するAI）を<strong>複数協調させる</strong>のがマルチエージェントシステムです。1人で全部やるのではなく、<strong>チームで分業して仕事を進める</strong>アプローチです。</p>
     <p>会社に例えると、Module 9は「1人の優秀な社員」の働き方でした。Module 10は「チーム全体」の編成方法 — 誰にどの仕事を任せるか、どう連携するか、問題が起きたらどうエスカレーションするかを学びます。</p>
 
@@ -6703,8 +6730,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 2: 設計パターン -->
-  <div id="m10-s2" class="card" style="display:none">
-    <h2>マルチエージェントの設計パターン</h2>
+  <div id="m10-s2" class="card">
+    <h2 id="m10-s2-heading">マルチエージェントの設計パターン</h2>
     <p>Anthropicの公式ドキュメント（"Building effective agents"）では、エージェントシステムを<strong>ワークフロー（Workflows）</strong>と<strong>エージェント（Agents）</strong>に大別しています。ワークフローはオーケストレーション側がフローを制御し、エージェントはLLM自身が判断する方式です。</p>
 
     <h3>ワークフローパターン</h3>
@@ -6762,8 +6789,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 3: 通信と連携 -->
-  <div id="m10-s3" class="card" style="display:none">
-    <h2>エージェント間の通信と連携</h2>
+  <div id="m10-s3" class="card">
+    <h2 id="m10-s3-heading">エージェント間の通信と連携</h2>
     <p>複数のエージェントが協調するには、<strong>情報をやり取りする仕組み</strong>が必要です。主に3つの方式があります。</p>
 
     <h3>1. メッセージパッシング（Message Passing）</h3>
@@ -6818,8 +6845,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 4: 安全性と信頼性 -->
-  <div id="m10-s4" class="card" style="display:none">
-    <h2>安全性と信頼性の設計</h2>
+  <div id="m10-s4" class="card">
+    <h2 id="m10-s4-heading">安全性と信頼性の設計</h2>
     <p>マルチエージェントシステムでは、複数のエージェントが自律的に行動するため、<strong>安全性の確保がさらに重要</strong>になります。Anthropicが推奨する主な安全性メカニズムを学びましょう。</p>
 
     <h3>1. Guardrails（ガードレール）</h3>
@@ -6872,8 +6899,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 7: 高度なマルチエージェントパターン（拡充コンテンツ） -->
-  <div id="m10-s7" class="card" style="display:none">
-    <h2>高度なマルチエージェントパターン</h2>
+  <div id="m10-s7" class="card">
+    <h2 id="m10-s7-heading">高度なマルチエージェントパターン</h2>
     <p>Module 10の前半では5つの基本パターンを学びました。ここでは、実際のプロダクション環境で使われるより高度なパターンを学びます。CCA-F試験のシナリオ問題（特にシナリオ3「マルチエージェントリサーチ」）で問われる重要テーマです。</p>
 
     <h3>Hub-and-Spoke（ハブ＆スポーク）パターン</h3>
@@ -6964,8 +6991,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 8: 情報追跡と障害対応（拡充コンテンツ） -->
-  <div id="m10-s8" class="card" style="display:none">
-    <h2>情報追跡（Provenance）と障害対応</h2>
+  <div id="m10-s8" class="card">
+    <h2 id="m10-s8-heading">情報追跡（Provenance）と障害対応</h2>
     <p>マルチエージェントシステムでは、「この情報はどのエージェントが、どの情報源から取得したか」を記録する<strong>情報出所（Provenance）追跡</strong>と、エージェントが失敗した場合の<strong>フォールバック（代替手段への切り替え）</strong>が欠かせません。</p>
 
     <h3>情報出所（Provenance）追跡</h3>
@@ -7044,8 +7071,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 9: Hub-and-Spoke実装詳細（拡充コンテンツ） -->
-  <div id="m10-s9" class="card" style="display:none">
-    <h2>Hub-and-Spoke実装の詳細</h2>
+  <div id="m10-s9" class="card">
+    <h2 id="m10-s9-heading">Hub-and-Spoke実装の詳細</h2>
     <p>Module 10の基礎編でHub-and-Spokeの概要を学びました。この拡充セクションでは、Anthropicが公式に構築した<strong>マルチエージェントリサーチシステム</strong>の実装を手がかりに、オーケストレーター（リードエージェント）の具体的な設計方法を掘り下げます。</p>
 
     <h3>オーケストレーターの5つの責務</h3>
@@ -7123,8 +7150,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 10: Agent-as-Tool vs Handoff詳細（拡充コンテンツ） -->
-  <div id="m10-s10" class="card" style="display:none">
-    <h2>Agent-as-ToolとHandoff: 実装パターンの詳細</h2>
+  <div id="m10-s10" class="card">
+    <h2 id="m10-s10-heading">Agent-as-ToolとHandoff: 実装パターンの詳細</h2>
     <p>Module 10基礎編で2つの連携方式の概要を学びました。ここでは、Anthropicの公式ドキュメントとAgent SDKに基づいて、それぞれの<strong>実装パターン</strong>と<strong>設計上の判断基準</strong>を深掘りします。</p>
 
     <h3>Agent-as-Toolパターンの実装</h3>
@@ -7206,8 +7233,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 11: 情報出所追跡詳細（拡充コンテンツ） -->
-  <div id="m10-s11" class="card" style="display:none">
-    <h2>情報出所（Provenance）追跡の実装</h2>
+  <div id="m10-s11" class="card">
+    <h2 id="m10-s11-heading">情報出所（Provenance）追跡の実装</h2>
     <p>マルチエージェントシステムでは、複数のエージェントが情報を収集・加工します。最終レポートの各主張が<strong>「どこから来たのか」</strong>を追跡できなければ、ハルシネーション（事実でない情報の生成）を見抜けません。Anthropicの公式マルチエージェントリサーチシステムでは、これを<strong>3層のProvenance追跡アーキテクチャ</strong>で解決しています。</p>
 
     <h3>Provenance追跡の3層アーキテクチャ</h3>
@@ -7225,7 +7252,7 @@ tool_choice: {"type": "auto"}</pre>
 
     <table class="compare-table">
       <tr><th>メタデータ項目</th><th>英語名</th><th>内容</th><th>例</th></tr>
-      <tr><td><strong>情報源URL</strong></td><td>Source URL</td><td>情報の取得元</td><td>docs.anthropic.com/...</td></tr>
+      <tr><td><strong>情報源URL</strong></td><td>Source URL</td><td>情報の取得元</td><td>platform.claude.com/docs/...</td></tr>
       <tr><td><strong>取得時刻</strong></td><td>Retrieval Timestamp</td><td>いつ取得したか</td><td>2026-03-27T10:30:00Z</td></tr>
       <tr><td><strong>情報源の種類</strong></td><td>Source Type</td><td>公式ドキュメント/論文/ブログ等</td><td>Official Documentation</td></tr>
       <tr><td><strong>取得エージェント</strong></td><td>Collecting Agent</td><td>どのサブエージェントが取得したか</td><td>research_subagent_02</td></tr>
@@ -7282,8 +7309,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 12: フォールバックループ詳細（拡充コンテンツ） -->
-  <div id="m10-s12" class="card" style="display:none">
-    <h2>フォールバックループの設計</h2>
+  <div id="m10-s12" class="card">
+    <h2 id="m10-s12-heading">フォールバックループの設計</h2>
     <p>マルチエージェントシステムでは、サブエージェントの失敗、ツールのエラー、タイムアウトなど、多くの障害が発生し得ます。Anthropicは<strong>「エージェントに障害を伝え、エージェント自身に適応させる」</strong>アプローチが驚くほど有効だと報告しています。ここでは、そのフォールバック（代替手段への切り替え）設計を体系的に学びます。</p>
 
     <h3>フォールバックの4層モデル</h3>
@@ -7362,8 +7389,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 5: 用語集 -->
-  <div id="m10-s5" class="card" style="display:none">
-    <h2>Module 10 用語集</h2>
+  <div id="m10-s5" class="card">
+    <h2 id="m10-s5-heading">Module 10 用語集</h2>
     <p>マルチエージェントシステムに関する重要用語をまとめました。</p>
 
     <div class="glossary-item">
@@ -7534,8 +7561,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 6: クイズ -->
-  <div id="m10-s6" class="card" style="display:none">
-    <h2>確認クイズ</h2>
+  <div id="m10-s6" class="card">
+    <h2 id="m10-s6-heading">確認クイズ</h2>
     <p>Module 10の内容を確認しましょう。全16問、すべて4択です。</p>
 
     <div class="quiz-section" id="m10-quiz">
@@ -7699,7 +7726,7 @@ tool_choice: {"type": "auto"}</pre>
     <span class="week-badge">Week 8</span>
     <h1>Module 11: コンテキスト管理と信頼性</h1>
     <p class="subtitle">長文処理の戦略とAI出力の信頼性を確保する設計パターン</p>
-    <span class="domain-tag">ドメイン5: コンテキスト管理 (15%)</span>
+    <span class="domain-tag">ドメイン5: 信頼性と安全性 (15%)</span>
   </div>
 
   <div class="objectives">
@@ -7713,28 +7740,31 @@ tool_choice: {"type": "auto"}</pre>
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m11','s1',this)">コンテキストウィンドウ</button>
-    <button class="section-tab" onclick="showSection('m11','s2',this)">RAGと検索拡張</button>
-    <button class="section-tab" onclick="showSection('m11','s3',this)">信頼性の確保</button>
-    <button class="section-tab" onclick="showSection('m11','s4',this)">エラー処理と運用</button>
-    <button class="section-tab" onclick="showSection('m11','s5',this)">用語集</button>
-    <button class="section-tab" onclick="showSection('m11','s6',this)">クイズ</button>
-    <button class="section-tab" onclick="showSection('m11','s7',this)">Rate Limits</button>
-    <button class="section-tab" onclick="showSection('m11','s8',this)">ガードレール強化</button>
-    <button class="section-tab" onclick="showSection('m11','s9',this)">データプライバシー</button>
-    <button class="section-tab" onclick="showSection('m11','s10',this)">高度なコンテキスト管理</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m11-s1-heading" style="color: var(--primary); text-decoration: none;">コンテキストウィンドウ</a></li>
+      <li><a href="#m11-s2-heading" style="color: var(--primary); text-decoration: none;">RAGと検索拡張</a></li>
+      <li><a href="#m11-s3-heading" style="color: var(--primary); text-decoration: none;">信頼性の確保</a></li>
+      <li><a href="#m11-s4-heading" style="color: var(--primary); text-decoration: none;">エラー処理と運用</a></li>
+      <li><a href="#m11-s5-heading" style="color: var(--primary); text-decoration: none;">用語集</a></li>
+      <li><a href="#m11-s6-heading" style="color: var(--primary); text-decoration: none;">クイズ</a></li>
+      <li><a href="#m11-s7-heading" style="color: var(--primary); text-decoration: none;">Rate Limits</a></li>
+      <li><a href="#m11-s8-heading" style="color: var(--primary); text-decoration: none;">ガードレール強化</a></li>
+      <li><a href="#m11-s9-heading" style="color: var(--primary); text-decoration: none;">データプライバシー</a></li>
+      <li><a href="#m11-s10-heading" style="color: var(--primary); text-decoration: none;">高度なコンテキスト管理</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: コンテキストウィンドウ -->
   <div id="m11-s1" class="card">
-    <h2>コンテキストウィンドウとトークン</h2>
+    <h2 id="m11-s1-heading">コンテキストウィンドウとトークン</h2>
     <p>コンテキストウィンドウ（Context Window）とは、AIモデルが一度に「見える」テキストの量の上限です。たとえるなら、<strong>机の上の作業スペース</strong>のようなもの。机が広いほど多くの資料を同時に広げられますが、無限ではありません。</p>
 
     <div class="concept-box">
       <div class="label">重要概念</div>
-      <p><strong>コンテキストウィンドウ（Context Window）：</strong>モデルが1回のリクエストで処理できるトークンの合計上限。<strong>入力トークン（プロンプト・システムプロンプト・会話履歴・ツール定義）+ 出力トークン（AIの応答）</strong>の合計がこの上限に収まる必要がある。Claudeは200,000トークン（約15万語・500ページ相当）のウィンドウを持つ。</p>
+      <p><strong>コンテキストウィンドウ（Context Window）：</strong>モデルが1回のリクエストで処理できるトークンの合計上限。<strong>入力トークン（プロンプト・システムプロンプト・会話履歴・ツール定義）+ 出力トークン（AIの応答）</strong>の合計がこの上限に収まる必要がある。Claude Opus 4.6/Sonnet 4.6は100万トークン（約75万語）、Haiku 4.5は200,000トークンのウィンドウを持つ。</p>
     </div>
 
     <h3>トークンとは</h3>
@@ -7784,8 +7814,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 2: RAGと検索拡張 -->
-  <div id="m11-s2" class="card" style="display:none">
-    <h2>RAG（検索拡張生成）</h2>
+  <div id="m11-s2" class="card">
+    <h2 id="m11-s2-heading">RAG（検索拡張生成）</h2>
     <p>RAG（Retrieval-Augmented Generation / 検索拡張生成）は、AIの「知識の限界」を克服するための手法です。たとえるなら、<strong>試験中にカンニングペーパーを見るのではなく、正式に参考書を持ち込める試験</strong>のようなものです。モデルの内部知識に頼るのではなく、外部のデータベースから関連情報を取得してコンテキストに注入します。</p>
 
     <h3>RAGの3段階パイプライン</h3>
@@ -7809,7 +7839,7 @@ tool_choice: {"type": "auto"}</pre>
     <table class="compare-table">
       <tr><th>観点</th><th>説明</th></tr>
       <tr><td><strong>関係性</strong></td><td>RAGはコンテキストウィンドウの制約を「間接的に」克服する手法</td></tr>
-      <tr><td><strong>仕組み</strong></td><td>数百万件のドキュメントから関連部分だけを抽出し、200Kウィンドウ内に収める</td></tr>
+      <tr><td><strong>仕組み</strong></td><td>数百万件のドキュメントから関連部分だけを抽出し、モデルのコンテキストウィンドウ（Opus/Sonnet: 1M、Haiku: 200K）内に収める</td></tr>
       <tr><td><strong>注意点</strong></td><td>「全部入れれば良い」わけではない。ノイズが多いと精度低下</td></tr>
     </table>
 
@@ -7839,8 +7869,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 3: 信頼性の確保 -->
-  <div id="m11-s3" class="card" style="display:none">
-    <h2>信頼性の確保</h2>
+  <div id="m11-s3" class="card">
+    <h2 id="m11-s3-heading">信頼性の確保</h2>
     <p>AIの出力は常に正しいとは限りません。本番環境では、出力の<strong>信頼性を設計で確保</strong>する必要があります。ここでは主要な信頼性パターンを学びます。</p>
 
     <h3>ハルシネーション対策</h3>
@@ -7884,8 +7914,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 4: エラー処理と運用 -->
-  <div id="m11-s4" class="card" style="display:none">
-    <h2>エラー処理と運用パターン</h2>
+  <div id="m11-s4" class="card">
+    <h2 id="m11-s4-heading">エラー処理と運用パターン</h2>
     <p>本番環境でAIシステムを運用する際、エラーは避けられません。重要なのは「エラーが起きないようにする」ことではなく、<strong>「エラーが起きても適切に対処できる設計」</strong>にすることです。</p>
 
     <h3>指数バックオフ（Exponential Backoff）</h3>
@@ -7934,14 +7964,14 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 5: 用語集 -->
-  <div id="m11-s5" class="card" style="display:none">
-    <h2>Module 11 用語集</h2>
+  <div id="m11-s5" class="card">
+    <h2 id="m11-s5-heading">Module 11 用語集</h2>
     <p>このモジュールで登場した重要用語をまとめました。試験は英語のため、英語表記も確認しておきましょう。</p>
 
     <div class="glossary-item">
       <div class="glossary-term">コンテキストウィンドウ</div>
       <div class="glossary-en">Context Window</div>
-      <div class="glossary-def">モデルが1回のリクエストで処理できるトークンの合計上限。Claudeは200,000トークン。入力+出力の合計がこの上限に収まる必要がある。</div>
+      <div class="glossary-def">モデルが1回のリクエストで処理できるトークンの合計上限。Claude Opus 4.6/Sonnet 4.6は100万トークン、Haiku 4.5は200,000トークン。入力+出力の合計がこの上限に収まる必要がある。</div>
     </div>
     <div class="glossary-item">
       <div class="glossary-term">検索拡張生成</div>
@@ -8001,7 +8031,7 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 6: Quiz -->
-  <div id="m11-s6" class="card" style="display:none">
+  <div id="m11-s6" class="card">
     <div class="quiz-section">
       <h3>Module 11 確認クイズ</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">このモジュールの理解度を確認しましょう。全問回答後に結果が表示されます。</p>
@@ -8105,8 +8135,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 7: Rate Limits & Service Tiers -->
-<div id="m11-s7" class="card" style="display:none">
-  <h2>Rate Limits & Service Tiers</h2>
+<div id="m11-s7" class="card">
+  <h2 id="m11-s7-heading">Rate Limits & Service Tiers</h2>
   <p>Claude APIには、サーバーを安定的に運用するための<strong>利用制限（Rate Limits）</strong>が設けられています。本番システムを設計する際、この制限を正しく理解し、効率的に利用する知識が求められます。</p>
 
   <h3>3つの制限指標</h3>
@@ -8202,8 +8232,8 @@ tool_choice: {"type": "auto"}</pre>
 </div>
 
   <!-- Section 8: ガードレール強化 -->
-<div id="m11-s8" class="card" style="display:none">
-  <h2>ガードレール強化（Strengthen Guardrails）</h2>
+<div id="m11-s8" class="card">
+  <h2 id="m11-s8-heading">ガードレール強化（Strengthen Guardrails）</h2>
   <p>AI出力の信頼性を高めるには、「プロンプトだけに頼る」のではなく、<strong>システム全体で多層的に安全策を設ける</strong>必要があります。ここではAnthropicが公式に推奨するガードレール強化の手法を学びます。</p>
 
   <h3>ハルシネーション削減 5つの手法</h3>
@@ -8297,8 +8327,8 @@ tool_choice: {"type": "auto"}</pre>
 </div>
 
   <!-- Section 9: データプライバシー基礎 -->
-<div id="m11-s9" class="card" style="display:none">
-  <h2>データプライバシー基礎</h2>
+<div id="m11-s9" class="card">
+  <h2 id="m11-s9-heading">データプライバシー基礎</h2>
   <p>Claudeを業務で利用する際、「送信したデータはどう扱われるのか？」という疑問は避けて通れません。ここでは、Anthropicのデータ取扱いポリシーを理解します。</p>
 
   <h3>3つのデータ取扱い区分</h3>
@@ -8365,8 +8395,8 @@ tool_choice: {"type": "auto"}</pre>
 </div>
 
   <!-- Section 10: 高度なコンテキスト管理 -->
-<div id="m11-s10" class="card" style="display:none">
-  <h2>高度なコンテキスト管理</h2>
+<div id="m11-s10" class="card">
+  <h2 id="m11-s10-heading">高度なコンテキスト管理</h2>
   <p>長時間のエージェントセッションやマルチエージェントシステムでは、コンテキストの管理がより複雑になります。ここでは、高度なコンテキスト管理の戦略を学びます。</p>
 
   <h3>プログレッシブ要約のリスク</h3>
@@ -8489,17 +8519,20 @@ tool_choice: {"type": "auto"}</pre>
     </ul>
   </div>
 
-  <!-- Section Tabs -->
-  <div class="section-nav">
-    <button class="section-tab active" onclick="showSection('m12','s1',this)">ドメイン総復習</button>
-    <button class="section-tab" onclick="showSection('m12','s2',this)">試験対策</button>
-    <button class="section-tab" onclick="showSection('m12','s3',this)">ミニ模試</button>
-    <button class="section-tab" onclick="showSection('m12','s4',this)">本番形式模試</button>
-  </div>
+  <nav class="card" style="background: var(--bg); padding: 1rem 1.5rem;">
+    <h3 style="font-size: .9rem; margin-bottom: .5rem; color: var(--text-light);">このモジュールの内容</h3>
+    <ol style="font-size: .85rem; margin: 0; padding-left: 1.25rem; columns: 2; column-gap: 2rem;">
+      <li><a href="#m12-s1-heading" style="color: var(--primary); text-decoration: none;">ドメイン総復習</a></li>
+      <li><a href="#m12-s2-heading" style="color: var(--primary); text-decoration: none;">試験対策</a></li>
+      <li><a href="#m12-s3-heading" style="color: var(--primary); text-decoration: none;">ミニ模試</a></li>
+      <li><a href="#m12-s4-heading" style="color: var(--primary); text-decoration: none;">本番形式模試</a></li>
+    </ol>
+  </nav>
+
 
   <!-- Section 1: ドメイン総復習 -->
   <div id="m12-s1" class="card">
-    <h2>5ドメイン 要点総まとめ</h2>
+    <h2 id="m12-s1-heading">5ドメイン 要点総まとめ</h2>
     <p>CCA-F試験は5つのドメインから構成されています。各ドメインの核心ポイントを振り返りましょう。</p>
 
     <h3>ドメイン1: エージェント型アーキテクチャとオーケストレーション（27%）</h3>
@@ -8564,8 +8597,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 2: 試験対策 -->
-  <div id="m12-s2" class="card" style="display:none">
-    <h2>CCA-F試験 直前対策ガイド</h2>
+  <div id="m12-s2" class="card">
+    <h2 id="m12-s2-heading">CCA-F試験 直前対策ガイド</h2>
 
     <h3>試験の基本情報</h3>
     <table class="compare-table">
@@ -8625,7 +8658,7 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 3: 模擬試験 -->
-  <div id="m12-s3" class="card" style="display:none">
+  <div id="m12-s3" class="card">
     <div class="quiz-section">
       <h3>CCA-F ミニ模試（15問）</h3>
       <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">全5ドメインから配点比率に応じて出題する基本確認テストです。目標：11問以上正解（73%以上）で合格圏内です。本格的な模試は「本番形式模試」タブをご利用ください。</p>
@@ -8787,8 +8820,8 @@ tool_choice: {"type": "auto"}</pre>
   </div>
 
   <!-- Section 4: 本番形式模試 -->
-  <div id="m12-s4" class="card" style="display:none">
-    <h2>本番形式模試</h2>
+  <div id="m12-s4" class="card">
+    <h2 id="m12-s4-heading">本番形式模試</h2>
     <p>全問題プールからドメイン配分に基づいてランダム出題します。CCA-F本番と同じドメイン比率で実力を測定できます。</p>
 
     <!-- 設定画面 -->
@@ -8867,7 +8900,7 @@ tool_choice: {"type": "auto"}</pre>
 
       <div class="btn-group" style="margin-top:1.5rem;">
         <button class="btn btn-accent" onclick="resetExam()">もう一度挑戦する</button>
-        <button class="btn btn-outline" onclick="showSection('m12','s1',document.querySelector('#page-m12 .section-tab'))">ドメイン総復習に戻る</button>
+        <button class="btn btn-outline" onclick="document.getElementById('m12-s1-heading').scrollIntoView({behavior:'smooth'})">ドメイン総復習に戻る</button>
       </div>
     </div>
   </div>
@@ -9676,7 +9709,7 @@ QUIZ_DATA['m10'] = {
 QUIZ_DATA['m11'] = {
   answers: [1, 1, 2, 1, 1, 1, 2, 2, 1, 1],
   explanations: [
-    'コンテキストウィンドウは入力トークンと出力トークンの合計の上限です。Claudeは200,000トークンのウィンドウを持ちます。入力が大きいほど出力に使える余地が減るため、コンテキストの効率的な利用が重要です。',
+    'コンテキストウィンドウは入力トークンと出力トークンの合計の上限です。Claude Opus 4.6/Sonnet 4.6は100万トークン、Haiku 4.5は200,000トークンのウィンドウを持ちます。入力が大きいほど出力に使える余地が減るため、コンテキストの効率的な利用が重要です。',
     'Contextual RetrievalはAnthropicが提唱した手法で、各チャンクにドキュメント全体の文脈説明を付加してからEmbeddingすることで、検索精度を最大67%向上させます。チャンク単体では失われがちな文脈情報を補完する点が特徴です。',
     '429 Rate Limitは一時的なエラーであり、retry-afterヘッダーに従って指定された時間だけ待機してからリトライするのが正しい対応です。即座の再送信はサーバーに負荷をかけ、状況を悪化させます。',
     '"Lost in the Middle"問題は、コンテキストの中央部に配置された情報が見落とされやすい現象です。対策として、重要情報はコンテキストの先頭または末尾に配置します。Anthropicは長文データを先頭に、質問を末尾に配置することで品質が最大30%向上すると報告しています。',
@@ -9993,22 +10026,6 @@ function showPage(pageId) {
 
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
-}
-
-function showSection(module, section, tabEl) {
-  // Hide all sections for this module
-  let i = 1;
-  while(true) {
-    const el = document.getElementById(module + '-s' + i);
-    if (!el) break;
-    el.style.display = 'none';
-    i++;
-  }
-  document.getElementById(module + '-' + section).style.display = 'block';
-
-  // Update tabs
-  tabEl.parentElement.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
-  tabEl.classList.add('active');
 }
 
 
