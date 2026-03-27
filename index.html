@@ -8493,7 +8493,8 @@ tool_choice: {"type": "auto"}</pre>
   <div class="section-nav">
     <button class="section-tab active" onclick="showSection('m12','s1',this)">ドメイン総復習</button>
     <button class="section-tab" onclick="showSection('m12','s2',this)">試験対策</button>
-    <button class="section-tab" onclick="showSection('m12','s3',this)">模擬試験</button>
+    <button class="section-tab" onclick="showSection('m12','s3',this)">ミニ模試</button>
+    <button class="section-tab" onclick="showSection('m12','s4',this)">本番形式模試</button>
   </div>
 
   <!-- Section 1: ドメイン総復習 -->
@@ -8626,8 +8627,8 @@ tool_choice: {"type": "auto"}</pre>
   <!-- Section 3: 模擬試験 -->
   <div id="m12-s3" class="card" style="display:none">
     <div class="quiz-section">
-      <h3>CCA-F 模擬試験（15問）</h3>
-      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">本番と同じシナリオベース形式の模擬試験です。全5ドメインから配点比率に応じて出題しています。目標：11問以上正解（73%以上）で合格圏内です。</p>
+      <h3>CCA-F ミニ模試（15問）</h3>
+      <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-light);">全5ドメインから配点比率に応じて出題する基本確認テストです。目標：11問以上正解（73%以上）で合格圏内です。本格的な模試は「本番形式模試」タブをご利用ください。</p>
 
       <!-- Q1: ドメイン1 - エージェント設計 -->
       <div class="quiz-question" id="m12-q1">
@@ -8782,6 +8783,92 @@ tool_choice: {"type": "auto"}</pre>
       <button class="btn btn-accent" onclick="submitQuiz('m12')" id="m12-submit-btn">回答を確定する</button>
       <button class="btn btn-outline" onclick="retryQuiz('m12')" id="m12-retry-btn" style="display:none">もう一度挑戦</button>
       <div id="m12-quiz-result" class="quiz-result" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Section 4: 本番形式模試 -->
+  <div id="m12-s4" class="card" style="display:none">
+    <h2>本番形式模試</h2>
+    <p>全問題プールからドメイン配分に基づいてランダム出題します。CCA-F本番と同じドメイン比率で実力を測定できます。</p>
+
+    <!-- 設定画面 -->
+    <div id="exam-setup">
+      <h3>出題設定</h3>
+      <table class="compare-table">
+        <tr><th>ドメイン</th><th>配点比率</th><th>出題比率</th></tr>
+        <tr><td>D1: エージェント設計</td><td>27%</td><td id="exam-d1-count">-</td></tr>
+        <tr><td>D2: Claude Code</td><td>20%</td><td id="exam-d2-count">-</td></tr>
+        <tr><td>D3: プロンプト&amp;構造化出力</td><td>20%</td><td id="exam-d3-count">-</td></tr>
+        <tr><td>D4: ツール&amp;MCP</td><td>18%</td><td id="exam-d4-count">-</td></tr>
+        <tr><td>D5: コンテキスト管理</td><td>15%</td><td id="exam-d5-count">-</td></tr>
+        <tr><td><strong>合計</strong></td><td>100%</td><td id="exam-total-count"><strong>-</strong></td></tr>
+      </table>
+
+      <div style="margin:1rem 0;">
+        <p style="font-weight:600;margin-bottom:.5rem;">出題数を選択:</p>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <button class="btn btn-outline exam-count-btn" onclick="setExamCount(20)">20問（速習）</button>
+          <button class="btn btn-outline exam-count-btn" onclick="setExamCount(50)">50問（標準）</button>
+          <button class="btn btn-outline exam-count-btn" onclick="setExamCount(60)">60問（本番同数）</button>
+          <button class="btn btn-outline exam-count-btn" onclick="setExamCount(0)">全問</button>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <div class="label">出題方式</div>
+        <p style="margin-top:.25rem;">各ドメインからCCA-F本番の配点比率（D1:27%, D2:20%, D3:20%, D4:18%, D5:15%）に近い比率でランダム出題します。問題はシャッフルされ、毎回異なる組み合わせで出題されます。</p>
+      </div>
+
+      <button class="btn btn-accent" onclick="startExam()" id="exam-start-btn" style="margin-top:1rem;" disabled>出題数を選択してください</button>
+    </div>
+
+    <!-- 試験画面 -->
+    <div id="exam-active" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding:.75rem;background:var(--bg);border-radius:8px;">
+        <span id="exam-progress" style="font-weight:600;font-size:.9rem;">Q1 / 20</span>
+        <span id="exam-timer" style="font-size:.9rem;color:var(--text-light);">経過時間: 00:00</span>
+      </div>
+
+      <div id="exam-question-area"></div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:1rem;">
+        <button class="btn btn-outline" onclick="examPrev()" id="exam-prev-btn" disabled>前の問題</button>
+        <span id="exam-nav-info" style="align-self:center;font-size:.85rem;color:var(--text-light);"></span>
+        <button class="btn btn-accent" onclick="examNext()" id="exam-next-btn">次の問題</button>
+      </div>
+
+      <div style="margin-top:1rem;text-align:center;">
+        <button class="btn btn-accent" onclick="submitExam()" id="exam-submit-btn" style="display:none;">回答を確定して結果を見る</button>
+      </div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="exam-results" style="display:none;">
+      <h3>試験結果</h3>
+      <div id="exam-result-summary" class="quiz-result" style="margin:1rem 0;"></div>
+
+      <h3 style="margin-top:1.5rem;">ドメイン別正答率</h3>
+      <table class="compare-table" id="exam-domain-table">
+        <tr><th>ドメイン</th><th>正答数</th><th>出題数</th><th>正答率</th><th>判定</th></tr>
+      </table>
+
+      <div id="exam-weakness" class="warn-box" style="display:none;margin-top:1rem;">
+        <div class="label">弱点ドメイン</div>
+        <p id="exam-weakness-text" style="margin-top:.25rem;"></p>
+      </div>
+
+      <div id="exam-strength" class="tip-box" style="display:none;margin-top:1rem;">
+        <div class="label">得意ドメイン</div>
+        <p id="exam-strength-text" style="margin-top:.25rem;"></p>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">問題別の結果</h3>
+      <div id="exam-detail-list"></div>
+
+      <div class="btn-group" style="margin-top:1.5rem;">
+        <button class="btn btn-accent" onclick="resetExam()">もう一度挑戦する</button>
+        <button class="btn btn-outline" onclick="showSection('m12','s1',document.querySelector('#page-m12 .section-tab'))">ドメイン総復習に戻る</button>
+      </div>
     </div>
   </div>
 
@@ -10202,6 +10289,509 @@ function resetProgress() {
     saveState();
     location.reload();
   }
+}
+
+// ===================== FULL EXAM MODE =====================
+// Domain mapping for exam: CCA-F domain ratios
+const EXAM_DOMAIN_RATIOS = { d1: 0.27, d2: 0.20, d3: 0.20, d4: 0.18, d5: 0.15 };
+const EXAM_DOMAIN_NAMES = {
+  d1: 'D1: エージェント設計',
+  d2: 'D2: Claude Code',
+  d3: 'D3: プロンプト&構造化出力',
+  d4: 'D4: ツール&MCP',
+  d5: 'D5: コンテキスト管理'
+};
+
+// Module to CCA-F domain mapping (using DOMAIN_MAP already defined)
+// d1 = D1(Agent), d2 = D2(Claude Code), d3 = D3(Prompt), d4 = D4(Tools), d5 = D5(Context)
+
+let examState = {
+  pool: [],       // all questions [{domain, question, options[], correctIndex, explanation, sourceModule, sourceIndex}]
+  selected: [],   // selected questions for this exam
+  answers: [],    // user answers
+  current: 0,     // current question index
+  count: 0,       // selected exam count
+  timer: null,
+  startTime: null,
+  submitted: false
+};
+
+function buildQuestionPool() {
+  const pool = [];
+
+  // Helper: extract questions from a module's HTML
+  function extractFromModule(moduleKey, domain) {
+    const qData = QUIZ_DATA[moduleKey];
+    if (!qData) return;
+
+    for (let i = 0; i < qData.answers.length; i++) {
+      const qEl = document.getElementById(moduleKey + '-q' + (i + 1));
+      if (!qEl) continue;
+
+      const qText = qEl.querySelector('.q-text');
+      if (!qText) continue;
+
+      const options = [];
+      qEl.querySelectorAll('.quiz-option').forEach(opt => {
+        // Get clean text without onclick
+        options.push(opt.textContent.trim());
+      });
+
+      if (options.length < 2) continue;
+
+      // For drill questions, use data-drill-domain
+      let qDomain = domain;
+      if (moduleKey === 'drill') {
+        const drillDomain = qEl.getAttribute('data-drill-domain');
+        if (drillDomain) {
+          const dMap = { D1: 'd1', D2: 'd2', D3: 'd3', D4: 'd4', D5: 'd5' };
+          qDomain = dMap[drillDomain] || domain;
+        }
+      }
+
+      // For scenario questions, try to detect domain from text
+      if (moduleKey === 'domain_scenario' && !qDomain) {
+        qDomain = detectDomainFromText(qText.textContent);
+      }
+
+      if (!qDomain) return; // Skip questions without domain
+
+      pool.push({
+        domain: qDomain,
+        question: qText.innerHTML,
+        options: options,
+        correctIndex: qData.answers[i],
+        explanation: qData.explanations[i],
+        sourceModule: moduleKey,
+        sourceIndex: i
+      });
+    }
+  }
+
+  // Detect domain from scenario question text
+  function detectDomainFromText(text) {
+    if (/エージェント|オーケストレ|マルチエージェント|ループ|HITL|Hub-and-Spoke|タスク分解/.test(text)) return 'd1';
+    if (/Claude Code|CLAUDE\.md|Hook|settings\.json|--print|permissions/.test(text)) return 'd2';
+    if (/プロンプト|構造化出力|JSON|スキーマ|Prefill|システムプロンプト/.test(text)) return 'd3';
+    if (/ツール定義|MCP|tool_use|description|input_schema|サーバー/.test(text)) return 'd4';
+    if (/コンテキスト|ハルシネーション|Rate Limit|トークン|キャッシュ|Guardrail/.test(text)) return 'd5';
+    // Fallback: distribute evenly
+    const domains = ['d1', 'd2', 'd3', 'd4', 'd5'];
+    return domains[Math.floor(Math.random() * domains.length)];
+  }
+
+  // Extract from all module quizzes
+  const moduleConfigs = [
+    // m0, m1 are null domain - skip or assign based on content
+    { key: 'm0', domain: null },
+    { key: 'm1', domain: null },
+    { key: 'm2', domain: 'd3' },
+    { key: 'm3', domain: 'd3' },
+    { key: 'm4', domain: 'd3' },
+    { key: 'm5', domain: 'd4' },
+    { key: 'm6', domain: 'd4' },
+    { key: 'm7', domain: 'd2' },
+    { key: 'm8', domain: 'd2' },
+    { key: 'm9', domain: 'd1' },
+    { key: 'm10', domain: 'd1' },
+    { key: 'm11', domain: 'd5' },
+    // m12 mini-test covers all domains - detect from text
+    { key: 'm12', domain: null }
+  ];
+
+  moduleConfigs.forEach(({ key, domain }) => {
+    if (domain) {
+      extractFromModule(key, domain);
+    } else if (QUIZ_DATA[key]) {
+      // For null-domain modules, detect domain from question text
+      const qData = QUIZ_DATA[key];
+      for (let i = 0; i < qData.answers.length; i++) {
+        const qEl = document.getElementById(key + '-q' + (i + 1));
+        if (!qEl) continue;
+        const qText = qEl.querySelector('.q-text');
+        if (!qText) continue;
+        const options = [];
+        qEl.querySelectorAll('.quiz-option').forEach(opt => {
+          options.push(opt.textContent.trim());
+        });
+        if (options.length < 2) continue;
+        const detected = detectDomainFromText(qText.textContent);
+        pool.push({
+          domain: detected,
+          question: qText.innerHTML,
+          options: options,
+          correctIndex: qData.answers[i],
+          explanation: qData.explanations[i],
+          sourceModule: key,
+          sourceIndex: i
+        });
+      }
+    }
+  });
+
+  // Domain-specific quizzes
+  extractFromModule('domain_d1', 'd1');
+  extractFromModule('domain_d2', 'd4'); // Note: domain_d2 maps to d4 in DOMAIN_MAP
+  extractFromModule('domain_d3', 'd2'); // domain_d3 maps to d2
+  extractFromModule('domain_d4', 'd3'); // domain_d4 maps to d3
+  extractFromModule('domain_d5', 'd5');
+
+  // Scenario quiz - detect domain per question
+  extractFromModule('domain_scenario', null);
+
+  // Drill questions
+  extractFromModule('drill', null);
+
+  return pool;
+}
+
+function setExamCount(count) {
+  // Build pool if needed
+  if (examState.pool.length === 0) {
+    examState.pool = buildQuestionPool();
+  }
+
+  const totalAvailable = examState.pool.length;
+
+  if (count === 0) count = totalAvailable;
+  if (count > totalAvailable) count = totalAvailable;
+
+  examState.count = count;
+
+  // Calculate per-domain counts
+  const domainCounts = {};
+  let assigned = 0;
+  const domains = ['d1', 'd2', 'd3', 'd4', 'd5'];
+
+  // Count available per domain
+  const available = {};
+  domains.forEach(d => {
+    available[d] = examState.pool.filter(q => q.domain === d).length;
+  });
+
+  // Assign by ratio, capped by available
+  domains.forEach(d => {
+    const target = Math.round(count * EXAM_DOMAIN_RATIOS[d]);
+    domainCounts[d] = Math.min(target, available[d]);
+    assigned += domainCounts[d];
+  });
+
+  // Distribute remainder
+  while (assigned < count) {
+    let added = false;
+    for (const d of domains) {
+      if (assigned >= count) break;
+      if (domainCounts[d] < available[d]) {
+        domainCounts[d]++;
+        assigned++;
+        added = true;
+      }
+    }
+    if (!added) break;
+  }
+
+  // Update UI
+  domains.forEach(d => {
+    const el = document.getElementById('exam-' + d + '-count');
+    if (el) el.textContent = domainCounts[d] + '問';
+  });
+  const totalEl = document.getElementById('exam-total-count');
+  if (totalEl) totalEl.innerHTML = '<strong>' + assigned + '問</strong>';
+
+  // Highlight selected button
+  document.querySelectorAll('.exam-count-btn').forEach(btn => {
+    btn.className = 'btn btn-outline exam-count-btn';
+  });
+  event.target.className = 'btn btn-accent exam-count-btn';
+
+  const startBtn = document.getElementById('exam-start-btn');
+  startBtn.disabled = false;
+  startBtn.textContent = assigned + '問で模試を開始';
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startExam() {
+  if (examState.pool.length === 0) {
+    examState.pool = buildQuestionPool();
+  }
+
+  const count = examState.count;
+  const domains = ['d1', 'd2', 'd3', 'd4', 'd5'];
+
+  // Count available per domain
+  const available = {};
+  domains.forEach(d => {
+    available[d] = examState.pool.filter(q => q.domain === d);
+  });
+
+  // Select questions per domain based on ratio
+  const selected = [];
+  let remaining = count;
+
+  domains.forEach(d => {
+    const target = Math.round(count * EXAM_DOMAIN_RATIOS[d]);
+    const n = Math.min(target, available[d].length, remaining);
+    const shuffled = shuffleArray([...available[d]]);
+    selected.push(...shuffled.slice(0, n));
+    remaining -= n;
+  });
+
+  // Fill remaining from any domain
+  if (remaining > 0) {
+    const usedKeys = new Set(selected.map(q => q.sourceModule + '-' + q.sourceIndex));
+    const unused = examState.pool.filter(q => !usedKeys.has(q.sourceModule + '-' + q.sourceIndex));
+    const shuffled = shuffleArray([...unused]);
+    selected.push(...shuffled.slice(0, remaining));
+  }
+
+  // Shuffle all selected questions
+  examState.selected = shuffleArray(selected);
+  examState.answers = new Array(examState.selected.length).fill(-1);
+  examState.current = 0;
+  examState.submitted = false;
+  examState.startTime = Date.now();
+
+  // Start timer
+  if (examState.timer) clearInterval(examState.timer);
+  examState.timer = setInterval(updateExamTimer, 1000);
+
+  // Show exam UI
+  document.getElementById('exam-setup').style.display = 'none';
+  document.getElementById('exam-active').style.display = 'block';
+  document.getElementById('exam-results').style.display = 'none';
+
+  renderExamQuestion();
+}
+
+function updateExamTimer() {
+  if (!examState.startTime) return;
+  const elapsed = Math.floor((Date.now() - examState.startTime) / 1000);
+  const min = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const sec = String(elapsed % 60).padStart(2, '0');
+  const el = document.getElementById('exam-timer');
+  if (el) el.textContent = '経過時間: ' + min + ':' + sec;
+}
+
+function renderExamQuestion() {
+  const q = examState.selected[examState.current];
+  const total = examState.selected.length;
+  const idx = examState.current;
+
+  document.getElementById('exam-progress').textContent = 'Q' + (idx + 1) + ' / ' + total;
+
+  // Navigation info: answered count
+  const answered = examState.answers.filter(a => a !== -1).length;
+  document.getElementById('exam-nav-info').textContent = '回答済み: ' + answered + '/' + total;
+
+  // Render question
+  const area = document.getElementById('exam-question-area');
+  let html = '<div class="quiz-question" style="margin-bottom:0;">';
+  html += '<div class="q-text" style="margin-bottom:1rem;">' + q.question + '</div>';
+
+  q.options.forEach((opt, i) => {
+    const selectedClass = examState.answers[idx] === i ? ' selected' : '';
+    html += '<div class="quiz-option' + selectedClass + '" onclick="selectExamAnswer(' + i + ')">' + escapeHtml(opt) + '</div>';
+  });
+  html += '</div>';
+
+  area.innerHTML = html;
+
+  // Update nav buttons
+  document.getElementById('exam-prev-btn').disabled = (idx === 0);
+  const nextBtn = document.getElementById('exam-next-btn');
+  const submitBtn = document.getElementById('exam-submit-btn');
+
+  if (idx === total - 1) {
+    nextBtn.style.display = 'none';
+    submitBtn.style.display = 'inline-flex';
+  } else {
+    nextBtn.style.display = 'inline-flex';
+    submitBtn.style.display = 'none';
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function selectExamAnswer(optIdx) {
+  if (examState.submitted) return;
+  examState.answers[examState.current] = optIdx;
+  renderExamQuestion();
+}
+
+function examPrev() {
+  if (examState.current > 0) {
+    examState.current--;
+    renderExamQuestion();
+  }
+}
+
+function examNext() {
+  if (examState.current < examState.selected.length - 1) {
+    examState.current++;
+    renderExamQuestion();
+  }
+}
+
+function submitExam() {
+  const unanswered = examState.answers.filter(a => a === -1).length;
+  if (unanswered > 0) {
+    if (!confirm('未回答の問題が' + unanswered + '問あります。このまま確定しますか？')) {
+      return;
+    }
+  }
+
+  examState.submitted = true;
+  if (examState.timer) {
+    clearInterval(examState.timer);
+    examState.timer = null;
+  }
+
+  const elapsed = Math.floor((Date.now() - examState.startTime) / 1000);
+  const elapsedMin = Math.floor(elapsed / 60);
+  const elapsedSec = elapsed % 60;
+
+  // Calculate results
+  const total = examState.selected.length;
+  let correct = 0;
+  const domainStats = {};
+  const domains = ['d1', 'd2', 'd3', 'd4', 'd5'];
+  domains.forEach(d => { domainStats[d] = { correct: 0, total: 0 }; });
+
+  examState.selected.forEach((q, i) => {
+    const isCorrect = examState.answers[i] === q.correctIndex;
+    if (isCorrect) correct++;
+    if (domainStats[q.domain]) {
+      domainStats[q.domain].total++;
+      if (isCorrect) domainStats[q.domain].correct++;
+    }
+  });
+
+  const pct = Math.round((correct / total) * 100);
+  const passed = pct >= 72;
+
+  // Show results
+  document.getElementById('exam-active').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'block';
+
+  // Summary
+  const summaryEl = document.getElementById('exam-result-summary');
+  summaryEl.className = 'quiz-result ' + (passed ? 'good' : 'needs-work');
+  summaryEl.style.background = passed ? 'var(--success-light)' : 'var(--danger-light)';
+  summaryEl.style.color = passed ? 'var(--success)' : 'var(--danger)';
+  summaryEl.innerHTML = '<div style="font-size:1.5rem;margin-bottom:.25rem;">' + correct + ' / ' + total + ' 正解 (' + pct + '%)</div>' +
+    '<div style="font-size:.9rem;">' + (passed ? '合格圏内です!' : '合格ライン（72%）に届いていません。弱点を確認しましょう。') + '</div>' +
+    '<div style="font-size:.85rem;color:var(--text-light);margin-top:.25rem;">所要時間: ' + elapsedMin + '分' + elapsedSec + '秒</div>';
+
+  // Domain table
+  const tableEl = document.getElementById('exam-domain-table');
+  let tableHtml = '<tr><th>ドメイン</th><th>正答数</th><th>出題数</th><th>正答率</th><th>判定</th></tr>';
+  const weakDomains = [];
+  const strongDomains = [];
+
+  domains.forEach(d => {
+    const s = domainStats[d];
+    if (s.total === 0) {
+      tableHtml += '<tr><td>' + EXAM_DOMAIN_NAMES[d] + '</td><td>-</td><td>0</td><td>-</td><td>-</td></tr>';
+      return;
+    }
+    const dPct = Math.round((s.correct / s.total) * 100);
+    let judge = '';
+    if (dPct >= 80) { judge = '得意'; strongDomains.push(EXAM_DOMAIN_NAMES[d] + '(' + dPct + '%)'); }
+    else if (dPct >= 60) { judge = '標準'; }
+    else { judge = '要復習'; weakDomains.push(EXAM_DOMAIN_NAMES[d] + '(' + dPct + '%)'); }
+    tableHtml += '<tr><td>' + EXAM_DOMAIN_NAMES[d] + '</td><td>' + s.correct + '</td><td>' + s.total + '</td><td>' + dPct + '%</td><td><strong>' + judge + '</strong></td></tr>';
+  });
+  tableEl.innerHTML = tableHtml;
+
+  // Weakness/Strength
+  const weakEl = document.getElementById('exam-weakness');
+  const weakText = document.getElementById('exam-weakness-text');
+  if (weakDomains.length > 0) {
+    weakEl.style.display = 'block';
+    weakText.textContent = weakDomains.join('、') + ' — これらのドメインを重点的に復習することで、合格に近づきます。';
+  } else {
+    weakEl.style.display = 'none';
+  }
+
+  const strongEl = document.getElementById('exam-strength');
+  const strongText = document.getElementById('exam-strength-text');
+  if (strongDomains.length > 0) {
+    strongEl.style.display = 'block';
+    strongText.textContent = strongDomains.join('、') + ' — これらは十分な理解があります。';
+  } else {
+    strongEl.style.display = 'none';
+  }
+
+  // Detail list
+  const detailEl = document.getElementById('exam-detail-list');
+  let detailHtml = '';
+  examState.selected.forEach((q, i) => {
+    const userAns = examState.answers[i];
+    const isCorrect = userAns === q.correctIndex;
+    const borderColor = userAns === -1 ? 'var(--border)' : (isCorrect ? 'var(--success)' : 'var(--danger)');
+    const statusText = userAns === -1 ? '未回答' : (isCorrect ? '正解' : '不正解');
+    const statusColor = userAns === -1 ? 'var(--text-light)' : (isCorrect ? 'var(--success)' : 'var(--danger)');
+
+    detailHtml += '<div style="border-left:4px solid ' + borderColor + ';padding:.75rem 1rem;margin-bottom:.5rem;border-radius:0 8px 8px 0;background:var(--card);">';
+    detailHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:.25rem;">';
+    detailHtml += '<span style="font-weight:600;font-size:.9rem;">Q' + (i + 1) + ' [' + EXAM_DOMAIN_NAMES[q.domain].split(':')[0] + ']</span>';
+    detailHtml += '<span style="font-weight:600;color:' + statusColor + ';font-size:.85rem;">' + statusText + '</span>';
+    detailHtml += '</div>';
+
+    if (!isCorrect) {
+      detailHtml += '<div style="font-size:.85rem;color:var(--text-light);margin-top:.25rem;">';
+      if (userAns !== -1 && q.options[userAns]) {
+        detailHtml += 'あなたの回答: ' + escapeHtml(q.options[userAns]) + '<br>';
+      }
+      detailHtml += '正解: ' + escapeHtml(q.options[q.correctIndex]);
+      detailHtml += '</div>';
+      detailHtml += '<div style="font-size:.85rem;margin-top:.5rem;padding:.5rem;background:var(--bg);border-radius:4px;">' + q.explanation + '</div>';
+    }
+    detailHtml += '</div>';
+  });
+  detailEl.innerHTML = detailHtml;
+}
+
+function resetExam() {
+  examState.selected = [];
+  examState.answers = [];
+  examState.current = 0;
+  examState.count = 0;
+  examState.submitted = false;
+  examState.startTime = null;
+  if (examState.timer) {
+    clearInterval(examState.timer);
+    examState.timer = null;
+  }
+
+  document.getElementById('exam-setup').style.display = 'block';
+  document.getElementById('exam-active').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'none';
+
+  // Reset buttons
+  document.querySelectorAll('.exam-count-btn').forEach(btn => {
+    btn.className = 'btn btn-outline exam-count-btn';
+  });
+  const startBtn = document.getElementById('exam-start-btn');
+  startBtn.disabled = true;
+  startBtn.textContent = '出題数を選択してください';
+
+  ['d1','d2','d3','d4','d5'].forEach(d => {
+    const el = document.getElementById('exam-' + d + '-count');
+    if (el) el.textContent = '-';
+  });
+  document.getElementById('exam-total-count').innerHTML = '<strong>-</strong>';
 }
 
 // ===================== INIT =====================
