@@ -283,6 +283,21 @@
       <span class="module-label">シナリオ別対策ガイド</span>
       <span class="module-pct" style="font-size:.7rem;">外部</span>
     </div>
+    <div class="nav-item" onclick="showPage('drill')" id="nav-drill">
+      <span class="status-dot" style="background:#DC2626;"></span>
+      <span class="module-label">弱点克服ドリル</span>
+      <span class="module-pct" id="pct-drill"></span>
+    </div>
+    <div class="nav-item" onclick="window.open('glossary-english.html','_blank')" id="nav-glossary-en">
+      <span class="status-dot" style="background:#2563EB;"></span>
+      <span class="module-label">英語用語集</span>
+      <span class="module-pct" style="font-size:.7rem;">外部</span>
+    </div>
+    <div class="nav-item" onclick="window.open('cheatsheet.html','_blank')" id="nav-cheatsheet">
+      <span class="status-dot" style="background:#059669;"></span>
+      <span class="module-label">直前チートシート</span>
+      <span class="module-pct" style="font-size:.7rem;">外部</span>
+    </div>
   </div>
 
   <div class="sidebar-progress">
@@ -6999,6 +7014,601 @@
   </div>
 </div>
 
+
+<div id="page-drill" style="display:none">
+  <div class="module-header">
+    <span class="week-badge">試験直前対策</span>
+    <h1>弱点克服ドリル</h1>
+    <p class="subtitle">全5ドメインから厳選した70問で弱点を集中攻略</p>
+    <span class="domain-tag">D1: 20問</span> <span class="domain-tag">D2: 15問</span> <span class="domain-tag">D3: 15問</span> <span class="domain-tag">D4: 10問</span> <span class="domain-tag">D5: 10問</span>
+  </div>
+
+  <div class="card">
+    <h2>ドメイン別フィルタ</h2>
+    <p>解きたいドメインを選択してください。複数選択可。</p>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0;">
+      <button class="btn btn-primary" onclick="filterDrill('all')" id="drill-filter-all">全問表示</button>
+      <button class="btn btn-outline" onclick="filterDrill('D1')" id="drill-filter-D1">D1 エージェント設計 (20)</button>
+      <button class="btn btn-outline" onclick="filterDrill('D2')" id="drill-filter-D2">D2 ツール設計 (15)</button>
+      <button class="btn btn-outline" onclick="filterDrill('D3')" id="drill-filter-D3">D3 Claude Code (15)</button>
+      <button class="btn btn-outline" onclick="filterDrill('D4')" id="drill-filter-D4">D4 MCP (10)</button>
+      <button class="btn btn-outline" onclick="filterDrill('D5')" id="drill-filter-D5">D5 コンテキスト管理 (10)</button>
+    </div>
+  </div>
+
+  <div class="card" id="drill-quiz-section">
+    <h2>問題</h2>
+    <div class="quiz-question" id="drill-q1" data-drill-domain="D1">
+      <div class="q-text">Q1. [D1] エージェントループの終了条件として最も適切なのはどれですか？あるタスク自動化エージェントが、ユーザーの指示を受けてファイル操作を行う設計です。</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',0,0)">ツール呼び出しが1回完了したら終了する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',0,1)">stop_reasonが"end_turn"を返し、かつ未処理のtool_useブロックがない場合に終了する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',0,2)">一定時間が経過したら強制終了する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',0,3)">ユーザーが明示的に「終了」と入力したら終了する</div>
+      <div class="quiz-explanation" id="drill-q1-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q2" data-drill-domain="D1">
+      <div class="q-text">Q2. [D1] エージェントがツールを呼び出した結果、stop_reasonが"tool_use"で返されました。クライアントコードが次に行うべき処理として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',1,0)">tool_useブロックのパラメータに基づいてツールを実行し、tool_resultをmessages配列に追加してAPIを再呼び出しする</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',1,1)">tool_useブロックの内容をそのままユーザーに表示して確認を求める</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',1,2)">stop_reasonが"end_turn"に変わるまで同じリクエストを再送する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',1,3)">ツール実行結果をシステムプロンプトに追加して新しいセッションを開始する</div>
+      <div class="quiz-explanation" id="drill-q2-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q3" data-drill-domain="D1">
+      <div class="q-text">Q3. [D1] 顧客注文のキャンセル処理を行うエージェントで、キャンセル実行前に人間の承認を求めるHITL（Human-in-the-Loop）を導入する判断基準として、最も適切なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',2,0)">すべてのエージェント操作に人間の承認を入れるべき</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',2,1)">不可逆な操作・高額取引・機密データアクセスの場合にHITLを入れる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',2,2)">エージェントの信頼度スコアが低い場合のみHITLを入れる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',2,3)">営業時間内のみHITLを入れ、時間外は自動処理する</div>
+      <div class="quiz-explanation" id="drill-q3-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q4" data-drill-domain="D1">
+      <div class="q-text">Q4. [D1] Augmented LLMの3つの構成要素（Building Blocks）として正しい組み合わせはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',3,0)">プロンプト・ファインチューニング・デプロイ</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',3,1)">検索（Retrieval）・ツール統合（Tool Integration）・メモリ（Memory）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',3,2)">入力検証・処理・出力フィルタリング</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',3,3)">エンコーダ・デコーダ・アテンション</div>
+      <div class="quiz-explanation" id="drill-q4-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q5" data-drill-domain="D1">
+      <div class="q-text">Q5. [D1] Hub-and-Spokeパターンとパイプラインパターンの使い分けとして、最も適切な判断はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',4,0)">Hub-and-Spokeは常にパイプラインより高速なため、常にHub-and-Spokeを選ぶべき</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',4,1)">タスクが独立して並列実行可能ならHub-and-Spoke、タスク間に順序依存がある場合はパイプラインが適切</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',4,2)">パイプラインはエラー処理が容易なため、エラーが予想される場合はパイプラインを選ぶべき</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',4,3)">Hub-and-Spokeは2エージェント以下、パイプラインは3エージェント以上で使用する</div>
+      <div class="quiz-explanation" id="drill-q5-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q6" data-drill-domain="D1">
+      <div class="q-text">Q6. [D1] マルチエージェントシステムで、オーケストレーターがサブエージェントにタスクを委譲する際、サブエージェントのコンテキストに含めるべきでない情報はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',5,0)">サブエージェントが処理すべきタスクの詳細な指示</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',5,1)">タスクに必要な入力データ</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',5,2)">他のサブエージェントが処理中の無関係なタスクの詳細情報</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',5,3)">出力フォーマットの仕様</div>
+      <div class="quiz-explanation" id="drill-q6-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q7" data-drill-domain="D1">
+      <div class="q-text">Q7. [D1] エージェントの安全なデプロイ（Secure Deployment）の3原則として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',6,0)">暗号化・認証・監査</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',6,1)">隔離（Isolation）・最小権限（Least Privilege）・多層防御（Defense in Depth）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',6,2)">テスト・モニタリング・アラート</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',6,3)">バックアップ・冗長化・フェイルオーバー</div>
+      <div class="quiz-explanation" id="drill-q7-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q8" data-drill-domain="D1">
+      <div class="q-text">Q8. [D1] エージェントがワークフローより適している場面はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',7,0)">毎回同じ手順で請求書を処理する定型業務</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',7,1)">ユーザーの質問内容に応じて検索先や処理手順を動的に変える必要がある場面</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',7,2)">CSVファイルの各行に同じ変換処理を適用するバッチ処理</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',7,3)">決まったテンプレートでメールを自動生成する処理</div>
+      <div class="quiz-explanation" id="drill-q8-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q9" data-drill-domain="D1">
+      <div class="q-text">Q9. [D1] マルチエージェントシステムで「情報出所（Information Provenance）」の追跡が重要な理由として、最も適切なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',8,0)">各エージェントの処理速度を計測するため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',8,1)">複数エージェントの出力を統合する際に、情報の信頼性と出典を検証できるようにするため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',8,2)">各エージェントのコストを個別に計算するため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',8,3)">エージェント間の通信量を最適化するため</div>
+      <div class="quiz-explanation" id="drill-q9-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q10" data-drill-domain="D1">
+      <div class="q-text">Q10. [D1] サブエージェントがエラーを発生させた場合のフォールバック戦略として、推奨される対応順序はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',9,0)">人間へのエスカレーション → リトライ → 別エージェントへの再割り当て</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',9,1)">リトライ → 別エージェントへの再割り当て → 人間へのエスカレーション</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',9,2)">エラーを無視 → ログ記録 → 次のタスクへ進む</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',9,3)">システム全体の停止 → 管理者への通知 → 手動復旧</div>
+      <div class="quiz-explanation" id="drill-q10-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q11" data-drill-domain="D1">
+      <div class="q-text">Q11. [D1] エージェントのmax_turnsパラメータの役割として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',10,0)">同時に実行できるエージェントの最大数を制限する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',10,1)">エージェントループの最大反復回数を制限し、無限ループや暴走を防ぐ</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',10,2)">1回のAPI呼び出しで生成できるトークンの最大数を制限する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',10,3)">エージェントが利用できるツールの最大数を制限する</div>
+      <div class="quiz-explanation" id="drill-q11-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q12" data-drill-domain="D1">
+      <div class="q-text">Q12. [D1] あるエージェントシステムで、Claude Agent SDKを使ってサブエージェントを起動しています。メインエージェントとサブエージェントのコンテキストの関係として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',11,0)">メインエージェントとサブエージェントは同じコンテキストを共有する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',11,1)">サブエージェントは独立したコンテキストを持ち、メインエージェントには最終結果のみが返される</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',11,2)">サブエージェントのコンテキストは常にメインエージェントより大きい</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',11,3)">メインエージェントはサブエージェントのコンテキストをリアルタイムで監視できる</div>
+      <div class="quiz-explanation" id="drill-q12-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q13" data-drill-domain="D1">
+      <div class="q-text">Q13. [D1] 並列処理が可能なHub-and-Spokeパターンで、4つの独立したサブタスクを4つのサブエージェントに同時に委譲する場合のメリットとして誤っているのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',12,0)">全体の処理時間が短縮される</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',12,1)">各サブエージェントのコンテキストが隔離される</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',12,2)">1つのサブエージェントの失敗が他のサブエージェントに影響しない</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',12,3)">オーケストレーターのコンテキストウィンドウ消費が増えない</div>
+      <div class="quiz-explanation" id="drill-q13-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q14" data-drill-domain="D1">
+      <div class="q-text">Q14. [D1] エージェントがツール実行中にユーザーから新しい指示を受け取った場合、最も適切な設計はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',13,0)">現在のツール実行を即座に中断し、新しい指示を処理する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',13,1)">新しい指示を無視して現在の処理を完了させる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',13,2)">現在のツール実行を完了させてからtool_resultと新しい指示をまとめてAPIに送信する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',13,3)">新しいエージェントセッションを開始して並行処理する</div>
+      <div class="quiz-explanation" id="drill-q14-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q15" data-drill-domain="D1">
+      <div class="q-text">Q15. [D1] CI/CDパイプラインでClaude Codeエージェントの暴走を防ぐために、--max-turnsと--max-budget-usdを組み合わせる理由として最も適切なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',14,0)">どちらか一方だけでは設定できないAPIの制約があるため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',14,1)">--max-turnsは実行回数を制限し--max-budget-usdはコストを制限するため、異なる種類の暴走に対応できる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',14,2)">2つのパラメータを組み合わせると処理速度が向上するため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',14,3)">--max-turnsはローカル環境用、--max-budget-usdはクラウド環境用のパラメータであるため</div>
+      <div class="quiz-explanation" id="drill-q15-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q16" data-drill-domain="D1">
+      <div class="q-text">Q16. [D1] ワークフローパターンの中で、複数のLLM呼び出しを並列で実行し、結果をプログラム的に集約するパターンは何と呼ばれますか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',15,0)">ルーティングパターン（Routing）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',15,1)">パラレライゼーションパターン（Parallelization）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',15,2)">プロンプトチェイニング（Prompt Chaining）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',15,3)">エバリュエーター・オプティマイザー（Evaluator-Optimizer）</div>
+      <div class="quiz-explanation" id="drill-q16-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q17" data-drill-domain="D1">
+      <div class="q-text">Q17. [D1] エージェントアーキテクチャにおいて、「ワークフローの方がエージェントより適切な場合」の判断基準として最も正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',16,0)">処理するデータ量が多い場合</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',16,1)">タスクの手順が事前に定義でき、LLMの自律的な判断が不要な場合</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',16,2)">複数のツールを使用する場合</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',16,3)">高いセキュリティが求められる場合</div>
+      <div class="quiz-explanation" id="drill-q17-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q18" data-drill-domain="D1">
+      <div class="q-text">Q18. [D1] ルーティングパターン（Routing）で、ユーザーの入力を「技術サポート」「請求・支払い」「一般問い合わせ」の3つのカテゴリに分類して専門エージェントに振り分ける設計をしています。分類の信頼性を高めるための最適なアプローチはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',17,0)">分類結果をユーザーに毎回確認してもらう</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',17,1)">tool_useでenum制約付きのツールを定義し、構造化出力で分類を保証する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',17,2)">3つのエージェントすべてに同じ入力を送り、最も適切な回答を選ぶ</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',17,3)">キーワードマッチングで分類する（LLMは使わない）</div>
+      <div class="quiz-explanation" id="drill-q18-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q19" data-drill-domain="D1">
+      <div class="q-text">Q19. [D1] エバリュエーター・オプティマイザー（Evaluator-Optimizer）パターンが最も適しているユースケースはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',18,0)">毎回同じ形式で出力すればよい定型レポート作成</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',18,1)">コードの自動生成で、生成→テスト実行→エラー修正→再テストを繰り返す場面</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',18,2)">大量のメールを同じルールで分類するバッチ処理</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',18,3)">ユーザーの質問に1回で回答すればよいFAQ応答</div>
+      <div class="quiz-explanation" id="drill-q19-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q20" data-drill-domain="D1">
+      <div class="q-text">Q20. [D1] エージェントの「ガードレール」としてmax_turnsを設定する場合、値が小さすぎることの問題は何ですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',19,0)">APIコストが増加する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',19,1)">複数ステップが必要なタスクが途中で打ち切られ、不完全な結果になる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',19,2)">セキュリティリスクが高まる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',19,3)">メモリ使用量が増加する</div>
+      <div class="quiz-explanation" id="drill-q20-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q21" data-drill-domain="D2">
+      <div class="q-text">Q21. [D2] ツール定義のdescriptionに含めるべき情報として、最も重要な組み合わせはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',20,0)">ツールの内部実装の詳細とソースコードの場所</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',20,1)">ツールの使用条件（いつ使うか）と非使用条件（いつ使わないか）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',20,2)">ツールの開発者名とバージョン情報</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',20,3)">ツールのレスポンスタイムとパフォーマンス指標</div>
+      <div class="quiz-explanation" id="drill-q21-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q22" data-drill-domain="D2">
+      <div class="q-text">Q22. [D2] tool_choiceパラメータの設定として、{"type": "any"}を指定した場合の動作はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',21,0)">Claudeがツールを使うかテキスト応答するかを自律的に判断する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',21,1)">Claudeは必ずいずれかのツールを使用し、テキストのみの応答は返さない</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',21,2)">指定されたツールのみを使用する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',21,3)">ツールの使用を完全に禁止する</div>
+      <div class="quiz-explanation" id="drill-q22-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q23" data-drill-domain="D2">
+      <div class="q-text">Q23. [D2] MCPクライアントとMCPサーバーの関係として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',22,0)">1つのクライアントが複数のサーバーに同時接続できる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',22,1)">クライアントとサーバーは1:1の関係で、複数サーバーに接続するにはホストが複数のクライアントを持つ</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',22,2)">サーバーがクライアントに接続を要求する（サーバー起動型）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',22,3)">クライアントとサーバーは同一プロセス内で動作する必要がある</div>
+      <div class="quiz-explanation" id="drill-q23-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q24" data-drill-domain="D2">
+      <div class="q-text">Q24. [D2] MCPの3つのプリミティブ（Resources, Tools, Prompts）の制御主体として正しい組み合わせはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',23,0)">Resources=モデル、Tools=アプリケーション、Prompts=サーバー</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',23,1)">Resources=アプリケーション、Tools=モデル、Prompts=ユーザー</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',23,2)">Resources=ユーザー、Tools=ユーザー、Prompts=モデル</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',23,3)">Resources=サーバー、Tools=サーバー、Prompts=サーバー</div>
+      <div class="quiz-explanation" id="drill-q24-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q25" data-drill-domain="D2">
+      <div class="q-text">Q25. [D2] MCPのRoots機能の目的として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',24,0)">MCPサーバーの起動ディレクトリを指定する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',24,1)">ホストがMCPサーバーに対して「アクセスしてよいファイルパスの範囲」を通知する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',24,2)">MCPクライアントの認証情報を保存する場所を指定する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',24,3)">MCPサーバーのログ出力先を指定する</div>
+      <div class="quiz-explanation" id="drill-q25-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q26" data-drill-domain="D2">
+      <div class="q-text">Q26. [D2] MCPのサンプリング（Sampling）機能について正しい説明はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',25,0)">MCPサーバーがクライアント経由でLLMに推論を依頼する逆方向通信の仕組み</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',25,1)">MCPクライアントがサーバーのリソースをランダムに取得する機能</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',25,2)">MCPサーバーが大量のデータから一部を抽出する機能</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',25,3)">MCPクライアントがサーバーの応答速度を測定する機能</div>
+      <div class="quiz-explanation" id="drill-q26-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q27" data-drill-domain="D2">
+      <div class="q-text">Q27. [D2] MCPのトランスポート方式で、ステートレスHTTPの利点と制約の組み合わせとして正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',26,0)">利点: ストリーミング対応 / 制約: スケーリングが困難</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',26,1)">利点: 水平スケーリングが容易 / 制約: ストリーミング・サンプリング・進捗通知が使えない</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',26,2)">利点: 低遅延 / 制約: ローカル環境限定</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',26,3)">利点: セキュリティが高い / 制約: 設定が複雑</div>
+      <div class="quiz-explanation" id="drill-q27-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q28" data-drill-domain="D2">
+      <div class="q-text">Q28. [D2] ツール実行でレート制限エラーが発生した場合のtool_resultとして最適なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',27,0)">{"content": "エラーが発生しました"}</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',27,1)">{"is_error": true, "content": "Rate limit exceeded. Type: rate_limit, isRetryable: true. Please wait before retrying."}</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',27,2)">{"is_error": false, "content": "処理をスキップしました"}</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',27,3)">tool_resultを返さずにエラーをログに記録する</div>
+      <div class="quiz-explanation" id="drill-q28-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q29" data-drill-domain="D2">
+      <div class="q-text">Q29. [D2] 推論オーバーロード（Inference Overload）の対策として最も効果的なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',28,0)">プロンプトキャッシングを有効にする</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',28,1)">文脈に応じたツールの動的フィルタリングでツール数を絞る</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',28,2)">max_tokensを増やす</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',28,3)">temperatureを下げる</div>
+      <div class="quiz-explanation" id="drill-q29-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q30" data-drill-domain="D2">
+      <div class="q-text">Q30. [D2] MCP設定ファイルの優先順位として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',29,0)">グローバル設定（~/.claude.json）がプロジェクト設定（.mcp.json）より優先される</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',29,1)">プロジェクト設定（.mcp.json）がグローバル設定（~/.claude.json）より優先される</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',29,2)">両方の設定がマージされ、競合する場合はエラーになる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',29,3)">最後に更新された設定ファイルが優先される</div>
+      <div class="quiz-explanation" id="drill-q30-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q31" data-drill-domain="D2">
+      <div class="q-text">Q31. [D2] Claudeが複数のツール呼び出しを1回のレスポンスで返した場合、クライアントの正しい処理方法はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',30,0)">最初のツール呼び出しのみを実行し、残りは無視する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',30,1)">すべてのツール呼び出しを実行し、各結果をtool_resultとしてmessages配列に追加してからAPIを再呼び出しする</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',30,2)">ツール呼び出しを1つずつ順番に処理し、各結果を個別にAPIに送信する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',30,3)">ツール呼び出しの数が多すぎる場合はエラーを返す</div>
+      <div class="quiz-explanation" id="drill-q31-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q32" data-drill-domain="D2">
+      <div class="q-text">Q32. [D2] MCPの通知（Notifications）について正しい説明はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',31,0)">クライアントからサーバーへの一方向メッセージで、サーバーからの返信を待つ</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',31,1)">サーバーからクライアントへの一方向メッセージで、クライアントからの返信は不要</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',31,2)">クライアントとサーバーの双方向メッセージで、確認応答が必要</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',31,3)">MCPサーバーが外部サービスに送信するアラートメッセージ</div>
+      <div class="quiz-explanation" id="drill-q32-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q33" data-drill-domain="D2">
+      <div class="q-text">Q33. [D2] tool_choiceを{"type": "auto"}に設定した場合のClaudeの動作として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',32,0)">常にツールを使用する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',32,1)">常にテキスト応答のみを返す</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',32,2)">状況に応じてツール使用とテキスト応答を自律的に判断する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',32,3)">ランダムにツールを選択する</div>
+      <div class="quiz-explanation" id="drill-q33-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q34" data-drill-domain="D3">
+      <div class="q-text">Q34. [D3] Claude Codeの権限評価順序として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',33,0)">allow → ask → deny の順で評価</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',33,1)">deny → ask → allow の順で評価</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',33,2)">ask → deny → allow の順で評価</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',33,3)">設定ファイルの記載順に評価</div>
+      <div class="quiz-explanation" id="drill-q34-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q35" data-drill-domain="D3">
+      <div class="q-text">Q35. [D3] CI/CDパイプラインからClaude Codeを自動実行する際に必要な最小構成はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',34,0)">--printフラグのみ</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',34,1)">--printフラグ + ANTHROPIC_API_KEY環境変数</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',34,2)">CLAUDE.mdファイルのみ</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',34,3)">対話モード + スクリプトによるキー入力自動化</div>
+      <div class="quiz-explanation" id="drill-q35-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q36" data-drill-domain="D3">
+      <div class="q-text">Q36. [D3] PreToolUseフックでツール実行をブロックする際、stderrとstdoutの使い分けとして正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',35,0)">stdoutにブロック理由を出力し、stderrはログ記録に使う</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',35,1)">stderrにフィードバックメッセージを出力し、stdoutはツール結果の変更に使う</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',35,2)">stdoutとstderrの両方にブロック理由を出力する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',35,3)">stderrにエラーコードを出力し、stdoutにユーザー向けメッセージを出力する</div>
+      <div class="quiz-explanation" id="drill-q36-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q37" data-drill-domain="D3">
+      <div class="q-text">Q37. [D3] CLAUDE.mdの読み込み順序と優先度として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',36,0)">リポジトリルート → グローバル → サブディレクトリ → ユーザーローカル（先が優先）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',36,1)">グローバル → リポジトリルート → ユーザーローカル → サブディレクトリ（後が優先）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',36,2)">ユーザーローカル → グローバル → リポジトリルート → サブディレクトリ（先が優先）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',36,3)">サブディレクトリ → リポジトリルート → グローバル → ユーザーローカル（先が優先）</div>
+      <div class="quiz-explanation" id="drill-q37-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q38" data-drill-domain="D3">
+      <div class="q-text">Q38. [D3] Claude CodeのExploreサブエージェントの特徴として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',37,0)">Opusモデルを使い、ファイルの読み書きが可能</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',37,1)">Haikuモデルを使い、読み取り専用ツール（Read, Grep, Glob等）のみアクセス可能</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',37,2)">Sonnetモデルを使い、Bashコマンドの実行が可能</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',37,3)">モデルは状況に応じて自動選択され、全ツールにアクセス可能</div>
+      <div class="quiz-explanation" id="drill-q38-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q39" data-drill-domain="D3">
+      <div class="q-text">Q39. [D3] bypassPermissions（--dangerously-skip-permissions）モードを使用してよい環境として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',38,0)">開発者のローカル環境</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',38,1)">コンテナなどの隔離された環境</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',38,2)">ステージング環境</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',38,3)">信頼できるチームメンバーがいる共有サーバー</div>
+      <div class="quiz-explanation" id="drill-q39-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q40" data-drill-domain="D3">
+      <div class="q-text">Q40. [D3] settings.jsonのpermissions.denyに「Bash(rm -rf *)」と設定した場合の動作として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',39,0)">permissions.allowに同じコマンドが含まれていれば実行可能</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',39,1)">denyが常に最優先のため、allowに含まれていても実行はブロックされる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',39,2)">askモードに格下げされ、ユーザーの確認を求める</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',39,3)">設定の記載順序によって結果が変わる</div>
+      <div class="quiz-explanation" id="drill-q40-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q41" data-drill-domain="D3">
+      <div class="q-text">Q41. [D3] Claude Codeで--max-budget-usd=5.0を設定した場合の動作として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',40,0)">5ドルに達するとユーザーに確認を求め、承認後に続行する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',40,1)">APIコストが5ドルに達すると、処理を強制終了する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',40,2)">5ドル以下のモデルのみが使用される</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',40,3)">月間のAPI利用料金が5ドルに制限される</div>
+      <div class="quiz-explanation" id="drill-q41-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q42" data-drill-domain="D3">
+      <div class="q-text">Q42. [D3] PostToolUseフックの実行タイミングと用途として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',41,0)">ツール実行前に実行され、入力パラメータを検証する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',41,1)">ツール実行後に実行され、ツール結果のログ記録や監査に使用する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',41,2)">Claude Codeの起動時に1回だけ実行される</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',41,3)">APIレスポンス受信時に実行され、出力をフィルタリングする</div>
+      <div class="quiz-explanation" id="drill-q42-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q43" data-drill-domain="D3">
+      <div class="q-text">Q43. [D3] Claude Codeの対話モードとヘッドレスモード（-p）の使い分けとして正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',42,0)">対話モードはバグ修正用、ヘッドレスモードは新機能開発用</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',42,1)">対話モードは開発者が手元で使う用途、ヘッドレスモードはCI/CDやスクリプトからの自動実行用</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',42,2)">対話モードは無料、ヘッドレスモードは有料</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',42,3)">対話モードはローカル環境限定、ヘッドレスモードはクラウド環境限定</div>
+      <div class="quiz-explanation" id="drill-q43-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q44" data-drill-domain="D3">
+      <div class="q-text">Q44. [D3] CLAUDE.mdに記載すべき内容と、settings.jsonに記載すべき内容の使い分けとして正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',43,0)">CLAUDE.mdにはコード規約、settings.jsonにはAPI設定を記載する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',43,1)">CLAUDE.mdには自然言語のルール・規約、settings.jsonには機械的な権限設定やフック定義を記載する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',43,2)">CLAUDE.mdには個人設定、settings.jsonにはチーム設定を記載する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',43,3)">CLAUDE.mdにはプロジェクト情報、settings.jsonにはモデル選択を記載する</div>
+      <div class="quiz-explanation" id="drill-q44-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q45" data-drill-domain="D3">
+      <div class="q-text">Q45. [D3] Claude Codeのセキュリティアーキテクチャにおいて、Bash実行のサンドボックス化が重要な理由として最も適切なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',44,0)">コマンドの実行速度を向上させるため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',44,1)">悪意のあるコマンドや意図しない操作がホストシステムに影響を与えることを防ぐため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',44,2)">複数のClaude Codeセッションを並列実行するため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',44,3)">APIコストを削減するため</div>
+      <div class="quiz-explanation" id="drill-q45-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q46" data-drill-domain="D3">
+      <div class="q-text">Q46. [D3] Claude Codeの--resumeフラグについて、Anthropicが推奨する使い方として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',45,0)">前回のセッションを常に--resumeで再開するのがベストプラクティス</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',45,1)">--resumeは使わず、新しいセッションで開始し、必要に応じてhandoverファイルで引き継ぐのが推奨</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',45,2)">--resumeはCI/CD環境でのみ使用すべき</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',45,3)">--resumeは対話モードでのみ使用可能</div>
+      <div class="quiz-explanation" id="drill-q46-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q47" data-drill-domain="D3">
+      <div class="q-text">Q47. [D3] フック（Hooks）を使って、Claude Codeがファイルを書き込む際に特定のディレクトリへの書き込みのみを許可する設計として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',46,0)">PostToolUseフックでWriteツールの実行結果を監視し、禁止ディレクトリへの書き込みがあればファイルを削除する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',46,1)">PreToolUseフックでWriteツールのパラメータを検査し、許可ディレクトリ以外への書き込みはstderrにメッセージを出力して非ゼロ終了コードでブロックする</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',46,2)">CLAUDE.mdに「このディレクトリにのみ書き込むこと」と記載する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',46,3)">permissions.allowにWriteツールのパスパターンを記載する</div>
+      <div class="quiz-explanation" id="drill-q47-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q48" data-drill-domain="D4">
+      <div class="q-text">Q48. [D4] Claude APIの構造化出力で、JSON Outputs（output_config方式）とStrict Tool Useの使い分けとして正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',47,0)">JSON Outputsはツール呼び出し用、Strict Tool Useは応答テキスト用</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',47,1)">JSON Outputsは応答全体の構造化に使用し、Strict Tool Useはツール呼び出しのパラメータ保証に使用する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',47,2)">どちらも同じ機能で互換性がある</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',47,3)">JSON Outputsは旧API用、Strict Tool Useは新API用</div>
+      <div class="quiz-explanation" id="drill-q48-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q49" data-drill-domain="D4">
+      <div class="q-text">Q49. [D4] Claude APIの構造化出力でサポートされていない制約はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',48,0)">enum（列挙型）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',48,1)">minimum / maximum（数値の最小・最大値）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',48,2)">required（必須フィールド）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',48,3)">type（型指定）</div>
+      <div class="quiz-explanation" id="drill-q49-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q50" data-drill-domain="D4">
+      <div class="q-text">Q50. [D4] プロンプト設計のアンチパターンとして、最も問題があるのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',49,0)">XMLタグで指示とコンテキストを構造化する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',49,1)">制約条件を「禁止形（〜しないこと）」で記述し、理由を添えない</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',49,2)">Few-shotの例に多様性を持たせる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',49,3)">長文コンテキストのデータを上部に、指示を下部に配置する</div>
+      <div class="quiz-explanation" id="drill-q50-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q51" data-drill-domain="D4">
+      <div class="q-text">Q51. [D4] Multi-pass Review（マルチパスレビュー）で、出力の検証を行うインスタンスとして推奨されるのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',50,0)">出力を生成した同じ会話セッション内でセルフレビューさせる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',50,1)">出力を生成したインスタンスとは独立した別のインスタンスで検証する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',50,2)">ユーザーが手動で全件レビューする</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',50,3)">検証は不要で、temperatureを0にすれば品質が保証される</div>
+      <div class="quiz-explanation" id="drill-q51-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q52" data-drill-domain="D4">
+      <div class="q-text">Q52. [D4] プロンプトキャッシングのデフォルトのキャッシュ寿命と、コスト削減効果として正しい組み合わせはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',51,0)">キャッシュ寿命: 1時間 / コスト削減: 最大50%</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',51,1)">キャッシュ寿命: 5分 / コスト削減: 最大90%、レイテンシ削減: 最大80%</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',51,2)">キャッシュ寿命: 24時間 / コスト削減: 最大30%</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',51,3)">キャッシュ寿命: セッション終了まで / コスト削減: 最大70%</div>
+      <div class="quiz-explanation" id="drill-q52-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q53" data-drill-domain="D4">
+      <div class="q-text">Q53. [D4] additionalProperties: false を構造化出力スキーマに設定する理由として最も適切なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',52,0)">出力サイズを削減してコストを下げるため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',52,1)">スキーマで定義していないフィールドが出力に含まれることを防ぐため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',52,2)">APIレスポンスの速度を向上させるため</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',52,3)">バリデーションエラーの発生を防ぐため</div>
+      <div class="quiz-explanation" id="drill-q53-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q54" data-drill-domain="D4">
+      <div class="q-text">Q54. [D4] 長文コンテキストでのデータと指示の配置として、Anthropicが推奨するのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',53,0)">指示を上部に、データを下部に配置する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',53,1)">データを上部に、指示・質問を下部に配置する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',53,2)">データと指示を交互に配置する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',53,3)">配置順序はパフォーマンスに影響しない</div>
+      <div class="quiz-explanation" id="drill-q54-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q55" data-drill-domain="D4">
+      <div class="q-text">Q55. [D4] ハルシネーション防止のためのグラウンディング（Grounding）手法として最も効果的な実装方法はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',54,0)">システムプロンプトに「正確な情報のみ回答すること」と記載する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',54,1)">Claudeにまず原文から関連箇所を引用させ、その引用に基づいて回答を生成させる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',54,2)">temperatureを0に設定する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',54,3)">max_tokensを制限して短い回答のみを許可する</div>
+      <div class="quiz-explanation" id="drill-q55-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q56" data-drill-domain="D4">
+      <div class="q-text">Q56. [D4] 分類タスクで出力カテゴリを確実に制限する方法として、最も信頼性が高いのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',55,0)">プロンプトで「以下のカテゴリのいずれかで回答してください」と指示する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',55,1)">Few-shotの例で正しいカテゴリのみを示す</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',55,2)">tool_useでenum制約のあるツールを定義し、構造化出力で分類を保証する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',55,3)">出力をプログラムで後処理し、カテゴリに一致しないものを除外する</div>
+      <div class="quiz-explanation" id="drill-q56-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q57" data-drill-domain="D5">
+      <div class="q-text">Q57. [D5] Claude APIのレート制限で使用されるToken Bucket方式の説明として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',56,0)">1日の利用開始時にバケツが満杯になり、使い切ったら翌日まで待つ方式</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',56,1)">バケツにトークンが一定速度で連続的に補充され、リクエストごとに消費する方式</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',56,2)">毎時間バケツがリセットされ、1時間ごとに上限が復活する方式</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',56,3)">使用量に応じてバケツのサイズ（上限）が動的に変化する方式</div>
+      <div class="quiz-explanation" id="drill-q57-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q58" data-drill-domain="D5">
+      <div class="q-text">Q58. [D5] AnthropicのService Tiersの3段階について、コストの低い順に並べた正しい順序はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',57,0)">Standard → Priority → Batch</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',57,1)">Batch → Standard → Priority</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',57,2)">Priority → Batch → Standard</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',57,3)">Batch → Priority → Standard</div>
+      <div class="quiz-explanation" id="drill-q58-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q59" data-drill-domain="D5">
+      <div class="q-text">Q59. [D5] プロンプトキャッシュのヒットとレート制限の関係として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',58,0)">キャッシュヒット分もレート制限のカウントに含まれる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',58,1)">キャッシュヒット分はレート制限（ITPM）にカウントされない</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',58,2)">キャッシュを使うとレート制限が2倍になる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',58,3)">キャッシュとレート制限は無関係</div>
+      <div class="quiz-explanation" id="drill-q59-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q60" data-drill-domain="D5">
+      <div class="q-text">Q60. [D5] Anthropicのデータ保持ポリシーで、API利用（Commercial区分）のデフォルトのデータ保持期間はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',59,0)">即座に削除</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',59,1)">7日間</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',59,2)">30日間</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',59,3)">90日間</div>
+      <div class="quiz-explanation" id="drill-q60-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q61" data-drill-domain="D5">
+      <div class="q-text">Q61. [D5] ハルシネーション削減の5つの手法のうち、「AIに『わかりません』と回答することを許可する」手法は何と呼ばれますか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',60,0)">直接引用グラウンディング（Direct Quote Grounding）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',60,1)">「わからない」の許可（Allow "I don't know"）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',60,2)">Chain-of-Thought検証（CoT Verification）</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',60,3)">Best-of-N検証（Best-of-N Verification）</div>
+      <div class="quiz-explanation" id="drill-q61-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q62" data-drill-domain="D5">
+      <div class="q-text">Q62. [D5] ジェイルブレイク攻撃の「プロンプトインジェクション」への対策として最も効果的なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',61,0)">システムプロンプトを暗号化する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',61,1)">XMLタグでシステム指示とユーザー入力を明確に分離し、プログラム側で入力検証を行う</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',61,2)">ユーザー入力の文字数を制限する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',61,3)">AIのtemperatureを0に固定する</div>
+      <div class="quiz-explanation" id="drill-q62-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q63" data-drill-domain="D5">
+      <div class="q-text">Q63. [D5] 企業が顧客の医療情報を含むデータをClaude APIで処理する場合、最も適切なプランとオプションの組み合わせはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',62,0)">Proプラン + データ改善オプトアウト</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',62,1)">APIプラン + デフォルト30日保持</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',62,2)">Enterprise Regulatedティア + ゼロ保持 + HIPAA対応</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',62,3)">Teamプラン + VPN接続</div>
+      <div class="quiz-explanation" id="drill-q63-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q64" data-drill-domain="D5">
+      <div class="q-text">Q64. [D5] プログレッシブ要約（Progressive Summarization）のリスクとして最も重要なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',63,0)">要約処理にかかるAPIコストが増加する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',63,1)">要約のたびに具体的な数値・固有名詞・条件分岐などの重要情報が脱落するリスクがある</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',63,2)">要約処理に時間がかかりレスポンスが遅延する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',63,3)">要約の品質がモデルのバージョンに依存する</div>
+      <div class="quiz-explanation" id="drill-q64-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q65" data-drill-domain="D5">
+      <div class="q-text">Q65. [D5] コンテンツモデレーションで、大量のユーザー投稿を効率的にチェックするための推奨アーキテクチャはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',64,0)">すべての投稿をOpusモデルで詳細にチェックする</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',64,1)">Haikuで高速スクリーニング → 疑わしいもののみSonnet/Opusで再検証する多段階処理</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',64,2)">キーワードマッチングのみで処理し、LLMは使わない</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',64,3)">ユーザーによる相互監視（ピアレビュー）のみに依存する</div>
+      <div class="quiz-explanation" id="drill-q65-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q66" data-drill-domain="D2">
+      <div class="q-text">Q66. [D2] MCP ServerがSampling機能を使用する場面として最も適切なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',65,0)">クライアントに対してツール実行結果を返すとき</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',65,1)">サーバー側の処理中にLLMの判断が必要になったとき</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',65,2)">クライアントからのリクエストを認証するとき</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',65,3)">サーバーのログをクライアントに送信するとき</div>
+      <div class="quiz-explanation" id="drill-q66-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q67" data-drill-domain="D2">
+      <div class="q-text">Q67. [D2] ツール定義において、descriptionフィールドの書き方として最も効果的なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',66,0)">技術的な実装詳細を含め、内部処理を詳細に記述する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',66,1)">ツールの使用目的と、どのような状況で使うべきかを明確に記述する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',66,2)">できるだけ短く、ツール名から推測できる内容は省略する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',66,3)">他のツールとの違いを網羅的に比較して記述する</div>
+      <div class="quiz-explanation" id="drill-q67-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q68" data-drill-domain="D3">
+      <div class="q-text">Q68. [D3] Claude Codeの--print（-p）モードで実行した場合の挙動として正しいのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',67,0)">対話モードと同じ権限設定が適用され、ツール使用時に確認が求められる</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',67,1)">全てのツール使用が自動許可され、確認なしで実行される</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',67,2)">ファイルの読み取りのみ許可され、書き込みは一切できない</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',67,3)">allowedToolsで明示的に許可したツールのみ使用可能で、それ以外は拒否される</div>
+      <div class="quiz-explanation" id="drill-q68-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q69" data-drill-domain="D4">
+      <div class="q-text">Q69. [D4] プロンプトキャッシュの効果を最大化するためのプロンプト構造として最も適切なのはどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',68,0)">リクエストごとにプロンプト全体をランダムに再構成する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',68,1)">変化しない部分（システムプロンプト・ツール定義）を先頭に、変化する部分（ユーザー入力）を末尾に配置する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',68,2)">ユーザー入力を先頭に、システムプロンプトを末尾に配置する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',68,3)">キャッシュ効率のためプロンプトを可能な限り短くする</div>
+      <div class="quiz-explanation" id="drill-q69-exp"></div>
+    </div>
+    <div class="quiz-question" id="drill-q70" data-drill-domain="D5">
+      <div class="q-text">Q70. [D5] APIレスポンスでstop_reasonが「end_turn」ではなく「max_tokens」だった場合、最も適切な対応はどれですか？</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',69,0)">レスポンスをそのまま使用し、途中で切れていても問題ないと判断する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',69,1)">max_tokensの値を増やして再リクエストするか、出力が長くなりすぎないようプロンプトを調整する</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',69,2)">APIキーを再発行してリトライする</div>
+      <div class="quiz-option" onclick="selectAnswer('drill',69,3)">別のモデル（より小さいモデル）に切り替える</div>
+      <div class="quiz-explanation" id="drill-q70-exp"></div>
+    </div>
+
+    <button class="btn btn-accent" onclick="submitQuiz('drill')" id="drill-submit-btn">回答を確定する</button>
+    <button class="btn btn-outline" onclick="retryQuiz('drill')" id="drill-retry-btn" style="display:none">もう一度挑戦</button>
+    <div id="drill-quiz-result" class="quiz-result" style="display:none"></div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="showPage('dashboard')">&#8592; ダッシュボードへ</button>
+  </div>
+</div>
+
 </div><!-- /main -->
 </div><!-- /app -->
 
@@ -7477,6 +8087,100 @@ function showSection(module, section, tabEl) {
   tabEl.classList.add('active');
 }
 
+
+QUIZ_DATA['drill'] = {
+  answers: [1, 0, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1],
+  explanations: [
+    'エージェントループの正しい終了条件は、Claudeがstop_reason="end_turn"を返し、かつ未処理のtool_useブロックがないことです。1回のツール呼び出しで終了（A）すると複数ステップのタスクに対応できません。時間ベース（C）は処理途中での切断リスクがあり、ユーザー入力待ち（D）は自動化の目的に反します。',
+    'stop_reason="tool_use"はClaudeがツール呼び出しを要求していることを意味します。正しい処理は、(1)tool_useブロックのパラメータでツールを実行し、(2)tool_resultをmessages配列に追加し、(3)APIを再呼び出しすることです。ユーザー確認（B）は毎回行うと自動化が損なわれ、再送（C）は無限ループになり、新セッション（D）は会話コンテキストが失われます。',
+    'HITLの導入は「影響度」で判断します。不可逆な操作（キャンセル・削除）、高額取引、機密データアクセスが基準です。すべての操作にHITLを入れる（A）と効率が著しく低下します。信頼度スコア（C）は実装が複雑で基準が曖昧です。営業時間で分ける（D）のは影響度と無関係な基準です。',
+    'Anthropicが定義するAugmented LLMの3つの構成要素は、検索（Retrieval: 外部知識の取得）、ツール統合（Tool Integration: 外部システムへの操作）、メモリ（Memory: 過去の情報の保持）です。これはエージェントの基本構成要素として公式ブログ「Building effective agents」で定義されています。',
+    'パターン選択の基準はタスク間の依存関係です。各サブタスクが独立して並列実行できる場合はHub-and-Spoke（中央が振り分け→各自実行→結果統合）が最適です。一方、Aの出力がBの入力になるような順序依存がある場合はパイプライン（直列処理）が適しています。速度やエラー処理やエージェント数は選択の主要基準ではありません。',
+    'コンテキスト隔離（Context Isolation）の原則により、各サブエージェントには自身のタスクに必要な情報のみを渡すべきです。他のサブエージェントの無関係なタスク情報を含めると、コンテキストウィンドウの無駄遣い、情報漏洩リスク、推論精度の低下を招きます。タスク指示（A）、入力データ（B）、出力仕様（D）はすべて必要な情報です。',
+    'Anthropicが推奨するSecure Deploymentの3原則は、隔離（コンテナ等でエージェントを分離）、最小権限（必要最低限の権限のみ付与）、多層防御（複数の防御層を重ねる）です。暗号化等（A）はデータ保護、テスト等（C）は運用監視、バックアップ等（D）は可用性の原則であり、エージェント固有のデプロイ原則とは異なります。',
+    'エージェントは「LLMが状況を判断して次のアクションを決める」パターンです。質問内容に応じて動的に処理を変える必要がある場面（B）に適しています。定型処理（A）、バッチ処理（C）、テンプレート処理（D）は手順が固定のため、ワークフロー（決定論的なフロー制御）の方が適切で、コスト面でも有利です。',
+    '情報出所（Provenance）の追跡は、「この情報はどのエージェントが、どのソースから取得したか」を記録する仕組みです。複数エージェントの出力を統合する際に、出所不明の情報が混入すると最終出力の信頼性が損なわれます。処理速度（A）、コスト（C）、通信量（D）はモニタリングの問題であり、情報の信頼性とは直接関係しません。',
+    '推奨される順序は、(1)リトライ（一時的エラーなら再試行で解決）→ (2)別エージェントへの再割り当て（同じエージェントでは解決しない場合）→ (3)人間へのエスカレーション（最終手段）です。人間への即エスカレーション（A）はコスト高、エラー無視（C）はデータ不整合、全体停止（D）は過剰反応です。',
+    'max_turnsはエージェントループの最大反復回数を設定するパラメータです。エージェントがツール呼び出し→結果受信→次の判断を繰り返すサイクルの上限を設けることで、無限ループや暴走を防ぎます。同時実行数（A）、トークン数（C: これはmax_tokens）、ツール数（D）の制限ではありません。',
+    'Agent SDKにおけるサブエージェントは独立したコンテキストを持ちます。メインエージェントにはサブエージェントの最終結果のみが返され、中間的な推論過程やツール呼び出しの詳細は含まれません。これにより、コンテキスト隔離が実現し、メインエージェントのコンテキストウィンドウの節約にもなります。',
+    'Hub-and-Spokeで並列実行する場合、各サブエージェントの結果をオーケストレーターが受け取って統合する必要があるため、オーケストレーターのコンテキストウィンドウ消費は増加します（D: 誤り）。処理時間短縮（A）、コンテキスト隔離（B）、障害隔離（C）はHub-and-Spokeの正しいメリットです。',
+    'ツール実行中に新しい指示を受けた場合、まず現在のツール実行を完了させ（tool_resultは必ず返す必要がある）、その結果と新しいユーザー指示を合わせてAPIに送信するのが適切です。即中断（A）はtool_resultが返らずAPIエラーになり、無視（B）はユーザー体験を損ない、新セッション（D）はコンテキストの断絶を招きます。',
+    'max_turnsはループ回数の上限、max_budget_usdはコストの上限を設定します。ループ回数が少なくても高コストなツールを呼ぶケースや、逆に低コストだが大量のループを繰り返すケースがあるため、両方を組み合わせることで異なる種類の暴走に対応できます。API制約（A）や速度向上（C）や環境別（D）とは無関係です。',
+    'パラレライゼーション（Parallelization）は複数のLLM呼び出しを同時に実行し、結果を集約するパターンです。セクショニング（タスク分割→並列処理）とボーティング（同じ問題を複数回処理→多数決）の2つのバリエーションがあります。ルーティング（A）は入力に基づく振り分け、チェイニング（C）は直列処理、エバリュエーター（D）は反復改善のパターンです。',
+    'ワークフローは手順が事前に決まっている場合に適しています。LLMの自律的な判断は不要でコストと遅延を節約できます。データ量（A）、ツール数（C）、セキュリティ（D）はワークフローとエージェントの選択基準ではありません。重要な基準は「手順が固定か、動的判断が必要か」です。',
+    'ルーティングの信頼性を高めるには、tool_useでenum制約付きのツールを定義し、分類カテゴリを厳密に制限するのが最適です。構造化出力により100%スキーマ準拠が保証されます。毎回確認（A）は効率低下、全エージェント送信（C）はコスト3倍、キーワードマッチ（D）は自然言語の曖昧さに対応できません。',
+    'エバリュエーター・オプティマイザーは「生成→評価→改善→再評価」を繰り返す反復パターンです。コード自動生成（生成→テスト→修正→再テスト）のように明確な評価基準があり反復改善が有効な場面に最適です。定型レポート（A）、バッチ分類（C）、FAQ応答（D）は1回の処理で完了するため、このパターンのメリットがありません。',
+    'max_turnsが小さすぎると、複数のツール呼び出しが必要なタスク（例: 検索→分析→レポート生成）が途中で打ち切られ、不完全な結果が返されます。コスト（A）は制限で減少し、セキュリティ（C）やメモリ（D）には影響しません。適切な値の設定にはタスクの複雑さに応じた見極めが必要です。',
+    'ツールのdescriptionで最も重要なのは「いつ使うか」と「いつ使わないか」の明記です。特に似た機能のツールが複数ある場合、使い分けの基準を記載することでClaudeの選択精度が大幅に向上します。内部実装（A）はClaudeの判断に不要、開発者情報（C）やパフォーマンス指標（D）もツール選択には関係しません。',
+    'tool_choice: {"type": "any"}は「必ずいずれかのツールを使う」指定です。テキストのみの応答は返されません。自律判断（A）は"auto"、特定ツール指定（C）は{"type": "tool", "name": "xxx"}、ツール禁止（D）はツール定義自体を渡さないことで実現します。',
+    'MCPではClient:Server=1:1の関係が基本です。複数のサーバーに接続したい場合は、ホスト（Claude Desktopなど）が複数のクライアントを生成します。1つのクライアントが複数サーバーに接続（A）はできません。接続はクライアントから開始（Cは逆）し、別プロセスでも動作可能（Dは誤り）です。',
+    'MCPのプリミティブの制御主体は、Resources=application-controlled（アプリが管理）、Tools=model-controlled（AIモデルが判断して使用）、Prompts=user-controlled（ユーザーが選択して使用）です。この区分はMCPの基本設計として非常に重要な概念で、試験頻出です。',
+    'Rootsは、ホスト（Claude Desktopなど）がMCPサーバーに対して「アクセスしてよいファイルパスの範囲」を指定する仕組みです。最小権限の原則に基づき、サーバーが不必要なファイルやディレクトリにアクセスすることを防ぎます。起動ディレクトリ（A）、認証保存（C）、ログ出力（D）の指定ではありません。',
+    'サンプリングはMCPサーバーがクライアント経由でホスト内のLLMに推論を依頼する「逆方向通信」の仕組みです。セキュリティのため、サンプリングリクエストは必ずホスト（ユーザー側）の承認を経てからLLMに送信されます。サーバーがLLMに直接アクセスすることはできません。',
+    'ステートレスHTTPは状態を保持しないため、ロードバランサーで複数サーバーに振り分ける水平スケーリングが容易です。一方、状態を持たないためストリーミングができず、サンプリング（逆方向通信）や進捗通知が使えなくなるトレードオフがあります。',
+    '構造化エラーレスポンスのベストプラクティスは、is_error: trueに加えてエラータイプとisRetryableフラグを含めることです。レート制限は一時的エラーなのでisRetryable: trueとすることで、Claudeが適切にリトライ判断できます。is_errorなし（A, C）ではエラーと認識されず、tool_result未返却（D）はAPIエラーになります。',
+    '推論オーバーロードはツールが多すぎてClaudeが選択に迷う問題です。対策の本質はツール数の削減と動的フィルタリング（会話の文脈に応じて必要なツールだけ渡す）です。プロンプトキャッシング（A）はコスト・速度の最適化でありツール数は変わりません。max_tokens（C）やtemperature（D）もツール選択精度には無関係です。',
+    'MCP設定ファイルはプロジェクトレベル（.mcp.json）がグローバルレベル（~/.claude.json）より優先されます。これはCLAUDE.mdの階層構造と同じ考え方で、より具体的（プロジェクト固有）な設定が優先されるという原則に基づいています。',
+    'Claudeは1回のレスポンスで複数のtool_useブロックを返すことがあります（並列ツール呼び出し）。正しい処理は、すべてのツールを実行し、各結果をtool_resultとしてmessages配列に追加してからAPIを再呼び出しすることです。最初だけ実行（A）は不完全、個別送信（C）は仕様違反、エラー（D）は正常な動作を妨げます。',
+    'MCPの通知はサーバーからクライアントへの一方通行のメッセージです。進捗通知（処理の何%が完了したか）やログ通知（処理の途中経過）があり、クライアントからの返信は不要です。通常の処理中にも随時送信できます。',
+    'tool_choice: "auto"はデフォルト設定で、Claudeが状況に応じてツールを使うかテキスト応答にするかを自律的に判断します。常にツール使用（A）は"any"、テキストのみ（B）はツール定義なし、ランダム（D）ではなく文脈に基づいた判断です。',
+    'Claude Codeの権限はdeny → ask → allowの順で評価されます。deny（拒否）が常に最優先で、明示的に拒否されたツール操作はallowに含まれていても実行できません。この評価順は安全性を最優先にする設計思想に基づいています。',
+    'CI/CDでClaude Codeを使うには、--print（ヘッドレスモード）フラグとANTHROPIC_API_KEY環境変数の2つが最小要件です。--printだけ（A）ではAPIキーがなく動作しません。CLAUDE.md（C）は指示書であり起動には不足、対話モード（D）はCIに不向きです。',
+    'フックではstderrとstdoutの役割が明確に分かれています。stderrの内容はClaude Codeへのフィードバック（ブロック理由の説明）として使われ、stdoutはツール結果の変更（入力パラメータの書き換えなど）に予約されています。混同するとツール結果が意図せず変更されるリスクがあります。',
+    'CLAUDE.mdは「グローバル（~/.claude/CLAUDE.md）→ リポジトリルート → ユーザーローカル（.claude/CLAUDE.md）→ サブディレクトリ」の順で読み込まれ、後に読まれたものが先のものを上書き（override）します。つまり「最も近い（具体的な）CLAUDE.mdが最優先」です。',
+    'Exploreサブエージェントは高速・低コストのHaikuモデルを使い、読み取り専用ツール（Read, Grep, Glob等）のみアクセスできます。コードベースの探索や検索に特化しており、ファイル変更やコマンド実行はできません。このため安全かつ高速にコードベースを調査できます。',
+    'bypassPermissionsモードは全権限チェックをスキップするため、コンテナなどの隔離環境でのみ使用すべきです。ローカル環境（A）では誤操作のリスクがあり、ステージング（C）や共有サーバー（D）では他の開発者やシステムに影響を与える可能性があります。',
+    'permissions.denyは常にpermissions.allowより優先されます（deny > ask > allow）。明示的にdenyされたコマンドは、allowリストに含まれていても実行できません。これはセキュリティの原則で、「ブラックリスト方式の禁止事項は許可で上書きできない」設計です。',
+    '--max-budget-usdはセッション内のAPIコスト上限を設定するパラメータです。設定金額に達すると処理を強制終了します。確認を求める（A）のではなく即終了、モデル選択（C）やアカウント制限（D）とは無関係です。CI/CDでの暴走防止に使われます。',
+    'PostToolUseフックはツール実行後（post）に実行されます。ツールの実行結果をログに記録したり、監査証跡を残したり、実行結果に基づいて追加アクションを取ったりする用途に使います。ツール実行前（A）はPreToolUse、起動時（C）やAPI受信時（D）のフックとは異なります。',
+    '対話モードは開発者が手元でインタラクティブに使う用途、ヘッドレスモード（--print / -p）はCI/CDパイプラインやスクリプトからの非対話的な自動実行用です。バグ修正/新機能（A）や無料/有料（C）やローカル/クラウド（D）の区別ではありません。',
+    'CLAUDE.mdは「自然言語でAIに伝えるルール・規約・コーディング方針」を記載するファイルです。settings.jsonは「機械的に処理される設定」（権限ルール、フック定義、環境変数など）を記載します。API設定（A）やチーム/個人（C）やモデル選択（D）の区別ではありません。',
+    'サンドボックス化は、Claude Codeが実行するBashコマンドがホストシステムに与える影響を制限するためのセキュリティ機構です。万が一悪意のあるコマンドが実行されても、サンドボックス内に封じ込められます。速度（A）、並列実行（C）、コスト（D）のためではありません。',
+    'Anthropicは新しいセッションでの開始を推奨しています。--resumeは前回のセッション状態を引き継ぎますが、コンテキストの累積やセッション状態の不整合リスクがあります。新セッション + handoverファイルによる引き継ぎがベストプラクティスです。',
+    'PreToolUseフックでツール実行前にパラメータを検査し、不正な書き込みを事前にブロックするのが正しい設計です。PostToolUse（A）では書き込み後なので手遅れ、CLAUDE.md（C）はプロンプトレベルで確実ではなく、permissions.allowのパスパターン（D）はWrite全般の許可であり特定ディレクトリの制限には不十分です。',
+    'JSON Outputs（output_config方式）はClaudeの応答テキスト全体を構造化データとして出力する場合に使います。Strict Tool Use（strict: true）はツール呼び出しのパラメータが確実にスキーマに準拠することを保証する場合に使います。用途が異なるため使い分けが必要です。',
+    'Claude APIの構造化出力ではminimum、maximum、pattern、anyOfなどの数値制約やパターン制約はサポートされていません。代わりに、descriptionフィールドに自然言語で制約を記述します。enum（A）、required（C）、type（D）はサポートされています。',
+    'Anthropicは制約条件を「推奨形（何をすべきか）」で書くことを推奨しています。「禁止形」は何をすべきかが不明確で、理由がないとClaudeが類似状況で適切に一般化できません。XMLタグ構造化（A）、多様なFew-shot（C）、データ上部配置（D）はいずれもベストプラクティスです。',
+    'Multi-pass Reviewでは独立した別のセッション（レビューインスタンス）を使って出力を評価します。同じ会話内でのセルフレビュー（A）は自分の出力に引っ張られやすく客観性が低下します。全件手動（C）は非効率、temperature=0（D）は品質保証にはなりません。',
+    'プロンプトキャッシングのデフォルトキャッシュ寿命は5分間です。コスト最大90%削減、レイテンシ（遅延）最大80%削減が見込めます。システムプロンプトなど繰り返し使われる安定コンテンツの再送コストを大幅に削減できます。',
+    'additionalProperties: falseは「スキーマに定義されていないフィールドの出力を禁止する」設定です。予期しないデータの混入を防ぎ、出力の予測可能性を高めます。「余白への書き込み禁止」のようなもので、必須仕様ではありませんが常に設定することが推奨されます。',
+    'Anthropicのテストでは、データ（ドキュメント）をプロンプトの上部に、指示や質問を下部に配置することで最大30%の品質向上が確認されています。Claudeはプロンプトの後半部分に特に注意を払う傾向があるため、重要な指示は下部に配置するのが効果的です。',
+    'グラウンディングの最も効果的な実装は、「まず引用→引用に基づいて回答」の2ステップ方式です。原文からの引用を強制することで、根拠のない情報生成を大幅に抑制できます。プロンプト指示（A）は確実ではなく、temperature（C）やmax_tokens（D）はハルシネーション防止の本質的な対策ではありません。',
+    'tool_useでenum制約を使うと、構造化出力により100%スキーマ準拠が保証されます。プロンプト指示（A）やFew-shot（B）ではカテゴリ外の出力が稀に発生する可能性があります。後処理（D）は問題発生後の対応であり、根本的な防止策ではありません。',
+    'Token Bucket方式では、バケツにトークンが一定速度で連続的に補充されます。リクエストのたびにトークンが消費され、バケツが空になるとリクエストが拒否されます。1日リセット（A）でも毎時リセット（C）でもなく、連続的な補充が特徴です。サイズは固定（D）でティアによって異なります。',
+    'コストの低い順は、Batch（Standardの50%コスト）→ Standard（通常料金）→ Priority（追加料金で優先処理）です。Batchは非同期処理で最大24時間かかりますが、リアルタイム性が不要な大量処理に最適です。',
+    'プロンプトキャッシュがヒットした場合、cache_read_input_tokensはITPM（Input Tokens Per Minute）のレート制限にカウントされません。これにより、キャッシュ活用で実質的なスループットを向上させることができます。これはRate Limits対策の重要なポイントです。',
+    'Commercial区分（API / Work / Enterprise）のデフォルトのデータ保持期間は30日です。安全性評価（Trust & Safety）目的で保持され、モデル訓練には使用されません。即時削除はゼロ保持オプション（Enterprise限定）です。',
+    '「Allow \'I don\'t know\'」は、AIに確信がない場合に「わかりません」と正直に回答することを明示的に許可する手法です。知ったかぶりによるハルシネーションを防ぎます。グラウンディング（A）は引用ベース回答、CoT（C）は段階的推論、Best-of-N（D）は複数回生成による一貫性チェックです。',
+    'プロンプトインジェクション対策では、XMLタグでシステム指示（信頼できる情報）とユーザー入力（信頼できない情報）を明確に分離し、さらにプログラム側で入力の検証・サニタイズを行う多層防御が推奨されます。暗号化（A）は実用的でなく、文字数制限（C）やtemperature（D）は攻撃を防げません。',
+    '医療情報は最高レベルのデータ保護が必要です。Enterprise Regulatedティアではゼロ保持（即時削除）オプションとHIPAA（医療データ保護基準）対応が利用可能です。Proプラン（A）やAPIデフォルト（B）では保持期間が長く、Teamプラン（D）にはHIPAA対応がありません。',
+    'プログレッシブ要約の最大のリスクは「伝言ゲーム効果」です。要約を繰り返すたびに、具体的な数値（予算150万→「予算が決まっている」）、固有名詞、条件分岐（Aの場合はX、Bの場合はY→「XまたはYで対応」）などの重要情報が脱落する可能性があります。コスト（A）や遅延（C）は二次的な問題です。',
+    '推奨アーキテクチャは多段階処理です。軽量モデル（Haiku）で全投稿を高速スクリーニングし、疑わしいコンテンツのみを高精度モデル（Sonnet/Opus）で再検証します。全件Opus（A）はコスト過大、キーワードマッチ（C）は文脈を理解できず、ピアレビュー（D）のみでは信頼性が低いです。',
+    'Samplingは、MCP Serverが処理の途中でLLMの判断を必要とする場合に、クライアント側のLLMに推論をリクエストする機能です。ツール結果の返却（A）は通常のレスポンス、認証（C）はOAuth等の別メカニズム、ログ送信（D）はNotification機能です。Samplingはサーバーが『考える』必要がある場面で使います。',
+    'ツールのdescriptionは、LLMがツール選択の判断に使う重要な情報です。『いつ・なぜ使うか』を明確にすることで、適切なツール選択を促します。実装詳細（A）はLLMの判断に不要、省略（C）は誤選択を招き、網羅的比較（D）はコンテキストを浪費します。目的と使用条件の記述が最も効果的です。',
+    '--print（-p）モードは非対話的なヘッドレス実行のため、ユーザーに確認を求めることができません。そのため全ツールが自動許可されます。ただしこれはセキュリティリスクがあるため、信頼できるプロンプトのみで使用すべきです。対話モードの権限（A）は不正解、読み取りのみ（C）も不正解、allowedToolsによる制限（D）は--print時ではなくSettings/API経由の制御です。',
+    'プロンプトキャッシュはプレフィックス一致で動作するため、変化しない部分（システムプロンプト、ツール定義等）を先頭に配置し、変化する部分（ユーザー入力）を末尾に置くことでキャッシュヒット率が最大化します。ランダム再構成（A）はキャッシュを無効化し、逆順配置（C）ではプレフィックスが毎回変わり、短縮（D）はキャッシュとは無関係です。',
+    'stop_reason: max_tokensは出力がmax_tokens上限に達して途中で打ち切られたことを意味します。対応としては、max_tokensの値を増やすか、プロンプトで出力を簡潔にするよう指示することが適切です。そのまま使用（A）は不完全な出力のリスクがあり、APIキー再発行（C）は無関係、小モデルへの切替（D）は根本解決になりません。'
+  ]
+};
+
+function filterDrill(domain) {
+  const qs = document.querySelectorAll('[data-drill-domain]');
+  qs.forEach(q => {
+    q.style.display = (domain === 'all' || q.dataset.drillDomain === domain) ? '' : 'none';
+  });
+  // Update button styles
+  ['all','D1','D2','D3','D4','D5'].forEach(d => {
+    const btn = document.getElementById('drill-filter-' + d);
+    if (btn) {
+      if (d === domain) {
+        btn.className = 'btn btn-primary';
+      } else {
+        btn.className = 'btn btn-outline';
+      }
+    }
+  });
+}
 // ===================== QUIZ =====================
 let quizSelections = {}; // { m0: [null, null, ...] }
 

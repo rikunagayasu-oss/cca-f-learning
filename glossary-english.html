@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA-F 英語用語集 — Claude Certified Architect Foundations</title>
+<style>
+  :root {
+    --primary: #D97706;
+    --primary-light: #FEF3C7;
+    --primary-dark: #92400E;
+    --accent: #7C3AED;
+    --accent-light: #EDE9FE;
+    --bg: #F9FAFB;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --success: #059669;
+    --success-light: #D1FAE5;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --info: #2563EB;
+    --info-light: #DBEAFE;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  .main { max-width: 900px; margin: 0 auto; padding: 2rem 3rem; }
+
+  .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  .card h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text); }
+  .card h3 { font-size: 1.1rem; margin: 1.5rem 0 .75rem; color: var(--primary-dark); }
+  .card p { margin-bottom: .75rem; }
+
+  .module-header { margin-bottom: 2rem; }
+  .module-header .week-badge { display: inline-block; background: var(--primary-light); color: var(--primary-dark); font-size: .8rem; font-weight: 600; padding: .25rem .75rem; border-radius: 999px; margin-bottom: .5rem; }
+  .module-header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: .25rem; }
+  .module-header .subtitle { color: var(--text-light); font-size: 1rem; }
+  .module-header .domain-tag { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: .75rem; font-weight: 600; padding: .2rem .6rem; border-radius: 999px; margin-top: .5rem; }
+
+  .objectives { background: var(--info-light); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .objectives h3 { color: var(--info); font-size: .95rem; margin-bottom: .5rem; }
+  .objectives ul { padding-left: 1.25rem; }
+  .objectives li { margin-bottom: .3rem; font-size: .9rem; }
+
+  .concept-box { border-left: 4px solid var(--primary); background: var(--primary-light); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .concept-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+
+  .tip-box { background: #ECFDF5; border-left: 4px solid var(--success); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .tip-box .label { font-size: .75rem; font-weight: 700; color: var(--success); text-transform: uppercase; }
+
+  .warn-box { background: #FEF3C7; border-left: 4px solid var(--primary); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .warn-box .label { font-size: .75rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; }
+
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9rem; }
+  .compare-table th { background: #F3F4F6; text-align: left; padding: .6rem .8rem; border-bottom: 2px solid var(--border); font-weight: 600; }
+  .compare-table td { padding: .6rem .8rem; border-bottom: 1px solid var(--border); }
+  .compare-table tr:hover td { background: #F9FAFB; }
+
+  .section-nav { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .section-tab { padding: .4rem 1rem; border-radius: 999px; border: 2px solid var(--border); background: white; cursor: pointer; font-size: .85rem; font-weight: 500; transition: all .15s; text-decoration: none; color: var(--text); }
+  .section-tab:hover { border-color: var(--primary); }
+  .section-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: .9rem; cursor: pointer; border: none; transition: all .15s; text-decoration: none; }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* Index navigation */
+  .alpha-index { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
+  .alpha-index a { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 6px; border: 1px solid var(--border); background: white; color: var(--accent); font-weight: 600; font-size: .85rem; text-decoration: none; transition: all .15s; }
+  .alpha-index a:hover { background: var(--accent-light); border-color: var(--accent); }
+  .alpha-index a.disabled { color: var(--border); pointer-events: none; }
+
+  /* Domain section header */
+  .domain-header { background: var(--accent-light); color: var(--accent); padding: .75rem 1.25rem; border-radius: 8px; margin: 1.5rem 0 1rem; font-weight: 700; font-size: 1rem; }
+
+  /* Frequency stars */
+  .freq-high { color: var(--danger); font-weight: 700; }
+  .freq-mid { color: var(--primary); font-weight: 600; }
+  .freq-low { color: var(--text-light); }
+
+  @media (max-width: 768px) {
+    .main { padding: 1rem 1.25rem; }
+  }
+
+  @media print {
+    .section-nav, .alpha-index { display: none; }
+    .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+<div class="main">
+
+  <div class="module-header">
+    <span class="week-badge">Reference</span>
+    <h1>CCA-F 英語用語集</h1>
+    <p class="subtitle">試験で登場する重要英語用語と日本語訳・解説の一覧</p>
+    <span class="domain-tag">全5ドメイン対応</span>
+  </div>
+
+  <div class="objectives">
+    <h3>この用語集の使い方</h3>
+    <ul>
+      <li>CCA-F試験は<strong>英語</strong>で出題されます。英語用語を見て意味がすぐ浮かぶようにしましょう</li>
+      <li><strong>ドメイン別</strong>で学習する場合は、各ドメインのセクションを順に確認してください</li>
+      <li><strong>アルファベット索引</strong>で特定の用語を素早く探せます</li>
+      <li>試験頻出度: <span class="freq-high">&#9733;&#9733;&#9733;</span> 最重要 / <span class="freq-mid">&#9733;&#9733;</span> 重要 / <span class="freq-low">&#9733;</span> 補足知識</li>
+    </ul>
+  </div>
+
+  <!-- Section Navigation -->
+  <div class="section-nav">
+    <a class="section-tab active" href="#domain1">D1: エージェント設計</a>
+    <a class="section-tab" href="#domain2">D2: ツール&amp;MCP</a>
+    <a class="section-tab" href="#domain3">D3: Claude Code</a>
+    <a class="section-tab" href="#domain4">D4: プロンプト&amp;構造化出力</a>
+    <a class="section-tab" href="#domain5">D5: コンテキスト&amp;信頼性</a>
+    <a class="section-tab" href="#alpha-index-section">A-Z索引</a>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- Domain 1: エージェント型アーキテクチャとオーケストレーション (27%) -->
+  <!-- ============================================ -->
+  <div id="domain1" class="card">
+    <div class="domain-header">Domain 1: エージェント型アーキテクチャとオーケストレーション（27%）</div>
+
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Agent</strong></td><td>エージェント</td><td>ツールを使いながら自律的にタスクを遂行するAIシステム。計画→実行→確認のループを回す。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agent Loop</strong></td><td>エージェントループ</td><td>エージェントが「考える→ツール呼び出し→結果確認→次の行動」を繰り返す中核的な処理サイクル。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agent SDK</strong></td><td>エージェントSDK</td><td>Anthropicが提供するエージェント構築用ライブラリ。CI/CDやプロダクション環境での自動化に使用。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agentic System</strong></td><td>エージェント的システム</td><td>LLMがツールを活用しながら自律的に動作するシステムの総称。ワークフローとエージェントを含む。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Augmented LLM</strong></td><td>拡張LLM</td><td>検索（Retrieval）・ツール（Tool）・メモリ（Memory）で強化されたLLM。エージェントの構成要素。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Coordinator</strong></td><td>コーディネーター</td><td>マルチエージェントシステムでサブエージェントを統括する中央の制御エージェント。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Defense in Depth</strong></td><td>多層防御</td><td>プロンプト・Hook・権限制限・監査ログなど複数の防御層を重ねるセキュリティ設計思想。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Escalation</strong></td><td>エスカレーション</td><td>エージェントが自力で処理できない問題を人間や上位システムに引き上げる仕組み。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Evaluator-Optimizer</strong></td><td>評価者-最適化者</td><td>1つのLLMが出力を生成し、別のLLMが評価して改善を繰り返すワークフローパターン。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Fallback</strong></td><td>フォールバック</td><td>主要な処理が失敗した場合の代替手段。段階的品質低下（Graceful Degradation）の一部。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Graceful Degradation</strong></td><td>段階的品質低下</td><td>障害発生時に完全停止せず、機能を段階的に縮小して稼働し続ける設計。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Guardrails</strong></td><td>ガードレール</td><td>エージェントの動作範囲を制限する安全機構。入力・出力のバリデーション、プログラム的制約など。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Handoff</strong></td><td>ハンドオフ</td><td>制御権を別のエージェントに完全移譲するパターン。「電話の転送」のイメージ。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>HITL (Human-in-the-Loop)</strong></td><td>ヒューマン・イン・ザ・ループ</td><td>重要な判断や操作の前に人間の確認・承認を挟む設計パターン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Hub-and-Spoke</strong></td><td>ハブ＆スポーク</td><td>中央のリードエージェント（ハブ）がサブエージェント（スポーク）に並行して作業を割り振る設計。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Idempotency</strong></td><td>べき等性</td><td>同じ操作を何度実行しても結果が変わらない性質。ツール設計で重要。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Isolation</strong></td><td>隔離</td><td>実行環境を他のシステムから分離するセキュリティ原則。Secure Deploymentの3原則の1つ。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Least Privilege</strong></td><td>最小権限</td><td>必要最小限の権限のみを付与するセキュリティ原則。Secure Deploymentの3原則の1つ。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Observability</strong></td><td>観測可能性</td><td>エージェントの動作状況をログ・メトリクス・トレースで監視できる状態。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Orchestration</strong></td><td>オーケストレーション</td><td>複数のAI処理やエージェントの実行順序・依存関係を管理・調整すること。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Orchestrator-Workers</strong></td><td>オーケストレータ-ワーカー</td><td>中央のオーケストレータがタスクを動的に分解し、複数のワーカーに割り振るパターン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Parallelization</strong></td><td>並列化</td><td>複数のサブタスクを同時に実行するパターン。Sectioning（異種タスク）とVoting（同種タスク）がある。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Programmatic Enforcement</strong></td><td>プログラム的エンフォースメント</td><td>ビジネスルールをコードで100%強制する仕組み。プロンプト指示だけでは不十分な場面で使用。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompt Chaining</strong></td><td>プロンプト連鎖</td><td>複数のLLM呼び出しを順番につなげ、前の出力を次の入力にするワークフローパターン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Routing</strong></td><td>ルーティング</td><td>入力を分類し、適切な専門処理パスに振り分けるワークフローパターン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Sectioning</strong></td><td>セクショニング</td><td>異なるサブタスクを複数エージェントが並行処理する並列化パターン。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Secure Deployment</strong></td><td>安全なデプロイ</td><td>エージェントの安全な本番展開。隔離・最小権限・多層防御の3原則。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Sub-agent</strong></td><td>サブエージェント</td><td>メインエージェントから起動される補助的なエージェント。独自のコンテキストウィンドウで動作。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Voting</strong></td><td>投票</td><td>同じタスクを複数エージェントが独立実行し、多数決で結果を決定する並列化パターン。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agent-as-Tool</strong></td><td>エージェント的ツール</td><td>呼び出し元が制御権を保持したまま、専門エージェントに処理を委任するパターン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- Domain 2: ツール設計とMCP統合 (18%) -->
+  <!-- ============================================ -->
+  <div id="domain2" class="card">
+    <div class="domain-header">Domain 2: ツール設計とMCP統合（18%）</div>
+
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Tool Use / Function Calling</strong></td><td>ツール利用</td><td>Claudeが外部ツールやAPIを呼び出すための仕組み。JSON形式でパラメータを返す。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Tool Definition</strong></td><td>ツール定義</td><td>ツールのname、description、input_schemaを定義するJSON構造。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>input_schema</strong></td><td>入力スキーマ</td><td>ツールが受け付けるパラメータの型・制約をJSON Schemaで定義したもの。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Tool Choice</strong></td><td>ツール選択</td><td>APIリクエストでClaudeにどのツールを使わせるかを制御するパラメータ。auto/any/tool指定。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Strict Mode (strict: true)</strong></td><td>厳密モード</td><td>ツール呼び出しのパラメータがスキーマに100%準拠することを保証するモード。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>is_error</strong></td><td>エラーフラグ</td><td>ツール実行結果でエラーが発生したことをLLMに明示的に伝えるフラグ。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>isRetryable</strong></td><td>リトライ可能フラグ</td><td>ツールエラーがリトライで解決可能かをエージェントに伝えるフラグ。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Parallel Tool Use</strong></td><td>並列ツール呼び出し</td><td>1回のAPI応答で複数のツールを同時に呼び出す機能。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>MCP (Model Context Protocol)</strong></td><td>MCP</td><td>AIモデルと外部ツール・データソースを接続するオープンな標準プロトコル。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>MCP Host</strong></td><td>MCPホスト</td><td>ユーザーが操作するAIアプリケーション。内部にMCPクライアントを持つ。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>MCP Client</strong></td><td>MCPクライアント</td><td>ホスト内で動作し、1つのMCPサーバーと1:1接続を維持するプロトコル処理層。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>MCP Server</strong></td><td>MCPサーバー</td><td>外部データやツールへのアクセスを提供するプログラム。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Resources</strong></td><td>リソース</td><td>MCPサーバーが公開するデータ（ファイル、DBレコード等）。アプリ側が読み取る。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompts (MCP)</strong></td><td>プロンプト（MCP）</td><td>MCPサーバーが提供する再利用可能なプロンプトテンプレート。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Sampling</strong></td><td>サンプリング</td><td>MCPサーバーがクライアントを通じてLLMにテキスト生成をリクエストする逆方向の仕組み。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Capability Negotiation</strong></td><td>能力交渉</td><td>MCP接続時にサーバーとクライアントが互いの能力を確認し合う仕組み。</td><td class="freq-low">&#9733;</td></tr>
+      <tr><td><strong>stdio</strong></td><td>標準入出力</td><td>MCPのローカル接続向けトランスポート方式。プロセス間の標準入出力で通信。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Streamable HTTP</strong></td><td>ストリーマブルHTTP</td><td>リモート接続向けのMCPトランスポート。ストリーミング・通知・サンプリングに対応。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Roots</strong></td><td>ルーツ</td><td>MCPサーバーがアクセスできるファイルパスの範囲をホストが制限する仕組み。</td><td class="freq-low">&#9733;</td></tr>
+      <tr><td><strong>Initialization Handshake</strong></td><td>初期化ハンドシェイク</td><td>MCPクライアントとサーバーが接続時に能力を確認し合う最初の手順。</td><td class="freq-low">&#9733;</td></tr>
+      <tr><td><strong>JSON-RPC 2.0</strong></td><td>JSON-RPC 2.0</td><td>MCPの通信メッセージ形式。リクエスト・レスポンス・通知の3種類。</td><td class="freq-low">&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- Domain 3: Claude Codeの設定とワークフロー (20%) -->
+  <!-- ============================================ -->
+  <div id="domain3" class="card">
+    <div class="domain-header">Domain 3: Claude Codeの設定とワークフロー（20%）</div>
+
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Claude Code</strong></td><td>Claude Code</td><td>Anthropicが提供するCLIベースのAI開発支援ツール。ターミナルから対話的に利用。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>CLAUDE.md</strong></td><td>CLAUDE.md</td><td>プロジェクト固有のルール・規約をClaude Codeに伝えるMarkdown設定ファイル。起動時に自動読み込み。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Headless Mode</strong></td><td>ヘッドレスモード</td><td><code>claude -p</code>で起動する非対話モード。CI/CDパイプラインやスクリプトからの自動実行に使用。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Hooks</strong></td><td>フック</td><td>特定イベント（PreToolUse/PostToolUse等）で自動実行されるスクリプト。settings.jsonで定義。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>PreToolUse Hook</strong></td><td>ツール実行前フック</td><td>ツール実行前に発火するフック。exit code 2で実行を阻止できる。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>PostToolUse Hook</strong></td><td>ツール実行後フック</td><td>ツール実行後に発火するフック。結果の検証やログ記録に使用。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Permission Mode</strong></td><td>権限モード</td><td>ツール使用の承認レベル。plan/default/acceptEdits/dontAsk/bypassPermissionsの5段階。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>settings.json</strong></td><td>設定ファイル</td><td>Claude Codeの機械的な設定ファイル。権限、MCPサーバー、環境変数をJSON形式で定義。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Managed Settings</strong></td><td>管理設定</td><td>IT管理者が配布する上書き不可の設定。権限設定の優先順位で最も強い。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Custom Slash Command</strong></td><td>カスタムスラッシュコマンド</td><td>.claude/commands/にMarkdownファイルを置いて定義する再利用可能なプロンプトテンプレート。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Plan Mode</strong></td><td>計画モード</td><td>ファイル変更を行わない読み取り専用モード。設計・調査・計画策定に使用。Shift+Tabで切替。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Checkpoint</strong></td><td>チェックポイント</td><td>ファイル変更前の状態を自動保存する機能。/rewindで復元可能。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Worktree</strong></td><td>ワークツリー</td><td>git worktreeを使ってリポジトリの隔離コピーで作業する機能。並列作業に有用。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Session Isolation</strong></td><td>セッション隔離</td><td>複数のCIジョブが同時実行されても互いに干渉しないようにする仕組み。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Batch API (CI/CD)</strong></td><td>バッチAPI（CI/CD）</td><td>CI/CDパイプラインでのバッチ処理。ヘッドレスモードと組み合わせてコスト削減。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Pipe Input</strong></td><td>パイプ入力</td><td>シェルのパイプ（|）でClaude Codeにデータを渡す方法。<code>git diff | claude -p</code>など。</td><td class="freq-low">&#9733;</td></tr>
+      <tr><td><strong>@import Directive</strong></td><td>@importディレクティブ</td><td>CLAUDE.md内で別のMarkdownファイルを読み込む構文。設定の分割管理に使用。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Rule File</strong></td><td>ルールファイル</td><td>.claude/rules/に配置するMarkdown。フロントマターで適用条件を指定し条件付きで自動適用。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Agent Skill</strong></td><td>エージェントスキル</td><td>再利用可能な専門知識をMarkdownにパッケージ化したもの。必要時のみ読み込みコンテキストを節約。</td><td class="freq-low">&#9733;</td></tr>
+      <tr><td><strong>Local Execution Model</strong></td><td>ローカル実行モデル</td><td>Claude Codeがユーザーのマシン上で直接実行される方式。コードがクラウドに永続保存されない。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- Domain 4: プロンプトエンジニアリングと構造化出力 (20%) -->
+  <!-- ============================================ -->
+  <div id="domain4" class="card">
+    <div class="domain-header">Domain 4: プロンプトエンジニアリングと構造化出力（20%）</div>
+
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Prompt Engineering</strong></td><td>プロンプトエンジニアリング</td><td>AIから望ましい出力を得るためにプロンプト（指示文）を設計・最適化する技術。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>System Prompt</strong></td><td>システムプロンプト</td><td>AIの振る舞い・役割・制約を設定する特別なプロンプト。毎回のリクエストに含める。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Few-shot Prompting</strong></td><td>少数例学習</td><td>期待する入出力の例を数個示すことで、AIに出力形式やパターンを学ばせる手法。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Chain of Thought (CoT)</strong></td><td>思考の連鎖</td><td>AIに段階的に推論させることで、複雑な問題の正確性を高める手法。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Extended Thinking</strong></td><td>拡張思考</td><td>Claudeが内部で深く推論してから回答する機能。複雑なタスクの精度を向上させる。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Structured Output</strong></td><td>構造化出力</td><td>AIの出力をJSONなどの決まった形式で返すこと。プログラムによる後続処理に不可欠。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>JSON Outputs (output_config)</strong></td><td>JSON出力</td><td>Claude APIの応答テキストをJSON形式で返させる方式。データ抽出・分類に適する。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Strict Tool Use</strong></td><td>厳密ツール利用</td><td>ツール呼び出しのパラメータがスキーマに100%準拠することを保証する方式。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Constrained Decoding</strong></td><td>制約付きデコーディング</td><td>AIの出力をスキーマ通りに制限する技術。JSON構造（型・必須フィールド）を100%保証。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>JSON Schema</strong></td><td>JSONスキーマ</td><td>JSONデータの構造を定義する「設計図」。必須項目・データ型・選択肢などを規定。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>additionalProperties</strong></td><td>追加プロパティ</td><td>スキーマ定義外のフィールド出力を制御するJSON Schemaのプロパティ。falseにするのがベストプラクティス。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prefill</strong></td><td>プレフィル</td><td>Assistantメッセージに出力冒頭を先に入れる技法。最新モデルでは非推奨（deprecated）。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompt Caching</strong></td><td>プロンプトキャッシング</td><td>同じプロンプトの再利用時にキャッシュから読み込みコストを削減する機能。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompt Injection</strong></td><td>プロンプトインジェクション</td><td>悪意ある入力でAIの指示を上書き・操作しようとする攻撃手法。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Prompt Template</strong></td><td>プロンプトテンプレート</td><td>変数を埋め込んで再利用可能にしたプロンプトの雛形。</td><td class="freq-low">&#9733;</td></tr>
+      <tr><td><strong>Role Prompting</strong></td><td>ロールプロンプティング</td><td>AIに特定の役割（専門家、アシスタント等）を演じさせるプロンプト手法。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Grounding</strong></td><td>グラウンディング</td><td>AIの回答を事実や参照データに基づかせ、ハルシネーションを防ぐ手法。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Pydantic</strong></td><td>パイダンティック</td><td>Pythonのデータ検証ライブラリ。クラス定義からJSON Schemaを自動生成しClaude SDKと連携。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Zod</strong></td><td>ゾッド</td><td>TypeScriptの型検証ライブラリ。zodOutputFormat()でスキーマ生成。</td><td class="freq-low">&#9733;</td></tr>
+      <tr><td><strong>Validation</strong></td><td>バリデーション</td><td>データが正しい形式・制約を満たしているかを検証すること。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Multi-pass Review</strong></td><td>マルチパスレビュー</td><td>複数のパス（処理）を通して出力を検証・改善するアーキテクチャパターン。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>stop_reason</strong></td><td>停止理由</td><td>APIレスポンスの停止理由。end_turn/tool_use/max_tokensなど。ループ制御に使用。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- Domain 5: コンテキスト管理と信頼性 (15%) -->
+  <!-- ============================================ -->
+  <div id="domain5" class="card">
+    <div class="domain-header">Domain 5: コンテキスト管理と信頼性（15%）</div>
+
+    <table class="compare-table">
+      <tr><th>英語</th><th>日本語</th><th>解説</th><th>頻出度</th></tr>
+      <tr><td><strong>Context Window</strong></td><td>コンテキストウィンドウ</td><td>AIが一度に処理できるテキストの最大量。Claudeは非常に長いウィンドウを持つ。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Token</strong></td><td>トークン</td><td>AIがテキストを処理する最小単位。英語1単語は約1トークン、日本語1文字は約1-2トークン。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>RAG (Retrieval-Augmented Generation)</strong></td><td>検索拡張生成</td><td>外部データベースから関連情報を検索し、AIの回答に組み込む手法。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Contextual Retrieval</strong></td><td>文脈的検索</td><td>チャンクに文脈説明を付加してから埋め込み検索する手法。検索精度を大幅に改善。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Chunking</strong></td><td>チャンキング</td><td>長いドキュメントを検索可能な小さな単位に分割すること。RAGの前処理。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Embedding</strong></td><td>埋め込み</td><td>テキストを数値ベクトルに変換すること。意味的に類似したテキストの検索に使用。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Hybrid Search</strong></td><td>ハイブリッド検索</td><td>キーワード検索（BM25等）と意味検索（埋め込み）を組み合わせた検索手法。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Reranking</strong></td><td>リランキング</td><td>検索結果を関連度に基づいて並べ替え、最も関連性の高い結果を上位にする処理。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Hallucination</strong></td><td>ハルシネーション</td><td>AIが事実に基づかない情報を生成する現象。「もっともらしい嘘」とも呼ばれる。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Citation</strong></td><td>引用</td><td>AIの回答に情報源への参照を付与する機能。ハルシネーション対策の一つ。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Rate Limits</strong></td><td>レート制限</td><td>API利用量の上限。RPM（リクエスト/分）、ITPM（入力トークン/分）、OTPM（出力トークン/分）で管理。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>RPM (Requests Per Minute)</strong></td><td>リクエスト/分</td><td>1分間に送信できるAPIリクエスト数の上限。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>ITPM (Input Tokens Per Minute)</strong></td><td>入力トークン/分</td><td>1分間に送信できる入力トークン数の上限。キャッシュ読み取りトークンは非カウント。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Token Bucket</strong></td><td>トークンバケツ</td><td>Rate Limitsの内部実装アルゴリズム。一定速度でトークンを補充し、バースト利用も許容。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Service Tiers</strong></td><td>サービスティア</td><td>APIの処理優先度レベル。Standard（デフォルト）/Priority（SLA付き）/Batch（50%割引）。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Message Batches API</strong></td><td>メッセージバッチAPI</td><td>大量リクエストを非同期一括処理するAPI。50%割引、最大10万件/バッチ、24時間以内に結果返却。</td><td class="freq-high">&#9733;&#9733;&#9733;</td></tr>
+      <tr><td><strong>Exponential Backoff</strong></td><td>指数バックオフ</td><td>リトライ間隔を指数的に増やす手法。Rate Limit超過時のリトライ戦略。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Jailbreak</strong></td><td>ジェイルブレイク</td><td>AIの安全制約を迂回しようとする攻撃手法。プロンプトインジェクションやロールプレイ要求など。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Content Moderation</strong></td><td>コンテンツモデレーション</td><td>AIの入出力から不適切・有害なコンテンツを検出・フィルタリングする仕組み。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Zero Data Retention</strong></td><td>ゼロデータ保持</td><td>APIへの入出力データをAnthropic側で一切保持しないオプション。商用契約で利用可能。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Progressive Summarization</strong></td><td>プログレッシブ要約</td><td>長い会話の過去部分を要約で置き換えてコンテキストを節約する手法。詳細脱落のリスクあり。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Context Positioning</strong></td><td>コンテキストポジショニング</td><td>重要情報をコンテキストの先頭・末尾に配置して注目度を高める手法。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Provenance</strong></td><td>情報出所</td><td>情報がどこから来たかの追跡記録。ソーストラッキング・変換ログ・信頼度スコアの3レベル。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Lost in the Middle</strong></td><td>中間の情報損失</td><td>長いコンテキストの中間部分に配置された情報が見落とされやすい現象。</td><td class="freq-mid">&#9733;&#9733;</td></tr>
+      <tr><td><strong>Case Facts</strong></td><td>ケースファクツ</td><td>要約で失われやすい重要事実を不変のブロックとしてプロンプト先頭に固定配置する手法。</td><td class="freq-low">&#9733;</td></tr>
+    </table>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- アルファベット索引 -->
+  <!-- ============================================ -->
+  <div id="alpha-index-section" class="card">
+    <h2>アルファベット索引（A-Z）</h2>
+    <p>全用語をアルファベット順に一覧表示しています。クリックすると該当ドメインのセクションにジャンプします。</p>
+
+    <div class="alpha-index">
+      <a href="#idx-A">A</a>
+      <a href="#idx-B">B</a>
+      <a href="#idx-C">C</a>
+      <a href="#idx-D">D</a>
+      <a href="#idx-E">E</a>
+      <a href="#idx-F">F</a>
+      <a href="#idx-G">G</a>
+      <a href="#idx-H">H</a>
+      <a href="#idx-I">I</a>
+      <a href="#idx-J">J</a>
+      <a class="disabled">K</a>
+      <a href="#idx-L">L</a>
+      <a href="#idx-M">M</a>
+      <a class="disabled">N</a>
+      <a href="#idx-O">O</a>
+      <a href="#idx-P">P</a>
+      <a class="disabled">Q</a>
+      <a href="#idx-R">R</a>
+      <a href="#idx-S">S</a>
+      <a href="#idx-T">T</a>
+      <a class="disabled">U</a>
+      <a href="#idx-V">V</a>
+      <a href="#idx-W">W</a>
+      <a class="disabled">X</a>
+      <a class="disabled">Y</a>
+      <a href="#idx-Z">Z</a>
+    </div>
+
+    <table class="compare-table">
+      <tr><th>英語用語</th><th>日本語訳</th><th>ドメイン</th></tr>
+
+      <!-- A -->
+      <tr id="idx-A"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">A</td></tr>
+      <tr><td>additionalProperties</td><td>追加プロパティ</td><td>D4</td></tr>
+      <tr><td>Agent</td><td>エージェント</td><td>D1</td></tr>
+      <tr><td>Agent Loop</td><td>エージェントループ</td><td>D1</td></tr>
+      <tr><td>Agent SDK</td><td>エージェントSDK</td><td>D1</td></tr>
+      <tr><td>Agent Skill</td><td>エージェントスキル</td><td>D3</td></tr>
+      <tr><td>Agent-as-Tool</td><td>エージェント的ツール</td><td>D1</td></tr>
+      <tr><td>Agentic System</td><td>エージェント的システム</td><td>D1</td></tr>
+      <tr><td>@import Directive</td><td>@importディレクティブ</td><td>D3</td></tr>
+      <tr><td>Augmented LLM</td><td>拡張LLM</td><td>D1</td></tr>
+
+      <!-- B -->
+      <tr id="idx-B"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">B</td></tr>
+      <tr><td>Batch API (CI/CD)</td><td>バッチAPI（CI/CD）</td><td>D3</td></tr>
+
+      <!-- C -->
+      <tr id="idx-C"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">C</td></tr>
+      <tr><td>Capability Negotiation</td><td>能力交渉</td><td>D2</td></tr>
+      <tr><td>Case Facts</td><td>ケースファクツ</td><td>D5</td></tr>
+      <tr><td>Chain of Thought (CoT)</td><td>思考の連鎖</td><td>D4</td></tr>
+      <tr><td>Checkpoint</td><td>チェックポイント</td><td>D3</td></tr>
+      <tr><td>Chunking</td><td>チャンキング</td><td>D5</td></tr>
+      <tr><td>Citation</td><td>引用</td><td>D5</td></tr>
+      <tr><td>Claude Code</td><td>Claude Code</td><td>D3</td></tr>
+      <tr><td>CLAUDE.md</td><td>CLAUDE.md</td><td>D3</td></tr>
+      <tr><td>Constrained Decoding</td><td>制約付きデコーディング</td><td>D4</td></tr>
+      <tr><td>Content Moderation</td><td>コンテンツモデレーション</td><td>D5</td></tr>
+      <tr><td>Context Positioning</td><td>コンテキストポジショニング</td><td>D5</td></tr>
+      <tr><td>Context Window</td><td>コンテキストウィンドウ</td><td>D5</td></tr>
+      <tr><td>Contextual Retrieval</td><td>文脈的検索</td><td>D5</td></tr>
+      <tr><td>Coordinator</td><td>コーディネーター</td><td>D1</td></tr>
+      <tr><td>Custom Slash Command</td><td>カスタムスラッシュコマンド</td><td>D3</td></tr>
+
+      <!-- D -->
+      <tr id="idx-D"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">D</td></tr>
+      <tr><td>Defense in Depth</td><td>多層防御</td><td>D1</td></tr>
+
+      <!-- E -->
+      <tr id="idx-E"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">E</td></tr>
+      <tr><td>Embedding</td><td>埋め込み</td><td>D5</td></tr>
+      <tr><td>Escalation</td><td>エスカレーション</td><td>D1</td></tr>
+      <tr><td>Evaluator-Optimizer</td><td>評価者-最適化者</td><td>D1</td></tr>
+      <tr><td>Exponential Backoff</td><td>指数バックオフ</td><td>D5</td></tr>
+      <tr><td>Extended Thinking</td><td>拡張思考</td><td>D4</td></tr>
+
+      <!-- F -->
+      <tr id="idx-F"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">F</td></tr>
+      <tr><td>Fallback</td><td>フォールバック</td><td>D1</td></tr>
+      <tr><td>Few-shot Prompting</td><td>少数例学習</td><td>D4</td></tr>
+
+      <!-- G -->
+      <tr id="idx-G"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">G</td></tr>
+      <tr><td>Graceful Degradation</td><td>段階的品質低下</td><td>D1</td></tr>
+      <tr><td>Grounding</td><td>グラウンディング</td><td>D4</td></tr>
+      <tr><td>Guardrails</td><td>ガードレール</td><td>D1</td></tr>
+
+      <!-- H -->
+      <tr id="idx-H"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">H</td></tr>
+      <tr><td>Hallucination</td><td>ハルシネーション</td><td>D5</td></tr>
+      <tr><td>Handoff</td><td>ハンドオフ</td><td>D1</td></tr>
+      <tr><td>Headless Mode</td><td>ヘッドレスモード</td><td>D3</td></tr>
+      <tr><td>HITL (Human-in-the-Loop)</td><td>ヒューマン・イン・ザ・ループ</td><td>D1</td></tr>
+      <tr><td>Hooks</td><td>フック</td><td>D3</td></tr>
+      <tr><td>Hub-and-Spoke</td><td>ハブ＆スポーク</td><td>D1</td></tr>
+      <tr><td>Hybrid Search</td><td>ハイブリッド検索</td><td>D5</td></tr>
+
+      <!-- I -->
+      <tr id="idx-I"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">I</td></tr>
+      <tr><td>Idempotency</td><td>べき等性</td><td>D1</td></tr>
+      <tr><td>Initialization Handshake</td><td>初期化ハンドシェイク</td><td>D2</td></tr>
+      <tr><td>input_schema</td><td>入力スキーマ</td><td>D2</td></tr>
+      <tr><td>is_error</td><td>エラーフラグ</td><td>D2</td></tr>
+      <tr><td>isRetryable</td><td>リトライ可能フラグ</td><td>D2</td></tr>
+      <tr><td>Isolation</td><td>隔離</td><td>D1</td></tr>
+      <tr><td>ITPM (Input Tokens Per Minute)</td><td>入力トークン/分</td><td>D5</td></tr>
+
+      <!-- J -->
+      <tr id="idx-J"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">J</td></tr>
+      <tr><td>Jailbreak</td><td>ジェイルブレイク</td><td>D5</td></tr>
+      <tr><td>JSON Outputs (output_config)</td><td>JSON出力</td><td>D4</td></tr>
+      <tr><td>JSON Schema</td><td>JSONスキーマ</td><td>D4</td></tr>
+      <tr><td>JSON-RPC 2.0</td><td>JSON-RPC 2.0</td><td>D2</td></tr>
+
+      <!-- L -->
+      <tr id="idx-L"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">L</td></tr>
+      <tr><td>Least Privilege</td><td>最小権限</td><td>D1</td></tr>
+      <tr><td>Local Execution Model</td><td>ローカル実行モデル</td><td>D3</td></tr>
+      <tr><td>Lost in the Middle</td><td>中間の情報損失</td><td>D5</td></tr>
+
+      <!-- M -->
+      <tr id="idx-M"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">M</td></tr>
+      <tr><td>Managed Settings</td><td>管理設定</td><td>D3</td></tr>
+      <tr><td>MCP (Model Context Protocol)</td><td>MCP</td><td>D2</td></tr>
+      <tr><td>MCP Client</td><td>MCPクライアント</td><td>D2</td></tr>
+      <tr><td>MCP Host</td><td>MCPホスト</td><td>D2</td></tr>
+      <tr><td>MCP Server</td><td>MCPサーバー</td><td>D2</td></tr>
+      <tr><td>Message Batches API</td><td>メッセージバッチAPI</td><td>D5</td></tr>
+      <tr><td>Multi-pass Review</td><td>マルチパスレビュー</td><td>D4</td></tr>
+
+      <!-- O -->
+      <tr id="idx-O"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">O</td></tr>
+      <tr><td>Observability</td><td>観測可能性</td><td>D1</td></tr>
+      <tr><td>Orchestration</td><td>オーケストレーション</td><td>D1</td></tr>
+      <tr><td>Orchestrator-Workers</td><td>オーケストレータ-ワーカー</td><td>D1</td></tr>
+
+      <!-- P -->
+      <tr id="idx-P"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">P</td></tr>
+      <tr><td>Parallel Tool Use</td><td>並列ツール呼び出し</td><td>D2</td></tr>
+      <tr><td>Parallelization</td><td>並列化</td><td>D1</td></tr>
+      <tr><td>Permission Mode</td><td>権限モード</td><td>D3</td></tr>
+      <tr><td>Pipe Input</td><td>パイプ入力</td><td>D3</td></tr>
+      <tr><td>Plan Mode</td><td>計画モード</td><td>D3</td></tr>
+      <tr><td>PostToolUse Hook</td><td>ツール実行後フック</td><td>D3</td></tr>
+      <tr><td>Prefill</td><td>プレフィル</td><td>D4</td></tr>
+      <tr><td>PreToolUse Hook</td><td>ツール実行前フック</td><td>D3</td></tr>
+      <tr><td>Programmatic Enforcement</td><td>プログラム的エンフォースメント</td><td>D1</td></tr>
+      <tr><td>Progressive Summarization</td><td>プログレッシブ要約</td><td>D5</td></tr>
+      <tr><td>Prompt Caching</td><td>プロンプトキャッシング</td><td>D4</td></tr>
+      <tr><td>Prompt Chaining</td><td>プロンプト連鎖</td><td>D1</td></tr>
+      <tr><td>Prompt Engineering</td><td>プロンプトエンジニアリング</td><td>D4</td></tr>
+      <tr><td>Prompt Injection</td><td>プロンプトインジェクション</td><td>D4</td></tr>
+      <tr><td>Prompt Template</td><td>プロンプトテンプレート</td><td>D4</td></tr>
+      <tr><td>Prompts (MCP)</td><td>プロンプト（MCP）</td><td>D2</td></tr>
+      <tr><td>Provenance</td><td>情報出所</td><td>D5</td></tr>
+      <tr><td>Pydantic</td><td>パイダンティック</td><td>D4</td></tr>
+
+      <!-- R -->
+      <tr id="idx-R"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">R</td></tr>
+      <tr><td>RAG (Retrieval-Augmented Generation)</td><td>検索拡張生成</td><td>D5</td></tr>
+      <tr><td>Rate Limits</td><td>レート制限</td><td>D5</td></tr>
+      <tr><td>Reranking</td><td>リランキング</td><td>D5</td></tr>
+      <tr><td>Resources</td><td>リソース</td><td>D2</td></tr>
+      <tr><td>Role Prompting</td><td>ロールプロンプティング</td><td>D4</td></tr>
+      <tr><td>Roots</td><td>ルーツ</td><td>D2</td></tr>
+      <tr><td>Routing</td><td>ルーティング</td><td>D1</td></tr>
+      <tr><td>RPM (Requests Per Minute)</td><td>リクエスト/分</td><td>D5</td></tr>
+      <tr><td>Rule File</td><td>ルールファイル</td><td>D3</td></tr>
+
+      <!-- S -->
+      <tr id="idx-S"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">S</td></tr>
+      <tr><td>Sampling</td><td>サンプリング</td><td>D2</td></tr>
+      <tr><td>Sectioning</td><td>セクショニング</td><td>D1</td></tr>
+      <tr><td>Secure Deployment</td><td>安全なデプロイ</td><td>D1</td></tr>
+      <tr><td>Service Tiers</td><td>サービスティア</td><td>D5</td></tr>
+      <tr><td>Session Isolation</td><td>セッション隔離</td><td>D3</td></tr>
+      <tr><td>settings.json</td><td>設定ファイル</td><td>D3</td></tr>
+      <tr><td>stdio</td><td>標準入出力</td><td>D2</td></tr>
+      <tr><td>stop_reason</td><td>停止理由</td><td>D4</td></tr>
+      <tr><td>Streamable HTTP</td><td>ストリーマブルHTTP</td><td>D2</td></tr>
+      <tr><td>Strict Mode (strict: true)</td><td>厳密モード</td><td>D2</td></tr>
+      <tr><td>Strict Tool Use</td><td>厳密ツール利用</td><td>D4</td></tr>
+      <tr><td>Structured Output</td><td>構造化出力</td><td>D4</td></tr>
+      <tr><td>Sub-agent</td><td>サブエージェント</td><td>D1</td></tr>
+      <tr><td>System Prompt</td><td>システムプロンプト</td><td>D4</td></tr>
+
+      <!-- T -->
+      <tr id="idx-T"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">T</td></tr>
+      <tr><td>Token</td><td>トークン</td><td>D5</td></tr>
+      <tr><td>Token Bucket</td><td>トークンバケツ</td><td>D5</td></tr>
+      <tr><td>Tool Choice</td><td>ツール選択</td><td>D2</td></tr>
+      <tr><td>Tool Definition</td><td>ツール定義</td><td>D2</td></tr>
+      <tr><td>Tool Use / Function Calling</td><td>ツール利用</td><td>D2</td></tr>
+
+      <!-- V -->
+      <tr id="idx-V"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">V</td></tr>
+      <tr><td>Validation</td><td>バリデーション</td><td>D4</td></tr>
+      <tr><td>Voting</td><td>投票</td><td>D1</td></tr>
+
+      <!-- W -->
+      <tr id="idx-W"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">W</td></tr>
+      <tr><td>Worktree</td><td>ワークツリー</td><td>D3</td></tr>
+
+      <!-- Z -->
+      <tr id="idx-Z"><td colspan="3" style="background:var(--accent-light);font-weight:700;color:var(--accent);">Z</td></tr>
+      <tr><td>Zero Data Retention</td><td>ゼロデータ保持</td><td>D5</td></tr>
+      <tr><td>Zod</td><td>ゾッド</td><td>D4</td></tr>
+    </table>
+  </div>
+
+  <!-- Navigation -->
+  <div style="margin-top:2rem; text-align:center;">
+    <a class="btn btn-outline" href="index.html">学習サイトに戻る</a>
+  </div>
+
+</div>
+</body>
+</html>
